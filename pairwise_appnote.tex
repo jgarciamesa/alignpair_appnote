@@ -1,0 +1,71 @@
+\include{header.tex}
+
+% document begins here
+\begin{document}
+% \vspace*{0.35in}
+
+% title goes here:
+\begin{flushleft}
+{\Large\textbf{COATi: }}
+% codon-aware pairwise aligner + artifacts
+\newline
+% authors go here:
+\\
+Juan J. Garcia Mesa\textsuperscript{1,2},
+Reed A. Cartwright\textsuperscript{1,3}
+\\
+\bigskip
+1 Biodesign Institute, Arizona State University
+\\
+2 Ira A. Schools of Engineering, Arizona State University
+\\
+3 School of Life Sciences, Arizona State University
+\\
+\bigskip
+* corresponding@author.mail
+
+\end{flushleft}
+
+% \abstract{Abstract}
+\begin{abstract}
+\noindent \textbf{Summary:} COATi is a statistical codon-aware pairwise aligner
+that supports complex insertion-deletion models and is able to handle artifacts
+present in genomic data.\\  % abstract summary can be longer.
+\textbf{Availability:} The source code, along with documentation, for COATi is
+freely available on GitHub: \url{https://github.com/CartwrightLab/coati} and is
+implemented in C++.\\
+\textbf{Supplementary information:} %\green{TODO}.
+\end{abstract}
+
+
+% now start line numbers
+\linenumbers
+
+\input{introduction}
+
+\input{description2}
+
+\input{results}
+
+\section{Conclusions/Discussion}
+
+COATi is an FST-based application that can find the optimal alignment between a
+pair of sequences in the presence of artifacts using a statistical model.
+% \green{(continue)}
+
+\section*{Acknowledgments}
+
+The author(s) would like to thank \green{person1}, \green{person2}, and
+\green{number} reviewers for their helpful suggestions.
+
+\subsection*{Funding}
+This research was founded by an NSF-IIBR grant (\green{grant number}).\\
+
+\noindent \textit{Conflict of interest:} none declared.
+
+% \section{References}
+% \printbibliography
+
+\nolinenumbers
+
+\end{document}

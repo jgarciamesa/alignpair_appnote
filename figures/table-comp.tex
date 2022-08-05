@@ -1,0 +1,58 @@
+% \begin{table}[h!]
+% \begin{adjustbox}{width=\columnwidth,center}
+\definecolor{asublue}{RGB}{0,163,224}
+
+\begingroup\centering
+\begin{tabular}{r|ccccc}
+      & \textbf{COATi} & \textbf{PRANK} & \textbf{MAFFT} & \textbf{Clustal$\Omega$} & \textbf{MACSE}\\
+\hline
+Avg alignment error ($d_{seq}$) & \cellcolor{asublue!25}0.00060 & 0.01086 & 0.00671 & 0.01300 & 0.00611\\
+Perfect alignments & \cellcolor{asublue!25}1300 & 86 & 1282 & 634 & 1059\\
+Best alignments & \cellcolor{asublue!25}1756 & 188 & 1463 & 666 & 1129\\
+Imperfect alignments & \cellcolor{asublue!25}437 & 1651 & 455 & 1109 & 678\\
+% \hline
+Accuracy of positive selection & \cellcolor{asublue!25}97.3\pct & 87.3\pct & 85.8\pct & 69.1\pct & 81.5\pct\\
+Accuracy of negative selection & \cellcolor{asublue!25}99.8\pct & 98.9\pct & 98.7\pct & 97.3\pct & 98.5\pct
+\end{tabular}
+\par\endgroup
+% \end{adjustbox}
+% \end{table}
+
+% NEWEST comparison data 2022/06/09, inferring gaps from all 5 methods
+% mcoati	0.00059 9270130816151
+% prank		0.01086 33839725945
+% mafft		0.00670 545158536942
+% clustalo	0.01299 61253293471
+% macse		0.00611 069632339777
+% [1] "Perfect alignments"
+%   mcoati    prank    mafft clustalo    macse
+%     1300       86     1282      634     1059
+% [1] "Best alignments"
+% [1] 1756  188 1463  666 1129
+% [1] "Imperfect alignments"
+% [1]  437 1651  455 1103  678
+% [1] "Species gorilla with model mcoati"
+% [1] "ka root mean-squared error:0.000461080945838058"
+% [1] "ks root mean-squared error:0.000935195768612048"
+% [1] "Accuracy of + selection:0.973404255319149"
+% [1] "Accuracy of - selection:0.99767549976755"
+% [1] "Species gorilla with model prank"
+% [1] "ka root mean-squared error:0.0428559577365695"
+% [1] "ks root mean-squared error:0.225105734336453"
+% [1] "Accuracy of + selection:0.87292817679558"
+% [1] "Accuracy of - selection:0.989287377736376"
+% [1] "Species gorilla with model mafft"
+% [1] "ka root mean-squared error:0.0307718945528414"
+% [1] "ks root mean-squared error:0.039579523100722"
+% [1] "Accuracy of + selection:0.857881136950904"
+% [1] "Accuracy of - selection:0.987182474947565"
+% [1] "Species gorilla with model clustalo"
+% [1] "ka root mean-squared error:0.0490336010168609"
+% [1] "ks root mean-squared error:0.0641562105407489"
+% [1] "Accuracy of + selection:0.691292875989446"
+% [1] "Accuracy of - selection:0.972784368457781"
+% [1] "Species gorilla with model macse"
+% [1] "ka root mean-squared error:0.0241886043324206"
+% [1] "ks root mean-squared error:0.0544004979209871"
+% [1] "Accuracy of + selection:0.81524926686217"
+% [1] "Accuracy of - selection:0.985473829836292"

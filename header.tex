@@ -1,0 +1,37 @@
+\RequirePackage{luatex85}
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage[letterpaper,margin=1in]{geometry}
+\setlength{\parskip}{5px}
+\usepackage{url}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{mathptmx}[ptm]
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+% \usepackage[scaled]{helvet}
+\usepackage[compact,tiny]{titlesec}
+\usepackage[backend=biber, style=nature, citestyle=authoryear, uniquename=init]{biblatex}
+\usepackage{tikz}
+\usepackage{wrapfig, framed}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[hidelinks]{hyperref}
+\usepackage{listings}
+\usepackage{relsize}
+\usepackage[left]{lineno}
+\usepackage{colortbl}
+
+\pagenumbering{arabic}
+\bibliography{pairwise_appnote.bib}
+\newcommand*\pct{\scalebox{.9}{\%}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black
+}

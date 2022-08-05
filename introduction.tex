@@ -1,0 +1,32 @@
+\section{Introduction}
+
+% sequence alignment is important and heavily used
+Sequence alignment is a fundamental task in bioinformatics and a cornerstone
+step in comparative and functional genomic studies
+\parencite{sequence_alignment_rosenberg_2009}.
+% often seen as an ad hoc problem
+Modern sequence analysis began with the heuristic homology algorithms of
+Needleman and Wunsch in 1970 \parencite{identification_smith_1981} and has
+progressed to arrive at current aligners.
+However, the alignment of molecular sequences is, in practice, often seen as a
+tool and the alignment inference as an ad hoc problem
+\parencite{morrison_MSA_2018}.
+
+% despite available aligners, there is room for improvement
+% summarize sentence into ~ "alignment is performed in the amino acid space"
+A common strategy is to perform alignment inference in the amino acid space
+\parencite{bininda2005transalign,abascal2010translatorx}.
+While this approach is an improvement over DNA models, it discards information,
+underperforms compared to alignment at the codon level, and fails in the
+presence of artifacts.
+% to correct this common practice is to discard lots of data
+Given that errors and artifacts are common in molecular data, this requires
+costly curation practices that discard large amounts of information.
+% errors in genomic data that lead to erroneous downstream analyses
+When uncorrected, errors in genomic datasets can lead to erroneous results in
+functional and comparative genomic studies \parencite{estimates_schneider_2009}.
+
+% to address this, we present COATi
+Here we present COATi, short for COdon-Aware Alignment Transducer, a statistical
+pairwise aligner that incorporates codon substitution models and is
+robust to artifacts present in genomic data.
