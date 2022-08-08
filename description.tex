@@ -17,17 +17,17 @@ Pairwise alignment in COATi is implemented via the Evolution FST (Fig.
 \ref{fig:evolution-fst}), based on existing transducers (e.g.
 \cite{holmes2001evolutionary}).
 The Evolution FST is formed by composing a substitution FST that encodes a 64x64
-codon model and an indel FST that models insertions and deletions, including
-frameshifts.
+codon model (Fig. \ref{fig:evolution-fst}-a) and an indel FST that models
+insertions and deletions, including frameshifts (Fig. \ref{fig:evolution-fst}-b).
 The innovation of the Evolution FST with respect to other transducers is the
-combination of a codon substitution model with gaps that can occur at any
-position of any length.
+combination of a codon substitution model that allows stop codons with gaps that
+can occur at any position of any length.
 
 \begin{figure}[h!]
 \begin{framed}
 \centering
     \includegraphics[width=\textwidth]{fig-evolution-fst.pdf}
-    \caption{The evolution FST is assembled by composing a substitution FST and
+    \caption{The Evolution FST is assembled by composing a substitution FST and
     an indel FST. Each node represents a state in an FST while arcs display
     possible transitions between states (and their weights). Absorption and
     emission of symbols occurs between states. (a) The substitution FST
@@ -53,5 +53,5 @@ I talk about time)}.
 Despite the existence of efficient C++ FST libraries (e.g. openFST
 \cite{allauzen2007openfst}), runtime is still limiting for sequence longer than
 a few thousand nucleotides.
-\green{To solve this issue, the search for an optimal path (alignment)} can be
+\green{To solve this issue, the search for an optimal path (alignment)} is
 reformulated as a dynamic programming problem.

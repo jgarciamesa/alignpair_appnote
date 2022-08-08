@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := pairwise_appnote.pdf
 
-TEX_FILES := $(addsuffix .tex, pairwise_appnote description header introduction results)
+TEX_FILES := $(addsuffix .tex, pairwise_appnote description header introduction results description2)
 
 outline.pdf: outline.tex
 	@latexmk -pdf $<
