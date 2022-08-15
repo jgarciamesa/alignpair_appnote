@@ -21,14 +21,13 @@ A common strategy is to perform alignment inference in the amino acid space
 While this approach is an improvement over DNA models, it discards information,
 underperforms compared to alignment at the codon level, and fails in the
 presence of artifacts such as frameshifts and early stop codons.
-% to correct this common practice is to discard lots of data
-Given that errors and artifacts are common in molecular data, this requires
-costly curation practices that discard large amounts of information.
 % errors in genomic data that lead to erroneous downstream analyses
 Errors in genomic datasets can lead to erroneous results in
 functional and comparative genomic studies \parencite{estimates_schneider_2009}.
-
+% to correct this common practice is to discard lots of data
+Given that errors and artifacts are common in molecular data, this requires
+costly curation practices that discard large amounts of information.
 % to address this, we present COATi
-Here we present COATi, short for COdon-Aware Alignment Transducer, a statistical
-pairwise aligner that incorporates codon substitution models and is
-robust to artifacts present in genomic data.
+To address this, we present COATi, short for COdon-Aware Alignment Transducer,
+a statistical pairwise aligner that incorporates codon substitution models and
+is robust to artifacts present in genomic data.
