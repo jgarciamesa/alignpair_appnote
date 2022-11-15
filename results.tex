@@ -1,25 +1,6 @@
 \section{Results}
 % prelim data comparison?
 
-Using 4000 human genes and their gorilla homologous pairs from the ENSEMBL
-database \parencite{ensembl_hubbard_2002} we simulated a data set of pairwise
-alignments with empirical gap patterns.
-We used the data set to evaluate the accuracy of popular cutting edge aligners
-Clustal$\Omega$ v1.2.4, %\parencite{clustal_omega_sievers_2011},
-MACSE v2.06 \parencite{ranwez_macse_2011}, MAFFT v7.407, and
-%\parencite{mafft_katoh_2002}
-PRANK v.170427 % \parencite{prank_loytynoja_2014}
-together with COATi.
-
-After downloading, 1660 alignments contained gaps identified by at least one
-aligner.
-We randomly introduced gap patterns extracted from all five methods into the
-2340 initially ungapped sequence pairs to generate the true alignments.
-Alignment accuracy was measured using the distance metric $d_{seq}$
-\parencite{metrics_blackburne_whelan_2011} between simulated and inferred
-alignments.
-In addition, accuracy of positive and negative selection was calculated
-using the $F_1$ score by estimating $k_s$ and $k_a$ statistics.
 % by estimating $k_s$ and $k_a$ statistics.
 
 % % Software comparison table
@@ -35,22 +16,22 @@ using the $F_1$ score by estimating $k_s$ and $k_a$ statistics.
 % 	\label{table:comp}
 % \end{table}
 
-COATi was significantly (p < $1.714$x$10^{-8}$) more accurate at inferring
-simulated alignments compared to other aligners according to the one-tailed
-Wilcoxon signed ranked test, with an average alignment error ($d_{seq}$) value
-of $6$x$10^{-4}$.
+Both models in COATi were significantly (p < $2.2$x$10^{-16}$) more accurate at
+inferring simulated alignments compared to other aligners according to the
+one-tailed Wilcoxon signed ranked test, with an average alignment error
+($d_{seq}$) value of $1$x$10^{-3}$.
 In addition, COATi produced more perfect alignments ($d_{seq}=0$), less imperfect
-alignments, and more accurately retrieved events of positive selection (97.3\%).
+alignments, and more accurately retrieved events of positive selection
+(fst model 91.9\%, marginal model 90.8\%) (Supplementary Table 1).
 Compared to COATi, MACSE (allows frameshifts) and MAFFT (using DNA) had an
-average alignment error an order of magnitude larger than COATi ($6$x$10^{-3}$)
-and a lower accuracy retrieving events of positive selection at a rate of 81.5\%
+average alignment error an order of magnitude larger than COATi and a lower
+accuracy retrieving events of positive selection at a rate of 81.5\%
 and 85.8\% respectively.
 PRANK (using codons) and Clustal$\Omega$ (using amino acid translations) had
-an average alignment error two orders of magnitude larger than COATi ($0.01$)
-and a 87.3\% and 69.1\% accuracy retrieving events of positive selection,
-respectively.
+an average alignment error two orders of magnitude larger than COATi and a
+87.3\% and 69.1\% accuracy retrieving events of positive selection, respectively.
 The accuracy retrieving events of negative selection was similar across all five
-aligners (98.6\% $\pm$ 1.25\%).
+aligners (97.7\% $\pm$ 1.67\%).
 
 % (Table \ref{table:comp}).
 

@@ -113,10 +113,10 @@
 \draw[line] (U1) -- node[w,pos=0.1,right] {$1-e$} (W1);
 \draw[line] (W1) -- node[w] {$g$} (D1);
 \draw[line] (W1) -- node[w] {$1-g$} (M1);
+\draw[line] (W1) to[out=330,in=210] (end1);
 \draw[line] (V1) to[out=150,in=30] node[w,above] {$e$} (D1);
 \draw[line] (D1) to[out=60,in=90] (end1 |- D1.south) to (end1);
 \draw[line] (V1) -- node[w,swap] {$1-e$} (M1);
-\draw[line] (M1) --  (end1);
 
 
 \draw[line] (I1) to[bend right=20] (U1);
@@ -136,7 +136,7 @@
 \draw[line] (M1) to[bend left=48] (S1);
 \draw[line] (M1) to[bend left=51] (S1);
 
-\draw[line] (M1) to[bend left=45] node[e,pos=0.25] {YYY\textrightarrow{}ZZZ} (S1);
+\draw[line] (M1) to[bend left=45] node[e,pos=0.25] {Y\textrightarrow{}Z} (S1);
 
 % \node[below left=7.5mm and 1mm of I1.east,text width=50mm,anchor=north west] {
 % \begin{tabular}{r@{\,: }l}
