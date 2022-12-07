@@ -1,23 +1,17 @@
-.DEFAULT_GOAL := pairwise_appnote.pdf
+.DEFAULT_GOAL := alignpair_letter.pdf
 
-TEX_FILES := $(addsuffix .tex, pairwise_appnote description header introduction results methods)
-FIGS := $(addprefix figures/, fig-evolution-fst.pdf)
+TEX_FILES := $(addsuffix .tex, alignpair_letter header abstract introduction materials_methods results_discussion)
+FIGS := $(addprefix figures/, fig-evolution-fst.pdf fig-aln.pdf)
 
-.PHONY: default
-default: outline.pdf
-
-outline.pdf: outline.tex
-	@latexmk -pdf $<
-
-pairwise_appnote.pdf: $(TEX_FILES) pairwise_appnote.bib $(FIGS)
+alignpair_letter.pdf: $(TEX_FILES) alignpair_letter.bib $(FIGS)
 	@latexmk -pdf $<
 	@make clean
 
-figures/fig-evolution-fst.pdf: figures/fig-evolution-fst.tex
+figures/fig-%.pdf: figures/fig-%.tex
 	@lualatex $<
 	@mv $(@F) figures/
 
-suppl.pdf: suppl.tex
+suppl.pdf: suppl.tex figures/table-comp.tex
 	@latexmk -pdf $<
 	@make clean
 

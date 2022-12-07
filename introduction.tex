@@ -1,25 +1,34 @@
-\section{Introduction}
+\section*{Introduction}
 
-% sequence alignment is important and heavily used
-Sequence alignment is a cornerstone step in bioinformatics
-\parencite{sequence_alignment_rosenberg_2009}.
-% errors in genomic data that lead to erroneous downstream analyses
-Uncorrected errors in sequence alignment can lead to erroneous results in
-functional and comparative genomic studies \parencite{estimates_schneider_2009}.
-% to correct this common practice is to discard lots of data
-Given that errors and artifacts are common in molecular data, this requires
-costly curation practices that discard large amounts of information.
-% despite available aligners, there is room for improvement
-% summarize sentence into ~ "alignment is performed in the amino acid space"
-In addition, a common strategy is to perform alignment inference in the amino
-acid space \parencite{bininda2005transalign,abascal2010translatorx}.
-While this approach is an improvement over DNA models, it discards information,
-underperforms compared to alignment at the codon level, and fails in the
-presence of artifacts such as frameshifts and early stop codons.
-Although some aligners incorporate codon substitution models, they do not
-support frameshifts or lack as statistical model.
+Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \parencite{sequence_alignment_rosenberg_2009}.
+Modern sequence analysis began with the heuristic homology algorithms of Needleman and Wunsch in 1970 \parencite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \parencite{art_morrison_2015}.
 
-% to address this, we present COATi
-To address this problem, we present COATi, short for COdon-Aware Alignment
-Transducer, a statistical pairwise aligner that incorporates codon substitution
-models and is robust to artifacts present in genomic data.
+A common strategy is to perform alignment inference in the amino acid space \parencite{bininda2005transalign,abascal2010translatorx}.
+While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts such as frameshifts and early stop codons.
+Although some aligners incorporate codon substitution models, they do not support frameshifts or lack a statistical model.
+In addition, while modeling indels to appear within codons is rare, this is often the case (Zhu \& Cartwright, personal communication, 2019).
+Considering gaps to only appear between codons can result in missing the optimal alignment and inflate estimates of sequence divergence (Fig. \ref{fig:aln}).
+
+\begin{figure}[h!]
+% \begin{framed}
+    \begin{minipage}[c]{0.65\textwidth}
+        \includegraphics[scale=1]{fig-aln.pdf}
+    \end{minipage}\hfill
+    \begin{minipage}[c]{0.35\textwidth}
+        \caption{
+        \textbf{Standard algorithms produce suboptimal alignments.}
+        (a) shows a possible alignment of an ancestor (A) sequence and a descendant (D) sequence.
+        (b), (c), and (d) are the results of different aligners.
+        Nucleotide mismatches are highlighted in red, phase zero, one, and two indels are shown in gray, purple, and orange, respectively.
+        Phase one indel (purple) is also of type I (synonymous) while phase two indel (orange) is of type II (nonsynonymous). 
+        COATi is able to retrieve the biological alignment (highlighted in blue).
+        }
+    \label{fig:aln}
+    \end{minipage}
+% \end{framed}
+\end{figure}
+
+Uncorrected errors in the alignment stage can lead to erroneous results in comparative and functional genomic studies \parencite{estimates_schneider_2009}.
+Current methods are ill-equipped to handle common artifacts in genomic data, requiring costly curation practices that discard significant amounts of information.
+To address this problem, we present COATi, short for COdon-aware Alignment Transducer, a pairwise statistical aligner that incorporates codon substitution models and is robust to artifacts present in modern genomic data.
+

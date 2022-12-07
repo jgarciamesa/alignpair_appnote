@@ -113,9 +113,9 @@
 \draw[line] (U1) -- node[w,pos=0.1,right] {$1-e$} (W1);
 \draw[line] (W1) -- node[w] {$g$} (D1);
 \draw[line] (W1) -- node[w] {$1-g$} (M1);
-\draw[line] (W1) to[out=330,in=210] (end1);
+\draw[line] (M1) -- (end1);
 \draw[line] (V1) to[out=150,in=30] node[w,above] {$e$} (D1);
-\draw[line] (D1) to[out=60,in=90] (end1 |- D1.south) to (end1);
+\draw[line] (D1) to[out=60,in=90] node[w] {$1-e$} (end1 |- D1.south) to (end1);
 \draw[line] (V1) -- node[w,swap] {$1-e$} (M1);
 
 

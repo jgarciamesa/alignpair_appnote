@@ -1,1 +1,1 @@
-COATi pairwise application note manuscript.
+COATi pairwise letter manuscript.

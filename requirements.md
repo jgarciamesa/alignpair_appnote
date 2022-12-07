@@ -23,5 +23,22 @@
 - Longer Brief Communications can be considered with proper justification and may be submitted as Letters and Articles.
 - No subsections are allowed and the Materials and Methods section, if necessary, should be included in the Supplementary Materials.
 
+## MBE - Letter
 
+Letters are short articles that present significant discoveries, methods, and resources.
+
+- Letters begin with an abstract of up to 150 words.
+- The main text in the letter is no more than 2,000 words and may contain subsections and up to three figures.
+- A brief Materials and Methods section may follow the main text (this text is included in the word count).
+- Letters presenting new methods or resources should include a New Approaches section after the introductory paragraph(s). (See General Author Guidelines for
+all other information on manuscript preparation.)
+
+## MBE - Latex Submissions
+% https://academic.oup.com/mbe/pages/General_Author_Guidelines#LaTeX%20Submissions
+- Typescripts should be double-spaced.
+- Please number each page.
+- When creating the PDF file from standard word processing packages, it is
+important to select the option "embed all fonts" (or equivalent) to ensure that
+mathematical symbols appear correctly. Failure to do so may result in an
+unreadable submission.
 
