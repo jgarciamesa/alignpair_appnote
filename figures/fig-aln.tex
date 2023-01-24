@@ -28,9 +28,10 @@
 \definecolor{asublue}{RGB}{0,163,224}
 
 \tikzstyle{aln}=[matrix of nodes, nodes in empty cells]
-\tikzstyle{best}=[fill=asublue!20,rounded corners]
+%\tikzstyle{best}=[fill=asublue!20,rounded corners]
+\tikzstyle{best}=[rounded corners]
 \tikzstyle{lab}=[font=\normalsize]
-\tikzstyle{indel}=[thick, rounded corners]
+\tikzstyle{indel}=[ultra thick, rounded corners]
 \tikzstyle{phase0}=[draw=colorGy]
 \tikzstyle{phase1}=[draw=colorP]
 \tikzstyle{phase2}=[draw=colorO]
@@ -67,7 +68,7 @@ D: & TCC & CA\e{G} & \verb|---| & GGG & CGG & TC\e{C} & CAG & GAC & GCC & ACG\\
 \draw [indel,phase0] (prank-2-11.north west) rectangle (prank-3-11.south east);
 \draw [indel,phase0] (prank-2-4.north west) rectangle (prank-3-4.south east);
 
-\node (titleMafftClustalo) [below right=2.4cm and -2.75cm of titlePrank] {\textbf{c) MAFFT \& Clustal$\pmb{\Omega}$ \& MACSE}};
+\node (titleMafftClustalo) [below right=2.4cm and -2.75cm of titlePrank] {\textbf{c) MAFFT, Clustal$\pmb{\Omega}$, and MACSE}};
 % mafft dna & clustalo amino acids
 \matrix(mafft-clustalo) [aln,below right=-1mm and -4.75cm of titleMafftClustalo] {
    & Ser & His     & Lys     & Gly     & Arg     & Ser & Asp & Ala & \\

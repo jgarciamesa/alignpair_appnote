@@ -1,12 +1,12 @@
 \section*{Introduction}
 
-Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \parencite{sequence_alignment_rosenberg_2009}.
-Modern sequence analysis began with the heuristic homology algorithms of Needleman and Wunsch in 1970 \parencite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \parencite{art_morrison_2015}.
-
-A common strategy is to perform alignment inference in the amino acid space \parencite{bininda2005transalign,abascal2010translatorx}.
+Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \parencite{sequence_alignment_rosenberg_2009}. While sophisticated advances have been made, the challenge of alignment inference has not been fully solved \parencite{art_morrison_2015}.
+%Modern sequence analysis began with the heuristic homology algorithms of \textcite{Needleman1970} and \textcite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \parencite{art_morrison_2015}. 
+%
+The alignment of protein coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space \parencite[e.g.][]{bininda2005transalign,abascal2010translatorx}.
 While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts such as frameshifts and early stop codons.
 Although some aligners incorporate codon substitution models, they do not support frameshifts or lack a statistical model.
-In addition, while modeling indels to appear within codons is rare, this is often the case (Zhu \& Cartwright, personal communication, 2019).
+In addition, while modeling indels to appear within codons is rare, this is often the case (\TODO{cite Ziqi's dissertation here and the mouse genome paper}).
 Considering gaps to only appear between codons can result in missing the optimal alignment and inflate estimates of sequence divergence (Fig. \ref{fig:aln}).
 
 \begin{figure}[h!]
