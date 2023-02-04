@@ -9,23 +9,20 @@ Although some aligners incorporate codon substitution models, they do not suppor
 In addition, while modeling indels to appear within codons is rare, this is often the case (\TODO{cite Ziqi's dissertation here and the mouse genome paper}).
 Considering gaps to only appear between codons can result in missing the optimal alignment and inflate estimates of sequence divergence (Fig. \ref{fig:aln}).
 
+% Figures are 86 mm or 178 mm wide
 \begin{figure}[h!]
-% \begin{framed}
-    \begin{minipage}[c]{0.65\textwidth}
-        \includegraphics[scale=1]{fig-aln.pdf}
-    \end{minipage}\hfill
-    \begin{minipage}[c]{0.35\textwidth}
-        \caption{
-        \textbf{Standard algorithms produce suboptimal alignments.}
-        (a) shows a possible alignment of an ancestor (A) sequence and a descendant (D) sequence.
+    \centering%
+    \includegraphics[scale=1]{fig-aln.pdf}
+    \par
+    \caption{
+        Standard algorithms produce suboptimal alignments.
+        (a) shows a possible alignment of an ancestor sequence (A) and a descendant sequence (D).
         (b), (c), and (d) are the results of different aligners.
-        Nucleotide mismatches are highlighted in red, phase zero, one, and two indels are shown in gray, purple, and orange, respectively.
-        Phase one indel (purple) is also of type I (synonymous) while phase two indel (orange) is of type II (nonsynonymous). 
-        COATi is able to retrieve the biological alignment (highlighted in blue).
+        Nucleotide mismatches are highlighted in red. Phase 0, phase 1, and phase 2 indels are shown in gray, purple, and orange, respectively.
+        Additionally, the orange indel is type II (an amino-acid indel plus an amino-acid change) while the purple indel is type I (an amino-acid indel only).
+        COATi is the only aligner able to retrieve the biological alignment in this example.
         }
     \label{fig:aln}
-    \end{minipage}
-% \end{framed}
 \end{figure}
 
 Uncorrected errors in the alignment stage can lead to erroneous results in comparative and functional genomic studies \parencite{estimates_schneider_2009}.

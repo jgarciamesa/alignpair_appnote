@@ -13,49 +13,52 @@ Furthermore, well-established algorithms for combining FSTs in different ways al
 A powerful and versatile algorithm for comparative sequence analysis is composition, which consists of sending the output of one FST into the input of a second FST.
 The model implemented in COATi is designed by composing smaller FSTs, each representing a specific process.
 
-Genomes for model organisms are often of high quality after being refined over many iterations and having their coding sequences meticulously curated.
-On the contrary, non-model organisms typically have lower-quality genomes that have been only partially curated.
-Low-quality genomes often lack the amount of sequencing data needed to fix artifacts, including missing exons, erroneous mutations, and indels \parencite{jackman2018tigmint}.
+Genome quality impacts conclusions drawn from comparative genomic studies. \TODO{Juan, add citations.}
+Genomes for model organisms often get refined over many iterations and achieve high quality with meticulously curated protein coding sequences.
+In contrast, genomes for non-model organisms might only receive partial curation and typically have lower quality sequences and annotations.
+These genomes often lack the amount of sequencing data needed to fix artifacts, including missing exons, erroneous mutations, and indels \parencite{jackman2018tigmint}.
 FSTs and their powerful methods provide a well-suited framework to statistically align a sequence from a non-model organism against a sequence from a model organism.
 
-COATi implements the pairwise alignment of a low-quality sequence (descendant)  against a high-quality sequence (ancestor) as a path through the Evolution FST (Fig. \ref{fig:evolution-fst}), based on existing transducers (e.g. \cite{holmes2001evolutionary}).
+COATi implements the pairwise alignment of a potentially lower-quality sequence against a high-quality sequence as a path through the Evolution FST (Fig. \ref{fig:evolution-fst}), based on existing transducers (e.g. \cite{holmes2001evolutionary}).
+Here, COATi treats the high-quality (reference) sequence as the ``ancestor'' and the potentially lower-quality sequence as the ``descendant''.
 This FST is the result of composing a substitution FST that encodes a codon model (Fig. \ref{fig:evolution-fst}-a) and an indel FST that models insertions and deletions, including frameshifts (Fig. \ref{fig:evolution-fst}-b).
 A key innovation of this FST with respect to others is the combination of a codon substitution model with a nucleotide-based geometric indel model that allows gaps to occur at any position.
 
 Composing both sequences with the Evolution FST results in the transducer of all possible alignments.
 Any path through this FST represents a pairwise alignment, while the shortest path corresponds to the best alignment.
 All FST operations in COATi, including model development, composition, search for the shortest path, and other optimization algorithms, are performed using the C++ openFST library \parencite{allauzen2007openfst}.
+However, the Evolution FST has a large state space to keep track of codon substitution rates when codons might be interspersed with indel events. This additional state space increase the computational complexity of the alignment algorithm.
 
 \begin{figure}[h!]
-\begin{framed}
 \centering
-    \includegraphics[width=\textwidth]{fig-evolution-fst.pdf}
-    \caption{The Evolution FST is assembled by composing a substitution FST and
-    an indel FST. Each node represents a state in an FST while arcs display
-    possible transitions between states (and their weights). (a) The
-    substitution FST encodes a 61x64 codon substitution model with $61\cdot 64$ arcs
-    from M to S. (b) The indel FST allows for insertions (I to U) and deletions
-    (D to V). Contiguous insertions and deletions are always arranged for
-    insertions to precede deletions to limit equivalent alignments.}
-    \label{fig:evolution-fst}
-\end{framed}
+\includegraphics[width=\textwidth]{fig-evolution-fst.pdf}
+\par
+\caption{The Evolution FST is assembled by composing a substitution FST and an indel FST.
+Each node represents a state in an FST while arcs display possible transitions between states (and their weights). Unlabeled arcs have weights of 1.
+(a) The substitution FST encodes a $61 \times 64 $ codon substitution model with 3904 arcs from M to S. These arcs consume three nucleotides from the input tape and emit three nucleotides to the output tape. The weight of each arc is a conditional probability derived from a codon substitution model. 
+(b) The indel FST allows for insertions (I to U) and deletions (D to V). Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. Contiguous insertions and deletions are always arranged for insertions to precede deletions to limit equivalent alignments.}
+\label{fig:evolution-fst}
 \end{figure}
 
 Codon substitution models are uncommon in sequence aligners, despite their extensive use in phylogenetics.
 COATi implements the Muse and Gaut (1994) codon model (codon-triplet-mg) and the Empirical Codon Model \parencite{kosiol_ECM_2007} (codon-triplet-ecm).
 It also lets the user provide a codon substitution matrix.
-The default FST model (codon-triplet-mg) does not allow substitutions from stop codons, although it supports mutations to (early) stop codons under the assumption that these are artifacts common in low-quality data.
+The default FST model (codon-triplet-mg) does not allow substitutions from stop codons \TODO{Juan is this still correct? Do we need to mention the extra error rate.}, although it supports mutations to (early) stop codons under the assumption that these are artifacts common in low-quality data.
 
-COATi also features a marginal substitution model with probability matrix
+To reduce the runtime complexity of COATi, we have also developed an approximation of the Evolution FST that can be implemented with standard dynamic programming techniques. This approximation uses a marginal substitution model where the output nucleotides are independent of one another and only depend on the input codon and position. This produces a $\left(61 \times 3 \right) \times 4$ substitution model and eliminates the need to track dependencies between output nucleotides.
 
-\[P'_{ijp} = \mathlarger{\mathlarger{\sum}}_{cod} \thickspace \begin{cases}
-P(i \thinspace | \thinspace cod) \enspace \text{if} \enspace cod_p = j\\
-0 \enspace \text{otherwise}
-\end{cases} \]
-
-Where $P'_{ijp}$ represents the probability that codon $i$ from the ancestor
-sequence changes to nucleotide $j$ of the descendant sequence at position $p$
-$\in \{0, 1, 2\}$ of the reading frame.
-$P$ is the substitution probability matrix Muse and Gaut or the Empirical Codon Model, resulting in the marginal models codon-marginal-mg (default model) and codon-marginal-ecm.
+A marginal substitution model is calculated from a standard substitution model by calculating the marginal probabilities that each ancestral codon produces specific descendant nucleotides at each reading frame positions.
+%
+Specifically, let
+$P_\text{cod}\left(Y_0 \cdot Y_1 \cdot Y_2 \middle| X_0 \cdot X_1 \cdot X_2\right)$ represent transition probabilities from a standard codon model, and
+%
+\[
+P_\text{mar}\left(Y_p = y \middle| X_0 \cdot X_1 \cdot X_2\right) =
+\sum_{Y_0 \cdot Y_1 \cdot Y_2} I(Y_p = y) P_\text{cod}\left(Y_0 \cdot Y_1 \cdot Y_2 \middle| X_0 \cdot X_1 \cdot X_2\right)
+\]
+%
+represent the marginal transition probabilities, where
+$p \in \{0, 1, 2\}$ is the position of the descendent nucleotide relative to the ancestral reading frame.
+COATi contains marginal models for both Muse and Gaut or the Empirical Codon Model, resulting in the marginal models codon-marginal-mg (default model) and codon-marginal-ecm.
 These models emphasize the position where the substitution in a codon occurs, help restrict the effects of low-quality data in the descendant sequence, and allow more than one substitution per codon.
 In combination with the indel model, alignment using the marginal model is implemented using dynamic programming.
