@@ -1,22 +1,22 @@
 \section*{Materials and Methods}  % temporary section name
 
-Statistical alignment is typically performed using pairwise hidden Markov models (pair-HMMs), which have the ability to rigorously model molecular sequence evolution \parencite{bradley2007transducers}.
+Statistical alignment is typically performed using pairwise hidden Markov models (pair-HMMs), which have the ability to rigorously model molecular sequence evolution \citembe{bradley2007transducers}.
 Pair-HMMs are computational machines with two output tapes that contain a finite number of states typically labeled match, insert, and delete that emit symbols (nucleotides or amino acids) to one or both tapes.
 Each tape represents a sequence and a path through a pair-HMM is a possible pairwise alignment.
-Conceptually, these machines generate two sequences ($X$ and $Y$) from an unknown ancestor and can calculate the probability that two sequences are related, represented by $P(X, Y)$ \parencite{yoon_2009_hmm}.
+Conceptually, these machines generate two sequences ($X$ and $Y$) from an unknown ancestor and can calculate the probability that two sequences are related, represented by $P(X, Y)$ \citembe{yoon_2009_hmm}.
 
 A limitation of pair-HMMs is the ability to only model the evolution of two related sequences from an unknown ancestor.
 Finite-state transducers (FSTs) have similar benefits to pair-HMMs with the additional feature to generate a descendant sequence given an ancestral one.
 FSTs consume symbols from an input tape and emit symbols to an output tape.
 Properly weighted, an FST can calculate the probability that a descendant sequence $Y$ evolved from an ancestor sequence $X$, represented by $P(Y | X)$.
-Furthermore, well-established algorithms for combining FSTs in different ways allow the design of complex models by combining simpler FSTs \parencite{bradley2007transducers}.
+Furthermore, well-established algorithms for combining FSTs in different ways allow the design of complex models by combining simpler FSTs \citembe{bradley2007transducers}.
 A powerful and versatile algorithm for comparative sequence analysis is composition, which consists of sending the output of one FST into the input of a second FST.
 The model implemented in COATi is designed by composing smaller FSTs, each representing a specific process.
 
 Genome quality impacts conclusions drawn from comparative genomic studies. \TODO{Juan, add citations.}
 Genomes for model organisms often get refined over many iterations and achieve high quality with meticulously curated protein coding sequences.
 In contrast, genomes for non-model organisms might only receive partial curation and typically have lower quality sequences and annotations.
-These genomes often lack the amount of sequencing data needed to fix artifacts, including missing exons, erroneous mutations, and indels \parencite{jackman2018tigmint}.
+These genomes often lack the amount of sequencing data needed to fix artifacts, including missing exons, erroneous mutations, and indels \citembe{jackman2018tigmint}.
 FSTs and their powerful methods provide a well-suited framework to statistically align a sequence from a non-model organism against a sequence from a model organism.
 
 COATi implements the pairwise alignment of a potentially lower-quality sequence against a high-quality sequence as a path through the Evolution FST (Fig. \ref{fig:evolution-fst}), based on existing transducers (e.g. \cite{holmes2001evolutionary}).
@@ -26,7 +26,7 @@ A key innovation of this FST with respect to others is the combination of a codo
 
 Composing both sequences with the Evolution FST results in the transducer of all possible alignments.
 Any path through this FST represents a pairwise alignment, while the shortest path corresponds to the best alignment.
-All FST operations in COATi, including model development, composition, search for the shortest path, and other optimization algorithms, are performed using the C++ openFST library \parencite{allauzen2007openfst}.
+All FST operations in COATi, including model development, composition, search for the shortest path, and other optimization algorithms, are performed using the C++ openFST library \citembe{allauzen2007openfst}.
 However, the Evolution FST has a large state space to keep track of codon substitution rates when codons might be interspersed with indel events. This additional state space increase the computational complexity of the alignment algorithm.
 
 \begin{figure}[h!]
@@ -41,7 +41,7 @@ Each node represents a state in an FST while arcs display possible transitions b
 \end{figure}
 
 Codon substitution models are uncommon in sequence aligners, despite their extensive use in phylogenetics.
-COATi implements the Muse and Gaut (1994) codon model (codon-triplet-mg) and the Empirical Codon Model \parencite{kosiol_ECM_2007} (codon-triplet-ecm).
+COATi implements the Muse and Gaut (\citeyear{muse_gaut_1994}) codon model (codon-triplet-mg) and the Empirical Codon Model \citembe{kosiol_ECM_2007} (codon-triplet-ecm).
 It also lets the user provide a codon substitution matrix.
 The default FST model (codon-triplet-mg) does not allow substitutions from stop codons \TODO{Juan is this still correct? Do we need to mention the extra error rate.}, although it supports mutations to (early) stop codons under the assumption that these are artifacts common in low-quality data.
 

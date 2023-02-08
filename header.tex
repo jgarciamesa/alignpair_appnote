@@ -12,7 +12,13 @@
 \usepackage{textcomp}
 % \usepackage[scaled]{helvet}
 \usepackage[compact,tiny]{titlesec}
-\usepackage[backend=biber, style=nature, citestyle=authoryear, uniquename=init]{biblatex}
+
+\usepackage[authoryear,round]{natbib}
+\renewcommand{\cite}[1]{\citeauthor{#1} \citeyear{#1}}
+\newcommand{\citetwo}[2]{\citeauthor{#1} \citeyear{#1}; \citeauthor{#2} \citeyear{#2}}
+\newcommand{\citembe}[1]{(\cite{#1})}
+\newcommand{\citembetwo}[2]{(\citetwo{#1}{#2})}
+
 \usepackage{tikz}
 \usepackage{wrapfig, framed}
 \usepackage[font=small,labelfont=bf]{caption}
@@ -23,7 +29,6 @@
 \usepackage{colortbl}
 
 \pagenumbering{arabic}
-\bibliography{alignpair_letter.bib}
 \newcommand*\pct{\scalebox{.9}{\%}}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\green}[1]{\textcolor{green}{#1}}

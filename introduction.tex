@@ -1,12 +1,12 @@
 \section*{Introduction}
 
-Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \parencite{sequence_alignment_rosenberg_2009}. While sophisticated advances have been made, the challenge of alignment inference has not been fully solved \parencite{art_morrison_2015}.
-%Modern sequence analysis began with the heuristic homology algorithms of \textcite{Needleman1970} and \textcite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \parencite{art_morrison_2015}. 
+Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \citembe{sequence_alignment_rosenberg_2009}. While sophisticated advances have been made, the challenge of alignment inference has not been fully solved \citembe{art_morrison_2015}.
+%Modern sequence analysis began with the heuristic homology algorithms of \textcite{Needleman1970} and \textcite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \citep{art_morrison_2015}. 
 %
-The alignment of protein coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space \parencite[e.g.][]{bininda2005transalign,abascal2010translatorx}.
+The alignment of protein coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space (e.g. \citetwo{bininda2005transalign}{abascal2010translatorx}).
 While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts such as frameshifts and early stop codons.
 Although some aligners incorporate codon substitution models, they do not support frameshifts or lack a statistical model.
-In addition, while modeling indels to appear within codons is rare, this is often the case (\TODO{cite Ziqi's dissertation here and the mouse genome paper}).
+In addition, while modeling indels to appear within codons is rare, this is often the case \citembetwo{zhu2022profiling}{taylor2004occurrence}.
 Considering gaps to only appear between codons can result in missing the optimal alignment and inflate estimates of sequence divergence (Fig. \ref{fig:aln}).
 
 % Figures are 86 mm or 178 mm wide
@@ -25,7 +25,7 @@ Considering gaps to only appear between codons can result in missing the optimal
     \label{fig:aln}
 \end{figure}
 
-Uncorrected errors in the alignment stage can lead to erroneous results in comparative and functional genomic studies \parencite{estimates_schneider_2009}.
+Uncorrected errors in the alignment stage can lead to erroneous results in comparative and functional genomic studies \citembe{estimates_schneider_2009}.
 Current methods are ill-equipped to handle common artifacts in genomic data, requiring costly curation practices that discard significant amounts of information.
 To address this problem, we present COATi, short for COdon-aware Alignment Transducer, a pairwise statistical aligner that incorporates codon substitution models and is robust to artifacts present in modern genomic data.
 
