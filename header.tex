@@ -15,9 +15,10 @@
 
 \usepackage[authoryear,round]{natbib}
 \renewcommand{\cite}[1]{\citeauthor{#1} \citeyear{#1}}
-\newcommand{\citetwo}[2]{\citeauthor{#1} \citeyear{#1}; \citeauthor{#2} \citeyear{#2}}
+\newcommand{\citetwo}[2]{\cite{#1}; \cite{#2}}
 \newcommand{\citembe}[1]{(\cite{#1})}
 \newcommand{\citembetwo}[2]{(\citetwo{#1}{#2})}
+\newcommand{\citembethree}[3]{(\citetwo{#1}{#2}; \cite{#3})}
 
 \usepackage{tikz}
 \usepackage{wrapfig, framed}

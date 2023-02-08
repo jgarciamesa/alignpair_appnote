@@ -6,7 +6,7 @@ Sequence alignment is a fundamental task in bioinformatics and a cornerstone ste
 The alignment of protein coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space (e.g. \citetwo{bininda2005transalign}{abascal2010translatorx}).
 While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts such as frameshifts and early stop codons.
 Although some aligners incorporate codon substitution models, they do not support frameshifts or lack a statistical model.
-In addition, while modeling indels to appear within codons is rare, this is often the case \citembetwo{zhu2022profiling}{taylor2004occurrence}.
+In addition, while modeling indels to appear within codons is rare, this is often the case \citembetwo{taylor2004occurrence}{zhu2022profiling}.
 Considering gaps to only appear between codons can result in missing the optimal alignment and inflate estimates of sequence divergence (Fig. \ref{fig:aln}).
 
 % Figures are 86 mm or 178 mm wide
