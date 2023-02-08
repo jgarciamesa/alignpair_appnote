@@ -43,7 +43,7 @@ Each node represents a state in an FST while arcs display possible transitions b
 Codon substitution models are uncommon in sequence aligners, despite their extensive use in phylogenetics.
 COATi implements the Muse and Gaut (\citeyear{muse_gaut_1994}) codon model (codon-triplet-mg) and the Empirical Codon Model \citembe{kosiol_ECM_2007} (codon-triplet-ecm).
 It also lets the user provide a codon substitution matrix.
-The default FST model (codon-triplet-mg) does not allow substitutions from stop codons \TODO{Juan is this still correct? Do we need to mention the extra error rate.}, although it supports mutations to (early) stop codons under the assumption that these are artifacts common in low-quality data.
+The default FST model (codon-triplet-mg) does not allow early stop codons on the ancestor sequence, although it supports mutations to (early) stop codons under the assumption that these are artifacts common in low-quality data.
 
 To reduce the runtime complexity of COATi, we have also developed an approximation of the Evolution FST that can be implemented with standard dynamic programming techniques. This approximation uses a marginal substitution model where the output nucleotides are independent of one another and only depend on the input codon and position. This produces a $\left(61 \times 3 \right) \times 4$ substitution model and eliminates the need to track dependencies between output nucleotides.
 
@@ -58,7 +58,10 @@ P_\text{mar}\left(Y_p = y \middle| X_0 \cdot X_1 \cdot X_2\right) =
 \]
 %
 represent the marginal transition probabilities, where
-$p \in \{0, 1, 2\}$ is the position of the descendent nucleotide relative to the ancestral reading frame.
+$p \in \{0, 1, 2\}$ is the position of the descendant nucleotide relative to the ancestral reading frame and $I$ is an indicator function defined
+%
+$I(y) := \{ 1 \text{ if } y = Y_p\text{, } 0 \text{ otherwise}\}$.
+%
 COATi contains marginal models for both Muse and Gaut or the Empirical Codon Model, resulting in the marginal models codon-marginal-mg (default model) and codon-marginal-ecm.
 These models emphasize the position where the substitution in a codon occurs, help restrict the effects of low-quality data in the descendant sequence, and allow more than one substitution per codon.
 In combination with the indel model, alignment using the marginal model is implemented using dynamic programming.
