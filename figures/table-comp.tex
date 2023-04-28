@@ -4,84 +4,17 @@
 
 \begingroup\centering
 \begin{tabular}{r|ccccc}
-      & \textbf{COATi} & \textbf{PRANK} & \textbf{MAFFT} & \textbf{Clustal$\Omega$} & \textbf{MACSE}\\
+      & \textbf{COATi} & \textbf{MAFFT} & \textbf{PRANK} & \textbf{MACSE} & \textbf{Clustal$\Omega$}\\
 \hline
-Avg alignment error ($d_{seq}$) & \cellcolor{bestcolor}0.00101 & 0.01010 & 0.00982 & 0.01582 & 0.00932\\
-Perfect alignments & \cellcolor{bestcolor}2452 & 22 & 2175 & 1150 & 1580\\
-Best alignments & \cellcolor{bestcolor}3624 & 155 & 2763 & 1609 & 2081\\
-Imperfect alignments & \cellcolor{bestcolor}1136 & 3566 & 1413 & 2438 & 2008\\
+Avg alignment error ($d_{seq}$) & \cellcolor{bestcolor}0.002136 & 0.013904 & 0.020016 & 0.013505 & 0.026805\\
+Perfect alignments & 4123 & \cellcolor{bestcolor}4325 & 4259 & 3450 & 2449\\
+Best alignments & \cellcolor{bestcolor}5120 & 4803 & 4747 & 3733 & 2583\\
+Imperfect alignments & 2064 & \cellcolor{bestcolor}1862 & 1928 & 2737 & 3738\\
 % \hline
-F1 score of positive selection & \cellcolor{bestcolor}90.8\pct & 80.5\pct & 73.5\pct & 61.3\pct & 70.6\pct\\
-F1 score of negative selection & \cellcolor{bestcolor}99.1\pct & 98.0\pct & 97.2\pct & 96.0\pct & 97.4\pct
+F1 score of positive selection & \cellcolor{bestcolor}98.2\pct & 86.2\pct & 88.4\pct & 81.3\pct & 71.3\pct \\
+F1 score of negative selection & \cellcolor{bestcolor}99.8\pct & 98.6\pct & 98.8\pct & 98.3\pct & 97.1\pct
 \end{tabular}
 \par\endgroup
 % \end{adjustbox}
 % \end{table}
 
-% comparison data Fall 2022 - 16k
-%mecm        0.00100 6916662321
-%macse       0.00932 470705850846
-%mafft       0.00981 827284723824
-%marginal    0.00101 295157751534
-%clustalo    0.01582 33765322671
-%prank       0.01009 5207890013
-%fst         0.00109 586573083504
-%dna         0.00109 485711623582
-%ecm         0.00116 793745997768
-%
-% [1] "Perfect alignments"
-%     mecm    macse    mafft   mcoati clustalo    prank    coati      dna    ecm
-%     2438     1580     2175     2452     1150       22     2517     2577    2506
-% [1] "Best alignments"
-% [1] 3608     2081     2763     3624     1609      155     3602     3652    3639
-% [1] "Imperfect alignments"
-% [1] 1150     2008     1413     1136     2438      3566    1071     1011    1082
-%
-% [1] "Species gorilla with model mecm"
-% [1] "ka root mean-squared error:0.00100926226681819"
-% [1] "ks root mean-squared error:0.00236978661633702"
-% [1] "Accuracy of + selection:0.915637860082305"
-% [1] "Accuracy of - selection:0.991653094462541"
-% [1] "Species gorilla with model macse"
-% [1] "ka root mean-squared error:0.0327146249833387"
-% [1] "ks root mean-squared error:0.0753999514529835"
-% [1] "Accuracy of + selection:0.705882352941177"
-% [1] "Accuracy of - selection:0.973769168684423"
-% [1] "Species gorilla with model mafft"
-% [1] "ka root mean-squared error:0.041389981600255"
-% [1] "ks root mean-squared error:0.0528993120504005"
-% [1] "Accuracy of + selection:0.735322425409047"
-% [1] "Accuracy of - selection:0.971815107102593"
-% [1] "Species gorilla with model mcoati"
-% [1] "ka root mean-squared error:0.00108452715625288"
-% [1] "ks root mean-squared error:0.00232522345414204"
-% [1] "Accuracy of + selection:0.907975460122699"
-% [1] "Accuracy of - selection:0.990833163577103"
-% [1] "Species gorilla with model clustalo"
-% [1] "ka root mean-squared error:0.0562479975129838"
-% [1] "ks root mean-squared error:0.0790533430944015"
-% [1] "Accuracy of + selection:0.612612612612613"
-% [1] "Accuracy of - selection:0.960498111666837"
-% [1] "Species gorilla with model prank"
-% [1] "ka root mean-squared error:0.037825885981252"
-% [1] "ks root mean-squared error:0.160220347970475"
-% [1] "Accuracy of + selection:0.804503582395087"
-% [1] "Accuracy of - selection:0.980464355119157"
-% [1] "Species gorilla with model coati"
-% [1] "ka root mean-squared error:0.00101421595739472"
-% [1] "ks root mean-squared error:0.0024852941001945"
-% [1] "Accuracy of + selection:0.919087136929461"
-% [1] "Accuracy of - selection:0.99206672091131"
-% [1] "Species gorilla with model dna"
-% [1] "ka root mean-squared error:0.00106650180637591"
-% [1] "ks root mean-squared error:0.00242713485387215"
-% [1] "Accuracy of + selection:0.916752312435766"
-% [1] "Accuracy of - selection:0.991754046625267"
-% [1] "Species gorilla with model ecm"
-% [1] "ka root mean-squared error:0.00104689678441889"
-% [1] "ks root mean-squared error:0.0026750523913319"
-% [1] "Accuracy of + selection:0.92713833157339"
-% [1] "Accuracy of - selection:0.992994212610417"
-% Warning message:
-% In k_metric(species = ARGS[1], ARGS[2:length(ARGS)]) :
-%   Number of sequences between ref and prank differs by 21
