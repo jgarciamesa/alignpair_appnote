@@ -11,9 +11,9 @@ figures/fig-%.pdf: figures/fig-%.tex
 	@lualatex $<
 	@mv $(@F) figures/
 
-suppl.pdf: suppl.tex figures/table-comp.tex
-	@latexmk -pdf $<
-	@make clean
+supplementary_materials.pdf: supplementary_materials.Rmd supplementary_materials/scripts/plot_dseq.R figures/fig-base-calling-error.pdf
+	@Rscript -e "rmarkdown::render('supplementary_materials.Rmd')"
+	@mv $@ supplementary_materials/
 
 clean:
 	@rm -f *.{aux,log,fdb_latexmk,fls,bbl,bcf,blg,run.xml,out}

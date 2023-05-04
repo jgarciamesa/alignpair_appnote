@@ -8,7 +8,7 @@ MACSE v2.06 \citembe{ranwez_macse_2011}, MAFFT v7.505
 \citembe{katoh2013mafft}, and PRANK v.150803 \citembe{prank_loytynoja_2014}
 together with COATi.
 
-After downloading, we removed 2232 sequences longer than 6000 nucleotides, identified 8369 sequence pairs that contained gaps identified by at least one aligner, and 5399 ungapped sequence pairs.
+After downloading, we removed 2232 sequences longer than 6000 nucleotides, identified 6048 sequence pairs that contained gaps identified by at least one aligner, and 7719 ungapped sequence pairs.
 We then randomly introduced gap patterns extracted from all five methods into the ungapped sequence pairs to generate the benchmark alignments.
 Alignment accuracy was measured using the distance metric $d_{seq}$
 \citembe{metrics_blackburne_whelan_2011} between simulated and inferred
@@ -22,7 +22,7 @@ The $F_1$ score evaluates the accuracy of a model by assigning equal importance 
 \begin{table}[!ht]
 \centering
 \input{figures/table-comp}
- \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 5399 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment.}
+ \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment.}
  \label{table:comp}
 \end{table}
 

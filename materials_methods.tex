@@ -30,7 +30,7 @@ However, the Evolution FST has a large state space to keep track of codon substi
 \caption{The Evolution FST is assembled by composing a substitution FST and an indel FST.
 Each node represents a state in an FST while arcs display possible transitions between states (and their weights). Unlabeled arcs have weights of 1.
 (a) The substitution FST encodes a $61 \times 61 $ codon substitution model with 3721 arcs from M to S. These arcs consume three nucleotides from the input tape and emit three nucleotides to the output tape. The weight of each arc is a conditional probability derived from a codon substitution model.
-(b) The indel FST allows for insertions (I to U) and deletions (D to V). Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. On top of the indel FST we add a base calling error FST (Figure S1) to model sequencing errors. Contiguous insertions and deletions are always arranged for insertions to precede deletions to limit equivalent alignments.}
+(b) The indel FST allows for insertions (I to U) and deletions (D to V). Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. On top of the indel FST we add a base calling error FST (Supplemental Materials Figure 5) to model sequencing errors. Contiguous insertions and deletions are always arranged for insertions to precede deletions to limit equivalent alignments.}
 \label{fig:evolution-fst}
 \end{figure}
 

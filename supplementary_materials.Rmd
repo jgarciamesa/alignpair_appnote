@@ -1,0 +1,132 @@
+---
+title: "Supplementary Materials"
+#author: "Juan J. García Mesa"
+#date: "`r Sys.Date()`"
+geometry: margin=1.8cm
+output:
+    pdf_document:
+        fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE}
+library(knitr)
+
+summary_table = function(results_file, coati_model) {
+    # read results_summary data
+    results = read.csv(results_file)
+    
+    # extract dseq values for each aligner
+    coati = results$dseq[which(results$aligner == coati_model)]
+    clustalomega = results$dseq[which(results$aligner == "clustalo")]
+    macse = results$dseq[which(results$aligner == "macse")]
+    mafft = results$dseq[which(results$aligner == "mafft")]
+    prank = results$dseq[which(results$aligner == "prank")]
+
+    dseq_summary = data.frame(coati = mean(coati),
+                      prank = mean(prank),
+                      mafft = mean(mafft),
+                      clustalo = mean(clustalomega),
+                      macse = mean(macse), row.names = "$d_{seq}$")
+    
+    ############################################################################
+    # one-side wilcoxon rank test
+    wtp = wilcox.test(coati, prank)
+    wtmf = wilcox.test(coati, mafft)
+    wtc = wilcox.test(coati, clustalomega)
+    wtmc = wilcox.test(coati, macse)
+    wilcoxon = data.frame(coati = NA, prank = wtp$p.value, mafft = wtmf$p.value,
+                          clustalo = wtc$p.value, macse = wtmc$p.value,
+                          row.names = "Wilcoxon rank test")
+    stats_table = rbind(dseq_summary, wilcoxon)
+
+    ############################################################################
+    # perfect, best, and imperfect alignments
+    source("supplementary_materials/scripts/number_alignments.R")
+    alns = num_alns(results_file)
+    
+    # fix row and column names and add to stats table
+    row.names(alns)[which(row.names(alns) == coati_model)] = "coati"
+    colnames(alns) = c("Perfect alignments", "Best alignments", "Imperfect alignments")
+    stats_table = rbind(stats_table, t(alns))
+    
+    ############################################################################
+    # selection (ka ks)
+    source("supplementary_materials/scripts/kaks.R")
+    
+    aligners = c(coati_model, "prank", "mafft", "clustalo", "macse")
+    selection = data.frame("F1.pos" = double(),
+                           "F1.neg" = double())
+    
+    # calculate F1 score for positive and negative selection for each aligner
+    for(model in aligners) {
+        model_rows = results[which(results$aligner == model), ]
+        pos = ps_accuracy(model_rows$ref_omega, model_rows$aln_omega)
+        neg = ns_accuracy(model_rows$ref_omega, model_rows$aln_omega)
+        
+        selection[nrow(selection) + 1, ] = c(pos, neg)
+    }
+    
+    # fix row and column names and add to stats table
+    colnames(selection) = c("F1-score pos selection", "F1-score neg selection")
+    rownames(selection) = c("coati", "prank", "mafft", "clustalo", "macse")
+    stats_table = rbind(stats_table, t(selection))
+    colnames(stats_table) = c(coati_model, "PRANK", "MAFFT", "ClustalOmega", "MACSE")
+    
+    # display stats table
+    stats_table
+}
+
+```
+
+```{r echo = FALSE, results = 'asis'}
+library(knitr)
+source("supplementary_materials/scripts/plot_dseq.R")
+
+results = "supplementary_data/tri-mg/results/results_summary.csv"
+print(kable(summary_table(results, "tri-mg"), digits = 5, caption = paste("Accuracy of COATi codon-triplet-mg, PRANK, MAFFT, ClustalOmega, and MACSE on 7719 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq}$>0 when at least one aligner found a perfect alignment.")))
+
+results = "supplementary_data/tri-ecm/results/results_summary.csv"
+print(kable(summary_table(results, "tri-ecm"), digits = 5, caption = paste("Accuracy of COATi codon-triplet-ecm, PRANK, MAFFT, ClustalOmega, and MACSE on 7678 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq}$>0 when at least one aligner found a perfect alignment.")))
+
+results = "supplementary_data/mar-mg/results/results_summary.csv"
+print(kable(summary_table(results, "mar-mg"), digits = 5, caption = paste("Accuracy of COATi codon-marginal-mg, PRANK, MAFFT, ClustalOmega, and MACSE on 7661 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq}$>0 when at least one aligner found a perfect alignment.")))
+
+results = "supplementary_data/mar-ecm/results/results_summary.csv"
+print(kable(summary_table(results, "mar-ecm"), digits = 5, caption = paste("Accuracy of COATi codon-marginal-ecm, PRANK, MAFFT, ClustalOmega, and MACSE on 7710 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq}$>0 when at least one aligner found a perfect alignment.")))
+```
+
+\newpage
+
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = "\\label{fig:dseq-tri-mg} Comparison of $d_{seq}$ values between COATi codon-triplet-mg and PRANK, MAFFT, ClustalOmega, and MACSE."}
+library(knitr)
+source("supplementary_materials/scripts/plot_dseq.R")
+plot_dseq_main("supplementary_data/tri-mg/results/results_summary.csv", "tri-mg")
+```
+
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap =  "\\label{fig:dseq-tri-ecm} Comparison of $d_{seq}$ values between COATi codon-triplet-ecm and PRANK, MAFFT, ClustalOmega, and MACSE."}
+library(knitr)
+source("supplementary_materials/scripts/plot_dseq.R")
+plot_dseq_main("supplementary_data/tri-ecm/results/results_summary.csv", "tri-ecm")
+```
+
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap =  "\\label{fig:dseq-mar-mg} Comparison of $d_{seq}$ values between COATi codon-marginal-mg and PRANK, MAFFT, ClustalOmega, and MACSE."}
+library(knitr)
+source("supplementary_materials/scripts/plot_dseq.R")
+plot_dseq_main("supplementary_data/mar-mg/results/results_summary.csv", "mar-mg")
+```
+
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap =  "\\label{fig:dseq-mar-ecm} Comparison of $d_{seq}$ values between COATi codon-marginal-ecm and PRANK, MAFFT, ClustalOmega, and MACSE."}
+library(knitr)
+source("supplementary_materials/scripts/plot_dseq.R")
+plot_dseq_main("supplementary_data/mar-ecm/results/results_summary.csv", "mar-ecm")
+```
+
+\newpage
+
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.cap="\\label{fig:figs} Base calling error FST. Arcs from M to S generate matches; however, here they can introduce single-nucleotide errors, which can generate stop codon artifacts."}
+knitr::include_graphics(path = "figures/fig-base-calling-error.pdf")
+```
