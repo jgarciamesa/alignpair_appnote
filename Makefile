@@ -2,8 +2,9 @@
 
 TEX_FILES := $(addsuffix .tex, alignpair_letter header abstract introduction materials_methods results_discussion)
 FIGS := $(addprefix figures/, fig-evolution-fst.pdf fig-aln.pdf)
+TABS := $(addprefix figures/, table-comp.tex)
 
-alignpair_letter.pdf: $(TEX_FILES) alignpair_letter.bib $(FIGS) mbe.bst
+alignpair_letter.pdf: $(TEX_FILES) alignpair_letter.bib $(FIGS) $(TABS) mbe.bst
 	@latexmk -pdf $<
 	@make clean
 

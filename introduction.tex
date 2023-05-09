@@ -3,7 +3,7 @@
 Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \citembe{sequence_alignment_rosenberg_2009}. While sophisticated advancements have been made, the challenge of alignment inference has not been fully solved \citembe{art_morrison_2015}.
 %Modern sequence analysis began with the heuristic homology algorithms of \textcite{Needleman1970} and \textcite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \citep{art_morrison_2015}. 
 %
-The alignment of protein coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space (e.g. \citetwo{bininda2005transalign}{abascal2010translatorx}).
+The alignment of protein-coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space (e.g.\ \citetwo{bininda2005transalign}{abascal2010translatorx}).
 While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts such as frameshifts and early stop codons.
 Although some aligners incorporate codon substitution models, they do not support frameshifts or lack a statistical model.
 In addition, existing aligners typically force gaps to occur between codons, whereas in natural sequences, only about 40\% of indels occur between codons \citembetwo{taylor2004occurrence}{zhu2022profiling}.
@@ -16,7 +16,7 @@ This mismatch between aligner assumptions and biology can produce sub-optimal al
     \par
     \caption{
         Standard algorithms produce suboptimal alignments.
-        (a) shows a possible alignment of an ancestor sequence (A) and a descendant sequence (D).
+        (a) shows the true alignment of an ancestor sequence (A) and a descendant sequence (D).
         (b), (c), and (d) are the results of different aligners.
         Nucleotide mismatches are highlighted in red. Phase 0, phase 1, and phase 2 indels are shown in gray, purple, and orange, respectively.
         Additionally, the orange indel is type II (an amino-acid indel plus an amino-acid change) while the purple indel is type I (an amino-acid indel only).
