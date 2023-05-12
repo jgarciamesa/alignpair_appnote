@@ -22,11 +22,13 @@ The $F_1$ score evaluates the accuracy of a model by assigning equal importance 
 \begin{table}[!ht]
 \centering
 \input{figures/table-comp}
- \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment.}
+ \vspace{1mm}
+ \footnotesize{* PRANK produced 50 empty alignments, calculations are based on 7869 alignments.}
+ \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment. Alignments with equal score to the true alignment are considered perfect.}
  \label{table:comp}
 \end{table}
 
-COATi, using the codon-triplet-ecm model, was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $4.0 \cdot 10^{-06}$ according to the one-tailed Wilcoxon signed rank test.
+COATi, using the codon-triplet-ecm model, was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $2.06 \cdot 10^{-79}$ according to the one-tailed Wilcoxon signed rank test.
 In addition, COATi produced more perfect alignments, less imperfect alignments, and more accurately retrieved events of positive selection (Table \ref{table:comp}).
 It obtained better results compared to a wide variety of alignment strategies.
 Clustal$\Omega$, performing a common approach of aligning via amino acid translations, obtained the highest average alignment error and had difficulties retrieving positive selection.
