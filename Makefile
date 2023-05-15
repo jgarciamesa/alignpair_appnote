@@ -3,6 +3,7 @@
 TEX_FILES := $(addsuffix .tex, alignpair_letter header abstract introduction materials_methods results_discussion)
 FIGS := $(addprefix figures/, fig-evolution-fst.pdf fig-aln.pdf)
 TABS := $(addprefix figures/, table-comp.tex)
+SCRIPTS := $(addprefix supplementary_materials/scripts/, kaks.R number_alignments.R plot_dseq.R)
 
 alignpair_letter.pdf: $(TEX_FILES) alignpair_letter.bib $(FIGS) $(TABS) mbe.bst
 	@latexmk -pdf $<
@@ -12,7 +13,12 @@ figures/fig-%.pdf: figures/fig-%.tex
 	@lualatex $<
 	@mv $(@F) figures/
 
-supplementary_materials.pdf: supplementary_materials.Rmd supplementary_materials/scripts/plot_dseq.R figures/fig-base-calling-error.pdf
+ALIGNERS := clustalo macse mafft prank
+
+supplementary_data/%/plot_distance.csv: supplementary_materials/scripts/distance_pseudo.R
+	@Rscript --vanilla $^ dseq $* $* $(ALIGNERS)
+
+supplementary_materials.pdf: supplementary_materials.Rmd figures/fig-base-calling-error.pdf
 	@Rscript -e "rmarkdown::render('supplementary_materials.Rmd')"
 	@mv $@ supplementary_materials/
 

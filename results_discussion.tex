@@ -14,19 +14,21 @@ Alignment accuracy was measured using the distance metric, $d_{seq}$
 alignments.
 In addition, accuracy of positive and negative selection was calculated
 using the $F_1$ score by estimating $k_s$ and $k_a$ statistics
-\citembe{ka_ks_li_1993} \TODO{reference section in supplemental methods about this. How do ks and ka define positive and negative selection?}.
-The $F_1$ score evaluates the accuracy of a model by assigning equal importance to precision and recall, and ranges between 0 and 1, with a score of 1 representing a perfect result.
+\citembe{ka_ks_li_1993} (Supplementary Methods).
+The $F_1$ score evaluates the accuracy of a model by assigning equal importance to precision and recall, and ranges between 0 and 1, with a score of 0 representing a perfect result.
 
 % Software comparison table
 \begin{table}[!ht]
 \centering
 \input{figures/table-comp}
- \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment.}
+ \vspace{1mm}
+ \footnotesize{* PRANK produced 50 empty alignments, calculations are based on 7869 alignments.}
+ \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment. Alignments with equal score to the true alignment are considered perfect.}
  \label{table:comp}
 \end{table}
 
 COATi, using the codon-triplet-mg model, obtained better results compared to a wide variety of alignment strategies.
-It was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $4.0 \cdot 10^{-06}$ according to the one-tailed, paired Wilcoxon signed-rank tests. \TODO{reference figures in supplement.}
+It was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $2.1 \cdot 10^{-79}$ according to the one-tailed, paired Wilcoxon signed-rank tests (Supplementary Materials Figure 1).
 %
 In addition, COATi produced more best alignments than any other method and was most accurate in identifying positive and negative selection (Table \ref{table:comp}). It found the third highest number of perfect alignments and the third lowest number of imperfect alignments. Manual inspection of these results indicate that the differences between COATi, MAFFT, and PRANK in generating perfect alignments were minor and due to sequence pairs with multiple optimal alignments.
 

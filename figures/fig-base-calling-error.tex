@@ -31,10 +31,8 @@
 
 \tikzstyle{line}=[draw, -stealth', very thick]
 \tikzstyle{block}=[circle,fill=colorB!50,on grid]
-\tikzstyle{lab}=[]
-\tikzstyle{w}=[lab,midway]
-\tikzstyle{e}=[lab,midway,auto=false,fill=colorP!50,font=\scriptsize]
-\tikzstyle{p}=[lab,midway,auto=false,fill=colorO!50,font=\scriptsize]
+\tikzstyle{w}=[below,pos=0.66]
+\tikzstyle{e}=[pos=0.33,auto=false,fill=colorP!50,font=\scriptsize]
 
 \begin{document}
 \begin{tikzpicture}[node distance=25mm, auto,
@@ -43,21 +41,18 @@
 
 \node[block,fill=colorG!50] (start_sub) {start};
 \node[block,right=15mm of start_sub] (S_sub) {S};
-\node[block,above right=10mm and 30mm of S_sub] (ij_sub) {};
-\node[block,right=30mm of S_sub] (ii_sub) {};
-\node[block,below right=10mm and 30mm of S_sub] (in_sub) {};
 \node[block,right=60mm of S_sub] (M_sub) {M};
 \node[block,fill=colorR!50,right=15mm of M_sub] (end_sub) {end};
 
 \draw[line] (start_sub) -- (S_sub);
 \draw[line] (M_sub) -- (end_sub);
 
-\draw[line] (M_sub) to[bend right=20] node[e] {i\textrightarrow{}j} (ij_sub);
-\draw[line] (ij_sub) to[bend right=20] node[w] {$\varepsilon$} (S_sub);
-\draw[line] (M_sub) to node[e] {i\textrightarrow{}i} (ii_sub);
-\draw[line] (ii_sub) to node[w] {$1 - 3 \cdot \varepsilon$} (S_sub);
-\draw[line] (M_sub) to[bend right=-20] node[e] {i\textrightarrow{}N} (in_sub);
-\draw[line] (in_sub) to[bend right=-20] (S_sub);
+\draw[line] (M_sub) to[bend right=25] node[w] {$\varepsilon$} (S_sub);
+\draw[line] (M_sub) to[bend right=25] node[e] {i\textrightarrow{}j} (S_sub);
+\draw[line] (M_sub) to node[w] {$1 - 3 \cdot \varepsilon$} (S_sub);
+\draw[line] (M_sub) to node[e] {i\textrightarrow{}i} (S_sub);
+\draw[line] (M_sub) to[bend right=-25] (S_sub);
+\draw[line] (M_sub) to[bend right=-25] node[e] {i\textrightarrow{}N} (S_sub);
 
 \draw[line] (S_sub) to[bend left=-60] (M_sub);
 
