@@ -15,7 +15,7 @@ Alignment accuracy was measured using the distance metric $d_{seq}$
 alignments.
 In addition, accuracy of positive and negative selection was calculated
 using the $F_1$ score by estimating $k_s$ and $k_a$ statistics
-\citembe{ka_ks_li_1993}.
+\citembe{ka_ks_li_1993} (Supplementary Methods).
 The $F_1$ score evaluates the accuracy of a model by assigning equal importance to precision and recall, and ranges between 0 and 1, with a score of 0 representing a perfect result.
 
 % Software comparison table
@@ -28,7 +28,7 @@ The $F_1$ score evaluates the accuracy of a model by assigning equal importance 
  \label{table:comp}
 \end{table}
 
-COATi, using the codon-triplet-ecm model, was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $2.06 \cdot 10^{-79}$ according to the one-tailed Wilcoxon signed rank test.
+COATi, using the codon-triplet-mg model, was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $2.06 \cdot 10^{-79}$ according to the one-tailed Wilcoxon signed rank test (Supplementary Materials Figure 1).
 In addition, COATi produced more perfect alignments, less imperfect alignments, and more accurately retrieved events of positive selection (Table \ref{table:comp}).
 It obtained better results compared to a wide variety of alignment strategies.
 Clustal$\Omega$, performing a common approach of aligning via amino acid translations, obtained the highest average alignment error and had difficulties retrieving positive selection.

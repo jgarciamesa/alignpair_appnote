@@ -1,11 +1,10 @@
 ---
-title: "Supplementary Materials"
-#author: "Juan J. García Mesa"
-#date: "`r Sys.Date()`"
-geometry: margin=1.8cm
+title: "Supplementary Materials for \" COATi: statistical pairwise alignment of protein coding sequences\""
+author: Juan J. Garcia Mesa, Ziqi Zhu, Reed A. Cartwright
 output:
     pdf_document:
         fig_caption: yes
+bibliography: alignpair_letter.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -126,25 +125,25 @@ results = "supplementary_data/mar-ecm/results/results_summary.csv"
 pval_mar_ecm = max(wilcoxon_test(results, "mar-ecm"))
 ```
 
-```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-tri-mg} Comparison of log-transformed $d_{seq}$ data with pseudocounts between COATi codon-triplet-mg and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_tri_mg, digits = 3), "$.")}
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-tri-mg} Comparison of log10-transformed $d_{seq}$ data with pseudocounts between COATi codon-triplet-mg and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_tri_mg, digits = 3), "$.")}
 library(knitr)
 source("supplementary_materials/scripts/plot_dseq.R")
 suppressWarnings(plot_dseq_main("supplementary_data/tri-mg/plot_distance.csv", "tri-mg"))
 ```
 
-```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-tri-ecm} Comparison of log-transformed $d_{seq}$ data with pseudocounts between COATi codon-triplet-ecm and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_tri_ecm, digits = 3), "$.")}
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-tri-ecm} Comparison of log10-transformed $d_{seq}$ data with pseudocounts between COATi codon-triplet-ecm and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_tri_ecm, digits = 3), "$.")}
 library(knitr)
 source("supplementary_materials/scripts/plot_dseq.R")
 suppressWarnings(plot_dseq_main("supplementary_data/tri-ecm/plot_distance.csv", "tri-ecm"))
 ```
 
-```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-mar-mg} Comparison of log-transformed $d_{seq}$ data with pseudocounts between COATi codon-marginal-mg and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_mar_mg, digits = 3), "$.")}
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-mar-mg} Comparison of log10-transformed $d_{seq}$ data with pseudocounts between COATi codon-marginal-mg and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_mar_mg, digits = 3), "$.")}
 library(knitr)
 source("supplementary_materials/scripts/plot_dseq.R")
 suppressWarnings(plot_dseq_main("supplementary_data/mar-mg/plot_distance.csv", "mar-mg"))
 ```
 
-```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-mar-ecm} Comparison of log-transformed $d_{seq}$ data with pseudocounts between COATi codon-marginal-ecm and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_mar_ecm, digits = 3), "$.")}
+```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.align = 'center', fig.cap = paste0("\\label{fig:dseq-mar-ecm} Comparison of log10-transformed $d_{seq}$ data with pseudocounts between COATi codon-marginal-ecm and PRANK, MAFFT, ClustalOmega, and MACSE. COATi was significantly more accurate than other aligners; all p-values were $\\leq ", signif(pval_mar_ecm, digits = 3), "$.")}
 library(knitr)
 source("supplementary_materials/scripts/plot_dseq.R")
 suppressWarnings(plot_dseq_main("supplementary_data/mar-ecm/plot_distance.csv", "mar-ecm"))
@@ -155,3 +154,14 @@ suppressWarnings(plot_dseq_main("supplementary_data/mar-ecm/plot_distance.csv", 
 ```{r echo = FALSE, fig.width = 6, fig.height = 6, fig.cap="\\label{fig:figs} Base calling error FST. Arcs from M to S generate matches; however, here they can introduce single-nucleotide errors, which can generate stop codon artifacts."}
 knitr::include_graphics(path = "figures/fig-base-calling-error.pdf")
 ```
+
+\newpage
+
+# Supplementary Methods
+
+Ks and Ka represent the number of substitutions per synonymous and non-synonymous sites. The ratio of nonsynonymous (Ka) to synonymous (Ks) nucleotide substitution rates indicates the selective pressures acting on genes. If the ratio is significantly greater than 1, it suggests positive selective pressure, meaning that nonsynonymous substitutions occur more frequently than synonymous substitutions. A ratio around 1 can indicate either neutral evolution at the protein level or a mixture of positive and negative selective pressures. If the ratio is less than 1, it indicates a pressure to maintain protein sequence, known as purifying selection.
+Ks and Ka are calculated using the R package seqinr v.4.2-30 [@seqinr].
+
+# References
+
+<div id="refs"></div>
