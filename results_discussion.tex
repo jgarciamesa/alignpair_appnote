@@ -23,14 +23,14 @@ The $F_1$ score evaluates the accuracy of a model by assigning equal importance 
 \input{figures/table-comp}
  \vspace{1mm}
  \footnotesize{* PRANK produced 50 empty alignments, calculations are based on 7869 alignments.}
- \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have $d_{seq}=0$, best alignments have the lowest $d_{seq}$, and imperfect alignments have $d_{seq}>0$ when at least one aligner found a perfect alignment. Alignments with equal score to the true alignment are considered perfect.}
+ \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Perfect alignments have the same score as the true alignment, best alignments have the lowest $d_{seq}$, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment.}
  \label{table:comp}
 \end{table}
 
 COATi, using the codon-triplet-mg model, obtained better results compared to a wide variety of alignment strategies.
 It was significantly more accurate (lower $d_{seq}$) at inferring simulated alignments compared to other methods; all p-values were less than $2.1 \cdot 10^{-79}$ according to the one-tailed, paired Wilcoxon signed-rank tests (Supplementary Materials Figure 1).
 %
-In addition, COATi produced more best alignments than any other method and was most accurate in identifying positive and negative selection (Table \ref{table:comp}). It found the third highest number of perfect alignments and the third lowest number of imperfect alignments. Manual inspection of these results indicate that the differences between COATi, MAFFT, and PRANK in generating perfect alignments were minor and due to sequence pairs with multiple optimal alignments.
+In addition, COATi produced more perfect alignments, less imperfect alignments, and more accurately retrieved events of positive selection (Table \ref{table:comp}).
 
 Clustal$\Omega$ generated alignments via amino acid translations and obtained the highest average alignment error while having difficulties retrieving positive selection.
 MACSE used a DNA-AA hybrid model, allowing frameshifts, and obtained similar results to MAFFT using a DNA model.

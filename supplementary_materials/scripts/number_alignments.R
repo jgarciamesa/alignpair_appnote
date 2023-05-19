@@ -18,17 +18,14 @@ num_alns = function(filename) {
                          "best" = integer(col_s),
                          "imperfect" = integer(col_s))
 
-    # perfect alignments (dseq = 0)
-    # alignments with same score as the reference alignment are considered dseq = 0
+    # perfect alignments (same score as the true alignment + dseq = 0)
+    is_perfect = matrix(data = FALSE, nrow = row_s, ncol = col_s)
+
     for(i in 1:row_s) {
-        alt = which(score[i, ] == ref_score[i])
-        if(length(alt) > 0) {
-            dseq[i, alt] = 0
-        }
-        z = which(dseq[i, ] == 0)
-        if(length(z) > 0){
-            results$perfect[z] = results$perfect[z] + 1
-        }
+        perf =  which(score[i, ] == ref_score[i])
+        is_perfect[i, perf] = TRUE
+
+        results$perfect[perf] = results$perfect[perf] + 1
     }
 
     # best alignments (lower d_seq)
@@ -38,12 +35,11 @@ num_alns = function(filename) {
         }
     }
 
-    # imperfect alignments (dseq != 0 when another methods has dseq = 0)
+    # imperfect alignments (score is diff than the true aln when at least one method found a perf aln)
     for(r in 1:(row_s)) {
-        if(min(dseq[r, ], na.rm = TRUE) == 0){
-            for(i in which(dseq[r, ]>0)) {
-            results$imperfect[i] = results$imperfect[i] + 1
-            }
+        if(any(is_perfect[r, ] == TRUE)) {
+            imp = intersect(which(is_perfect[r, ] == FALSE), which(!is.na(dseq[r, ])))
+            results$imperfect[imp] = results$imperfect[imp] + 1
         }
     }
 

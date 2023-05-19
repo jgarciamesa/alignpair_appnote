@@ -96,20 +96,20 @@ library(kableExtra)
 library(knitr)
 source("supplementary_materials/scripts/plot_dseq.R")
 results = "supplementary_data/tri-mg/results/results_summary.csv"
-k = kable(summary_table(results, "tri-mg"), digits = 5, caption = paste("Accuracy of COATi codon-triplet-mg, PRANK, MAFFT, ClustalOmega, and MACSE on 7719 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq} > 0$ when at least one aligner found a perfect alignment. "), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
+k = kable(summary_table(results, "tri-mg"), digits = 5, caption = paste("Accuracy of COATi codon-triplet-mg, PRANK, MAFFT, ClustalOmega, and MACSE on 7719 simulated sequence pairs. Perfect alignments have the same score as the true alignment, best alignments have lowest $d_{seq}$, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment."), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
 print(footnote(k, general = "PRANK produced 50 empty alignments, calculations are based on 7669 alignments.", footnote_as_chunk = TRUE, general_title = "*"))
 #
 results = "supplementary_data/tri-ecm/results/results_summary.csv"
-k = kable(summary_table(results, "tri-ecm"), digits = 5, caption = paste("Accuracy of COATi codon-triplet-ecm, PRANK, MAFFT, ClustalOmega, and MACSE on 7678 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq} > 0$ when at least one aligner found a perfect alignment."), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
+k = kable(summary_table(results, "tri-ecm"), digits = 5, caption = paste("Accuracy of COATi codon-triplet-ecm, PRANK, MAFFT, ClustalOmega, and MACSE on 7678 simulated sequence pairs. Perfect alignments have the same score as the true alignment, best alignments have lowest $d_{seq}$, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment."), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
 print(footnote(k, general = "PRANK produced 41 empty alignments, calculations are based on 7637 alignments.", footnote_as_chunk = TRUE, general_title = "*"))
 #
 results = "supplementary_data/mar-mg/results/results_summary.csv"
-k = kable(summary_table(results, "mar-mg"), digits = 5, caption = paste("Accuracy of COATi codon-marginal-mg, PRANK, MAFFT, ClustalOmega, and MACSE on 7661 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq} > 0$ when at least one aligner found a perfect alignment. "), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
-print(footnote(k, general = "PRANK produced 50 empty alignments, calculations are based on 7611 alignments.", footnote_as_chunk = TRUE, general_title = "*"))
+k = kable(summary_table(results, "mar-mg"), digits = 5, caption = paste("Accuracy of COATi codon-marginal-mg, PRANK, MAFFT, ClustalOmega, and MACSE on 7666 simulated sequence pairs. Perfect alignments have the same score as the true alignment, best alignments have lowest $d_{seq}$, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment."), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
+print(footnote(k, general = "PRANK produced 47 empty alignments, calculations are based on 7619 alignments.", footnote_as_chunk = TRUE, general_title = "*"))
 #
 results = "supplementary_data/mar-ecm/results/results_summary.csv"
-k = kable(summary_table(results, "mar-ecm"), digits = 5, caption = paste("Accuracy of COATi codon-marginal-ecm, PRANK, MAFFT, ClustalOmega, and MACSE on 7710 simulated sequence pairs. Perfect alignments have $d_{seq}$ = 0, best alignments have lowest $d_{seq}$, and imperfect alignments have $d_{seq} > 0$ when at least one aligner found a perfect alignment."), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
-print(footnote(k, general = "PRANK produced 35 empty alignments, calculations are based on 7675 alignments.", footnote_as_chunk = TRUE, general_title = "*"))
+k = kable(summary_table(results, "mar-ecm"), digits = 5, caption = paste("Accuracy of COATi codon-marginal-ecm, PRANK, MAFFT, ClustalOmega, and MACSE on 7717 simulated sequence pairs. Perfect alignments have the same score as the true alignment, best alignments have lowest $d_{seq}$, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment."), escape = FALSE) %>% kable_styling(latex_options = "HOLD_position")
+print(footnote(k, general = "PRANK produced 40 empty alignments, calculations are based on 7677 alignments.", footnote_as_chunk = TRUE, general_title = "*"))
 ```
 
 \newpage
