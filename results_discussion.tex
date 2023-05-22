@@ -21,7 +21,7 @@ The $F_1$ score evaluates the accuracy of a model by assigning equal importance 
 \centering
 \input{figures/table-comp}
  \vspace{1mm}
- \footnotesize{\textsuperscript{*}PRANK produced 50 empty alignments, calculations are based on 7869 alignments.}
+ \footnotesize{\textsuperscript{*}PRANK produced 50 empty alignments, calculations are based on 7669 alignments.}
  \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7719 empirically simulated sequence pairs. Best alignments have the lowest $d_{seq}$ (including ties), perfect alignments have the same score as the true alignment, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment.}
  \label{table:comp}
 \end{table}
@@ -33,7 +33,7 @@ In addition, COATi produced more perfect alignments, less imperfect alignments, 
 
 Clustal$\Omega$ generated alignments via amino acid translations and obtained the highest average alignment error while having difficulties retrieving positive selection.
 MACSE used a DNA-AA hybrid model, allowing frameshifts, and obtained similar results to MAFFT using a DNA model.
-PRANK, using a codon model, had an verage alignment error between MACSE/MAFFT and Clustal$\Omega$ but was unable to generate alignments for some sequence pairs.
+PRANK, using a codon model, had an average alignment error between MACSE/MAFFT and Clustal$\Omega$ but was unable to generate alignments for some sequence pairs.
 
 Despite human and gorilla sequences having a relatively short evolutionary distance, COATi showed a biologically significant improvement over other methods, with an average alignment error nine-fold smaller than the next best method.
 COATi is an FST-based application that can calculate the optimal alignment
