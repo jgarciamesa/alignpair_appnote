@@ -46,8 +46,8 @@
 \matrix (biology)[aln,best,below right=-1mm and -15mm of titleBiology] {
    & Ser & His & Lys & Gly & Arg &            &            & Asp & Ala & \\
 A: & TCC & CAT & AAG & GGG & CGG & T\verb|--| & \verb|-|CG & GAC & GCC & \verb|---|\\
-D: & TCC & CA\verb|-| & \verb|--|G & GGG & CGG & TCC & CAG & GAC & GCC & ACG\\
-   & Ser &            &            & Gly & Arg & Ser & Gln & Asp & Ala & Thr\\
+D: & TCC & CA\verb|-| & \verb|--|G & GGG & CGG & TCC & CCG & GAC & GCC & ACG\\
+   & Ser &            &            & Gly & Arg & Ser & Pro & Asp & Ala & Thr\\
 };
 \node (bio17) [fit=(biology-1-7)(biology-1-8)]{Ser};
 \node [fit=(biology-4-3)(biology-4-4)]{Gln};
@@ -56,35 +56,35 @@ D: & TCC & CA\verb|-| & \verb|--|G & GGG & CGG & TCC & CAG & GAC & GCC & ACG\\
 \draw [indel,phase2] (biology-2-3.north west) rectangle (biology-3-4.south east);
 
 
-\node (titlePrank) [below right=2.6cm and -1.8cm of titleBiology] {\textbf{b) Prank (codon)}};
+\node (titlePrankMacse) [below right=2.6cm and -1.8cm of titleBiology] {\textbf{b) PRANK (codon) and MACSE}};
 % prank codon --gaprate=0.01
-\matrix (prank) [aln,below right=-1mm and -2.5cm of titlePrank] {
+\matrix (prank-macse) [aln,below right=-1mm and -4.6cm of titlePrankMacse] {
    & Ser & His     & Lys & Gly  & Arg & Ser &           & Asp & Ala & \\
 A: & TCC & CAT     & AAG & GGG  & CGG & TCG &\verb|---| & GAC & GCC & \verb|---|\\
-D: & TCC & CA\e{G} & \verb|---| & GGG & CGG & TC\e{C} & CAG & GAC & GCC & ACG\\
-   & Ser & Gln     &            & Gly     & Arg & Ser   & Gln  & Asp & Ala & Thr\\
+D: & TCC & CA\e{G} & \verb|---| & GGG & CGG & TC\e{C} & CCG & GCC & GCC & ACG\\
+   & Ser & Gln     &            & Gly     & Arg & Ser   & Pro  & Asp & Ala & Thr\\
 };
-\draw [indel,phase0] (prank-2-8.north west) rectangle (prank-3-8.south east);
-\draw [indel,phase0] (prank-2-11.north west) rectangle (prank-3-11.south east);
-\draw [indel,phase0] (prank-2-4.north west) rectangle (prank-3-4.south east);
+\draw [indel,phase0] (prank-macse-2-8.north west) rectangle (prank-macse-3-8.south east);
+\draw [indel,phase0] (prank-macse-2-11.north west) rectangle (prank-macse-3-11.south east);
+\draw [indel,phase0] (prank-macse-2-4.north west) rectangle (prank-macse-3-4.south east);
 
-\node (titleMafftClustalo) [below right=2.4cm and -2.75cm of titlePrank] {\textbf{c) MAFFT, Clustal$\pmb{\Omega}$, and MACSE}};
+\node (titleMafftClustalo) [below right=2.4cm and -4.9cm of titlePrankMacse] {\textbf{c) MAFFT and Clustal$\pmb{\Omega}$}};
 % mafft dna & clustalo amino acids
-\matrix(mafft-clustalo) [aln,below right=-1mm and -4.75cm of titleMafftClustalo] {
+\matrix(mafft-clustalo) [aln,below right=-1mm and -3.5cm of titleMafftClustalo] {
    & Ser & His     & Lys     & Gly     & Arg     & Ser & Asp & Ala & \\
 A: & TCC & CAT & AAG & GGG     & CGG     & TCG & GAC & GCC & \verb|---|\\
-D: & TCC & CA\e{G}     & \e{GG}G     & \e{C}GG & \e{TCC} & \e{CA}G & GAC & GCC & ACG\\
-   & Ser & Gln     & Gly     & Arg     & Ser     & Gln & Asp & Ala & Thr\\
+D: & TCC & CA\e{G}     & \e{GG}G     & \e{C}GG & \e{TCC} & \e{C}CG & GAC & GCC & ACG\\
+   & Ser & Gln     & Gly     & Arg     & Ser     & Pro & Asp & Ala & Thr\\
 };
 \draw [indel,phase0] (mafft-clustalo-2-10.north west) rectangle (mafft-clustalo-3-10.south east);
 
-\node (titleCoati) [below right=2.4cm and -5.05cm of titleMafftClustalo] {\textbf{d) COATi}};
+\node (titleCoati) [below right=2.4cm and -3.75cm of titleMafftClustalo] {\textbf{d) COATi}};
 % coati mar-mg
 \matrix (coati) [aln,best,below right=-1mm and -1.35cm of titleCoati] {
    & Ser & His & Lys & Gly & Arg &            &            & Asp & Ala & \\
 A: & TCC & CAT & AAG & GGG & CGG & T\verb|--| & \verb|-|CG & GAC & GCC & \verb|---|\\
-D: & TCC & CA\verb|-| & \verb|--|G & GGG & CGG & TCC & CAG & GAC & GCC & ACG\\
-   & Ser &            &            & Gly & Arg & Ser & Gln & Asp & Ala & Thr\\
+D: & TCC & CA\verb|-| & \verb|--|G & GGG & CGG & TCC & CCG & GAC & GCC & ACG\\
+   & Ser &            &            & Gly & Arg & Ser & Pro & Asp & Ala & Thr\\
 };
 \node (cti17) [fit=(coati-1-7)(coati-1-8)]{Ser};
 \node [fit=(coati-4-3)(coati-4-4)]{Gln};
