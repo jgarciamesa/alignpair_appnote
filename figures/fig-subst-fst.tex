@@ -1,0 +1,62 @@
+\definecolor{colorR}{RGB}{228,26,28}    % RED
+\definecolor{colorB}{RGB}{55,126,184}   % BLUE
+\definecolor{colorG}{RGB}{77,175,74}    % GREEN
+\definecolor{colorP}{RGB}{152,78,163}   % PURPLE
+\definecolor{colorO}{RGB}{255,127,0}    % ORANGE
+\definecolor{colorY}{RGB}{255,255,51}   % YELLOW
+\definecolor{colorBn}{RGB}{166,86,40}   % BROWN
+\definecolor{colorPk}{RGB}{247,129,191} % PINK
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+\tikzstyle{line}=[draw, -stealth', very thick]
+\tikzstyle{block}=[circle,fill=colorB!50,on grid]
+\tikzstyle{lab}=[]
+\tikzstyle{w}=[lab,midway]
+\tikzstyle{e}=[lab,midway,above=0.2mm,auto=false,font=\scriptsize]
+
+% \begin{document}
+% \begin{tikzpicture}[node distance=25mm, auto]
+\begin{tikzpicture}[node distance=25mm, auto,
+	dottedline/.style = {ultra thick, loosely dotted,shorten >=1mm, shorten <=1mm}]
+%%% MG94 marginal substitution FST
+% \node (titlea) {};
+
+\node[block,fill=colorG!50] (start_sub) {start};
+\node[block,right=15mm of start_sub] (S_sub) {M};
+\node[block,right=75mm of S_sub] (M_sub) {S};
+\node[block,fill=colorR!50,right=15mm of M_sub] (end_sub) {end};
+
+% AAA->AAA
+\node[block,above right=12mm and 20mm of S_sub,minimum size=15pt] (s2) {};
+\node[block,above right=3mm and 20mm of s2,minimum size=15pt] (s1) {};
+% % AAA->AAC
+\node[block,above right=4mm and 20mm of S_sub,minimum size=15pt] (s4) {};
+\node[block,below right=-1mm and 20mm of s4,minimum size=15pt] (s3) {};
+% TTT->TTT
+\node[block,below right=6mm and 20mm of S_sub,minimum size=15pt] (s122) {};
+\node[block,below right=3mm and 20mm of s122,minimum size=15pt] (s121) {};
+
+\draw[line] (start_sub) -- (S_sub);
+\draw[line] (S_sub) to[bend right=40] (M_sub);
+\draw[line] (M_sub) -- (end_sub);
+
+% AAA->AAA
+% \draw[line] (M_sub) to[bend right=15] node[w,pos=0.7,above right=3mm and 1mm,font=\scriptsize,rotate=-20] {$P(AAA|AAA)$} (s1);
+\draw[line] (M_sub) to[bend right=15] node[e,pos=0.4,rotate=-20] {A:A/$P(AAA|AAA)$} (s1);
+\draw[line] (s1) to[bend right=15] node[e,pos=0.5] {A:A} (s2);
+\draw[line] (s2) to[bend right=15] node[e,pos=0.5] {A:A} (S_sub);
+
+% % AAA->AAC
+\draw[line] (M_sub) to[bend right=5] node[e,pos=0.5,rotate=-8,below=-5mm] {A:A/$P(AAC|AAA)$} (s3);
+\draw[line] (s3) to[bend right=8] node[e,pos=0.5] {A:A} (s4);
+\draw[line] (s4) to[bend right=8] node[e,pos=0.5] {A:C} (S_sub);
+
+\node[below=9mm of s1,font=\Huge] {$\vdots$};
+\node[below=5mm of s2,font=\Huge] {$\vdots$};
+
+% TTT->TTT
+% \draw[line] (M_sub) to[bend right=-5] node[w,pos=0.5,above right=1mm and -11mm, rotate=5,font=\scriptsize] {$P(TTT|TTT)$} (s121);
+\draw[line] (M_sub) to[bend right=-5] node[e,pos=0.5,rotate=9] {T:T/$P(TTT|TTT)$} (s121);
+\draw[line] (s121) to[bend right=-5] node[e,pos=0.5] {T:T} (s122);
+\draw[line] (s122) to[bend right=-5] node[e,pos=0.4] {T:T} (S_sub);
+\end{tikzpicture}

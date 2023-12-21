@@ -1,0 +1,93 @@
+\definecolor{colorR}{RGB}{228,26,28}    % RED
+\definecolor{colorB}{RGB}{55,126,184}   % BLUE
+\definecolor{colorG}{RGB}{77,175,74}    % GREEN
+\definecolor{colorP}{RGB}{152,78,163}   % PURPLE
+\definecolor{colorO}{RGB}{255,127,0}    % ORANGE
+\definecolor{colorY}{RGB}{255,255,51}   % YELLOW
+\definecolor{colorBn}{RGB}{166,86,40}   % BROWN
+\definecolor{colorPk}{RGB}{247,129,191} % PINK
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+\tikzstyle{line}=[draw, -stealth', very thick]
+\tikzstyle{block}=[circle,fill=colorB!50,on grid]
+\tikzstyle{lab}=[]
+\tikzstyle{w}=[lab,midway]
+\tikzstyle{e}=[lab,midway,below=-4mm,auto=false,font=\scriptsize]
+
+% \begin{document}
+% \begin{tikzpicture}[node distance=25mm, auto]
+\begin{tikzpicture}[node distance=25mm, auto,
+	dottedline/.style = {ultra thick, loosely dotted,shorten >=1mm, shorten <=1mm}]
+
+% complimenting FST
+\node (titlea) {\textbf{a) DNA Complement}};
+
+\node[block,below left=1cm and -10mm of titlea.west,fill=colorG!50] (start1) {start};
+\node[block,right=15mm of start1,minimum size=20pt] (cod0) {};
+\node[block,right=20mm of cod0,minimum size=20pt] (cod1) {};
+\node[block,right=20mm of cod1,minimum size=20pt] (cod2) {};
+\node[block,right=20mm of cod2,minimum size=20pt] (cod3) {};
+\node[block,fill=colorR!50,right=15mm of cod3] (end1) {end};
+
+\draw[line] (start1) -- (cod0);
+\draw[line] (cod3) -- (end1);
+
+\draw[line] (cod0) to[bend right=-60] node[e] {A:T} (cod1);
+\draw[line] (cod0) to[bend right=-25] node[e] {C:G} (cod1);
+\draw[line] (cod0) to[bend right=25] node[e,below=-4.5mm] {G:C} (cod1);
+\draw[line] (cod0) to[bend right=60] node[e] {T:A} (cod1);
+
+\draw[line] (cod1) to[bend right=-60] node[e] {A:T} (cod2);
+\draw[line] (cod1) to[bend right=-25] node[e] {C:G} (cod2);
+\draw[line] (cod1) to[bend right=25] node[e,below=-4.5mm] {G:C} (cod2);
+\draw[line] (cod1) to[bend right=60] node[e] {T:A} (cod2);
+
+\draw[line] (cod2) to[bend right=-60] node[e] {A:T} (cod3);
+\draw[line] (cod2) to[bend right=-25] node[e] {C:G} (cod3);
+\draw[line] (cod2) to[bend right=25] node[e,below=-4.5mm] {G:C} (cod3);
+\draw[line] (cod2) to[bend right=60] node[e] {T:A} (cod3);
+
+% T->U
+\node[right=6cm of titlea] (titleb) {\textbf{b) Replacing thymine with uracil}};
+
+\node[block,below right=1cm and 12mm of titleb.west,fill=colorG!50] (start2) {start};
+\node[block,right=20mm of start2,minimum size=30pt] (cod4) {};
+\node[block,fill=colorR!50,right=20mm of cod4] (end2) {end};
+
+\draw[line] (start2) -- (cod4);
+\draw[line] (cod4) -- (end2);
+
+\draw[line] (cod4) to[out=165,in=105,min distance=2mm,looseness=5] node[e,below left=0.5mm and -6mm] {A:A} (cod4);
+\draw[line] (cod4) to[out=85,in=15,min distance=2mm,looseness=5] node[e,below left=0.5mm and -1mm] {C:C} (cod4);
+\draw[line] (cod4) to[out=-15,in=285,min distance=2mm,looseness=5] node[e,above left=0.5mm and -1mm] {G:G} (cod4);
+\draw[line] (cod4) to[out=255,in=195,min distance=2mm,looseness=5] node[e,above left=0.5mm and -6mm] {T:U} (cod4);
+
+% transcription FST
+\node[below right=3cm and 25mm of titlea.west] (titlec) {\textbf{c) DNA Transcription}};
+
+\node[block,below right=1cm and 1cm of titlec.west,fill=colorG!50] (start3) {start};
+\node[block,right=15mm of start3,minimum size=20pt] (cod5) {};
+\node[block,right=20mm of cod5,minimum size=20pt] (cod6) {};
+\node[block,right=20mm of cod6,minimum size=20pt] (cod7) {};
+\node[block,right=20mm of cod7,minimum size=20pt] (cod8) {};
+\node[block,fill=colorR!50,right=15mm of cod8] (end3) {end};
+
+\draw[line] (start3) -- (cod5);
+\draw[line] (cod8) -- (end3);
+
+\draw[line] (cod5) to[bend right=-60] node[e] {A:U} (cod6);
+\draw[line] (cod5) to[bend right=-25] node[e] {C:G} (cod6);
+\draw[line] (cod5) to[bend right=25] node[e,below=-4.5mm] {G:C} (cod6);
+\draw[line] (cod5) to[bend right=60] node[e] {T:A} (cod6);
+
+\draw[line] (cod6) to[bend right=-60] node[e] {A:U} (cod7);
+\draw[line] (cod6) to[bend right=-25] node[e] {C:G} (cod7);
+\draw[line] (cod6) to[bend right=25] node[e,below=-4.5mm] {G:C} (cod7);
+\draw[line] (cod6) to[bend right=60] node[e] {T:A} (cod7);
+
+\draw[line] (cod7) to[bend right=-60] node[e] {A:U} (cod8);
+\draw[line] (cod7) to[bend right=-25] node[e] {C:G} (cod8);
+\draw[line] (cod7) to[bend right=25] node[e,below=-4.5mm] {G:C} (cod8);
+\draw[line] (cod7) to[bend right=60] node[e] {T:A} (cod8);
+
+\end{tikzpicture}

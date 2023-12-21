@@ -1,0 +1,171 @@
+% !TEX program=lualatex
+\documentclass[tikz]{standalone}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\usepackage{fontspec}
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{xcolor}
+\usepackage{xfrac}
+
+\usetikzlibrary{shapes,arrows,positioning,calc}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{hobby,spath3,intersections}
+
+\setmainfont{TeX Gyre Heros}
+\setmathfont{Latin Modern Math}
+
+% \tikzset{
+%   font={\fontsize{6}{7}\selectfont}
+% }
+
+%%% Okabe Ito set
+\definecolor{colorO}{RGB}{230,159,0}
+\definecolor{colorSb}{RGB}{86,180,233}
+\definecolor{colorBg}{RGB}{0,158,115}
+\definecolor{colorY}{RGB}{240,228,66}
+\definecolor{colorBu}{RGB}{0,114,178}
+\definecolor{colorV}{RGB}{213,94,0}
+\definecolor{colorRp}{RGB}{204,121,167}
+\definecolor{colorBk}{RGB}{0,0,0}
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+% (86 mm) or double (178 mm) column width
+
+\tikzset{
+  end/.style={fill=none, text=black, inner sep=1pt},
+  block/.style={circle,on grid,fill=colorBu,text=white,minimum width=2em,node distance=4em},
+  line/.style={draw, -stealth', thick},
+  lab/.style={text = black, inner sep=1pt},
+  title/.style={text = black, font=\bfseries}
+}
+
+\begin{document}
+\fontsize{8}{9}\selectfont
+\begin{tikzpicture}
+%\useasboundingbox (0,0) rectangle +(178mm,178mm);
+
+\node[end, anchor=west] at (0,0) (start) {start};
+\node[end, anchor=east] at (86mm,0) (end) {end};
+
+\node[block,right = of start] (s) {S}; 
+\node[block,left = of end] (m) {M};
+
+\draw[line] (start) to (s);
+\draw[line] (m) to (end);
+
+\coordinate (mid) at ($(s.center)!0.5!(m.center)$);
+
+\draw[line] (m) to (s);
+
+% \path[spath/save=sm] (s.center) circle (1em+0.2pt)
+%                   (m.center) circle (1em+0.2pt);
+
+\foreach \y [count=\yi] in {
+  {A:A/$(1-e)$}, {A:C/$(e/3)$}, {A:G/$(e/3)$}, {A:T/$(e/3)$},
+  {C:A/$(e/3)$}, {C:C/$(1-e)$}, {C:G/$(e/3)$}, {C:T/$(e/3)$}
+} {
+    \coordinate (y) at ($(mid) + (0, 15.5em) + \yi*(0, -1.75em)$);
+    % \path[spath/save=arc] (s.center) to[curve through={(y)}] (m.center);
+
+    % \tikzset{
+    %   spath/split at intersections with={arc}{sm},
+    %   spath/remove components={arc}{1,3}
+    % }
+    % \path[line,spath/use=arc];
+    
+    \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
+    \node[lab,anchor=south] at (y) {\y};
+}
+
+\foreach \y [count=\yi] in {
+  {G:A/$(e/3)$}, {G:C/$(e/3)$}, {G:G/$(1-e)$}, {G:T/$(e/3)$},
+  {T:A/$(e/3)$}, {T:C/$(e/3)$}, {T:G/$(e/3)$}, {T:T/$(1-e)$}
+} {
+    \coordinate (y) at ($(mid) + (0, 0.25em) + \yi*(0, -1.75em)$);
+    \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
+    \node[lab,anchor=north] at (y) {\y};
+}
+
+\node[lab,fill=white] at (mid) {ε:ε/$1$};
+
+\draw (start.west) + (0, 15.5em) node[title,anchor=west] (subfig-a) {a) Error FST};
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\node[end, anchor=west] at (0,-70mm) (start) {start};
+\node[end, anchor=east] at (86mm,-70mm) (end) {end};
+
+\node[block,right = of start] (s) {S}; 
+\node[block,left = of end] (m) {M};
+
+\draw[line] (start) to (s);
+\draw[line] (m) to (end);
+
+\coordinate (mid) at ($(s.center)!0.5!(m.center)$);
+
+\draw[line] (m) to (s);
+
+\foreach \y [count=\yi] in {
+  {A:A/$1$}, {C:C/$1$}, {G:G/$1$}, {T:T/$1$}
+} {
+    \coordinate (y) at ($(mid) + (0, 8.5em) + \yi*(0, -1.75em)$);
+    \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
+    \node[lab,anchor=south] at (y) {\y};
+}
+
+\foreach \y [count=\yi] in {
+  {A:N/$1$}, {C:N/$1$}, {G:N/$1$}, {T:N/$1$}
+} {
+    \coordinate (y) at ($(mid) + (0, 0.25em) + \yi*(0, -1.75em)$);
+    \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
+    \node[lab,anchor=north] at (y) {\y};
+}
+
+\node[lab,fill=white] at (mid) {ε:ε/$1$};
+
+\draw (start.west) + (0, 8.5em) node[title,anchor=west] (subfig-b) {b) Ambiguity FST};
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\node[end, anchor=west] at (92mm,-3.5em) (start) {start};
+\node[end, anchor=east] at (178mm,-3.5em) (end) {end};
+
+\node[block,right = of start] (s) {S}; 
+\node[block,left = of end] (m) {M};
+
+\draw[line] (start) to (s);
+\draw[line] (m) to (end);
+
+\coordinate (mid) at ($(s.center)!0.5!(m.center)$);
+
+\draw[line] (m) to (s);
+
+\foreach \y [count=\yi] in {
+  {A:N/$1$}, {A:A/$(1-e)$}, {A:C/$(e/3)$}, {A:G/$(e/3)$}, {A:T/$(e/3)$},
+  {C:N/$1$}, {C:A/$(e/3)$}, {C:C/$(1-e)$}, {C:G/$(e/3)$}, {C:T/$(e/3)$}
+} {
+    \coordinate (y) at ($(mid) + (0, 19em) + \yi*(0, -1.75em)$);
+    \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
+    \node[lab,anchor=south] at (y) {\y};
+}
+
+\foreach \y [count=\yi] in {
+  {G:N/$1$}, {G:A/$(e/3)$}, {G:C/$(e/3)$}, {G:G/$(1-e)$}, {G:T/$(e/3)$},
+  {T:N/$1$}, {T:A/$(e/3)$}, {T:C/$(e/3)$}, {T:G/$(e/3)$}, {T:T/$(1-e)$}
+} {
+    \coordinate (y) at ($(mid) + (0, 0.25em) + \yi*(0, -1.75em)$);
+    \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
+    \node[lab,anchor=north] at (y) {\y};
+}
+
+\node[lab,fill=white] at (mid) {ε:ε/$1$};
+
+\draw (start.west) + (0, 19em) node[title,anchor=west] (subfig-b) {c) Error $∘$ Ambiguity FST};
+
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,119 @@
+\definecolor{colorR}{RGB}{228,26,28}    % RED
+\definecolor{colorB}{RGB}{55,126,184}   % BLUE
+\definecolor{colorG}{RGB}{77,175,74}    % GREEN
+\definecolor{colorP}{RGB}{152,78,163}   % PURPLE
+\definecolor{colorO}{RGB}{255,127,0}    % ORANGE
+\definecolor{colorY}{RGB}{255,255,51}   % YELLOW
+\definecolor{colorBn}{RGB}{166,86,40}   % BROWN
+\definecolor{colorPk}{RGB}{247,129,191} % PINK
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+\tikzstyle{line}=[draw, -stealth', very thick]
+\tikzstyle{block}=[circle,fill=colorB!50,on grid]
+\tikzstyle{lab}=[]
+\tikzstyle{w}=[lab,midway]
+\tikzstyle{e}=[lab,midway,above=0.2mm,auto=false,font=\small]
+
+\begin{tikzpicture}[node distance=40mm, auto,
+	dottedline/.style = {ultra thick, loosely dotted,shorten >=1mm, shorten <=1mm}]
+
+%%% Indel FST
+% \node[below left=3cm and -14mm of titlea.east] (titleb) {\textbf{b) Insertion-Deletion}};
+\node (titleb) {};
+
+\node[block,below right=1.5cm and -1.5cm of titleb.center,fill=colorG!50] (start1) {start};
+\node[block,below=15mm of start1] (S1) {M};
+\node[block,below=of S1] (I1) {U};
+\node[block,right=of I1] (U1) {I};
+\node[block,above=of U1] (W1) {W};
+\node[block,above=20mm of W1] (D1) {V};
+\node[block,right=of D1] (V1) {D};
+\node[block,right=of W1] (M1) {S};
+\node[block,fill=colorR!50,right=20mm of M1] (end1) {end};
+
+\draw (D1) +(0mm,-20mm) coordinate (C1);
+\draw (D1) +(50mm,-10mm) coordinate (C2);
+\draw[line] (start1) -- (S1);
+\draw[line] (S1) -- node[w] {$g$} (I1);
+\draw[line] (S1) -- node[w] {$1-g$} (W1);
+\draw[line] (U1) to[out=120,in=60]  node[w,above] {$e$} (I1);
+\draw[line] (U1) -- node[w,pos=0.1,right] {$1-e$} (W1);
+\draw[line] (W1) -- node[w] {$g$} (D1);
+\draw[line] (W1) -- node[w] {$1-g$} (M1);
+\draw[line] (M1) -- node[w] {} (end1);
+\draw[line] (V1) to[out=120,in=60] node[w,above] {$e$} (D1);
+\draw[line] (V1) -- node[w] {$1-e$} (M1);
+%insertions
+\draw[line] (I1) to[bend right=-25] node[e,pos=0.48,below=-5mm] {\O:A/$\grande{\pi}_{\text{A}}$} (U1);
+\draw[line] (I1) to[bend right=0] node[e,pos=0.48,below=-5mm] {\O:C/ $\grande{\pi}_{\text{C}}$} (U1);
+\draw[line] (I1) to[bend right=25] node[e,pos=0.48,below=-5mm] {\O:G/ $\grande{\pi}_{\text{G}}$} (U1);
+\draw[line] (I1) to[bend right=50] node[e,pos=0.48,below=-5mm] {\O:T/ $\grande{\pi}_{\text{T}}$} (U1);
+% deletion
+\draw[line] (D1) to[bend right=-25] node[e,pos=0.5,below=-4.5mm] {A:\O} (V1);
+\draw[line] (D1) to[bend right=0] node[e,pos=0.5,below=-4.5mm] {C:\O} (V1);
+\draw[line] (D1) to[bend right=25] node[e,pos=0.5,below=-4.5mm] {G:\O} (V1);
+\draw[line] (D1) to[bend right=50] node[e,pos=0.5,below=-4.5mm] {T:\O} (V1);
+% A -> {A,C,G,T}
+\draw[line] (M1) to[bend left=25] (S1);
+\draw[line] (M1) to[bend left=35] (S1);
+\draw[line] (M1) to[bend left=45] (S1);
+\draw[line] (M1) to[bend left=55] (S1);
+\path[] (M1) to[bend left=25] node[e,pos=0.8,below=-3mm,fill=white] {A:A} (S1);
+\path[] (M1) to[bend left=35] node[e,pos=0.6,below=-3mm,fill=white] {C:C} (S1);
+\path[] (M1) to[bend left=45] node[e,pos=0.4,below=-3mm,fill=white] {G:G} (S1);
+\path[] (M1) to[bend left=55] node[e,pos=0.2,below=-3mm,fill=white] {T:T} (S1);
+% % dots
+% \node[below left=9mm and -1mm of W1,font=\Huge] {$\vdots$};
+% % T -> {A,C,G,T}
+% \draw[line] (M1) to[bend left=55] (S1);
+% \draw[line] (M1) to[bend left=59] (S1);
+% \draw[line] (M1) to[bend left=63] (S1);
+% \draw[line] (M1) to[bend left=67] (S1);
+% \path[] (M1) to[bend left=55] node[e,pos=0.8,below=-3mm,fill=white] {T:A} (S1);
+% \path[] (M1) to[bend left=59] node[e,pos=0.6,below=-3mm,fill=white] {T:C} (S1);
+% \path[] (M1) to[bend left=63] node[e,pos=0.4,below=-3mm,fill=white] {T:G} (S1);
+% \path[] (M1) to[bend left=67] node[e,pos=0.2,below=-3mm,fill=white] {T:T} (S1);
+
+%%%% Base calling error FST
+% \node[right=6cm of titleb.east] (titlec) {\textbf{Base Calling Error}};
+
+% \node[block,below=1.5cm of titlec,fill=colorG!50] (start_bce) {start};
+% \node[block,right=15mm of start_bce] (S_bce) {M};
+% \node[block,right=60mm of S_bce] (M_bce) {S};
+% \node[block,fill=colorR!50,right=15mm of M_bce] (end_bce) {end};
+
+% \draw[line] (start_bce) -- (S_bce);
+% \draw[line] (M_bce) -- (end_bce);
+
+% % \draw[line] (M_bce) to[bend right=25] node[w,below=1mm,pos=0.66] {$\varepsilon$} (S_bce);
+% \draw[line] (M_bce) to[bend right=25] node[e] {y$_\text{i}$:z$_\text{j}$/$\grande{\varepsilon}$} (S_bce);
+% % \draw[line] (M_bce) to node[w,below=0.2mm,pos=0.66] {$1 - 3 \cdot \varepsilon$} (S_bce);
+% \draw[line] (M_bce) to node[e] {y$_\text{i}$:z$_\text{j}$/$1-3\cdot \grande{\varepsilon}$} (S_bce);
+% \draw[line] (M_bce) to[bend right=-25] (S_bce);
+% \draw[line] (M_bce) to[bend right=-25] node[e] {y$_\text{i}$:N} (S_bce);
+
+% \draw[line] (S_bce) to[bend left=-60] (M_bce);
+
+%%% Legend
+
+% \node[below left=2cm and 1.5cm of start_bce,text width=50mm,anchor=north west] (sequences) {
+\node[below right=5.8cm and 4.5cm of titleb,text width=50mm,anchor=north west] (sequences) {
+\begin{tabular}{r@{\,: }l}
+\multicolumn{2}{l}{\textbf{Parameters}}\\
+    \hline
+	% X & input nucleotides\\
+	% y & input sequence\\
+	% z & output sequence\\
+	\O & empty sequence\\
+	$g$ & gap open weight\\
+	$e$ & gap extension weight\\
+	$\grande{\pi}$ & residue stationary freq.\\
+        % Y$_i$:Y$_i$ & matches\\
+        % Y$_i$:Y$_j$ & mismatches\\
+ % 	$i \rightarrow i$ & matching input to intermediate base\\
+	% $i \rightarrow j$ & mismatching input to intermediate base\\
+	% $i \rightarrow N$ & input to intermediate ambiguous base N\\
+\end{tabular}
+};
+
+\end{tikzpicture}

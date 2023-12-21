@@ -1,16 +1,19 @@
-\RequirePackage{luatex85}
-\documentclass[12pt,letterpaper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
 \usepackage[letterpaper,margin=1in]{geometry}
-\setlength{\parskip}{5px}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\usepackage{fontspec}
+\usepackage{microtype}
+
+\setmainfont{TeX Gyre Pagella}
+\setmathfont{Latin Modern Math}
+
 \usepackage{url}
 \usepackage{graphicx}
 \graphicspath{{figures/}}
-\usepackage{mathptmx}[ptm]
-\usepackage[T1]{fontenc}
-\usepackage{textcomp}
-% \usepackage[scaled]{helvet}
+
 \usepackage[compact,tiny]{titlesec}
 
 \usepackage[authoryear,round]{natbib}
@@ -21,6 +24,7 @@
 \newcommand{\citembethree}[3]{(\citetwo{#1}{#2}; \cite{#3})}
 
 \usepackage{tikz}
+\usetikzlibrary{arrows,automata,positioning,shapes,decorations.text,backgrounds,matrix}
 \usepackage{wrapfig, framed}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage[hidelinks]{hyperref}
@@ -28,13 +32,15 @@
 \usepackage{relsize}
 \usepackage[left]{lineno}
 \usepackage{colortbl}
+\usepackage{multicol}
 
 \pagenumbering{arabic}
 \newcommand*\pct{\scalebox{.9}{\%}}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\green}[1]{\textcolor{green}{#1}}
-\newcommand{\blue}[1]{\textcolor{blue}{#1}}
-\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\newcommand{\cyan}[1]{\textcolor{cyan}{#1}}
+\newcommand{\grande}[1]{\mathlarger{\mathlarger{#1}}}
+%\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 \hypersetup{
     colorlinks=true,
     linkcolor=black,
@@ -43,3 +49,5 @@
 }
 
 \newcommand{\TODO}[1]{\begingroup\bfseries\color{red}TODO:~#1\endgroup}
+
+

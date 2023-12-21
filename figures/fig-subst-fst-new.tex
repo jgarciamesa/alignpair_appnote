@@ -1,0 +1,202 @@
+% !TEX program=lualatex
+\documentclass[tikz]{standalone}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\usepackage{fontspec}
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{xcolor}
+
+\usetikzlibrary{shapes,arrows,positioning}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{hobby,spath3,intersections}
+
+\setmainfont{TeX Gyre Heros}
+\setmathfont{Latin Modern Math}
+
+% \tikzset{
+%   font={\fontsize{6}{7}\selectfont}
+% }
+
+%%% Okabe Ito set
+\definecolor{colorO}{RGB}{230,159,0}
+\definecolor{colorSb}{RGB}{86,180,233}
+\definecolor{colorBg}{RGB}{0,158,115}
+\definecolor{colorY}{RGB}{240,228,66}
+\definecolor{colorBu}{RGB}{0,114,178}
+\definecolor{colorV}{RGB}{213,94,0}
+\definecolor{colorRp}{RGB}{204,121,167}
+\definecolor{colorBk}{RGB}{0,0,0}
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+\tikzstyle{line}=[draw, -stealth', very thick]
+\tikzstyle{lab}=[]
+\tikzstyle{w}=[lab,midway]
+\tikzstyle{e}=[lab,midway,above=0.2mm,auto=false,font=\scriptsize]
+
+% (86 mm) or double (178 mm) column width
+
+\begin{document}
+\fontsize{6}{7}\selectfont
+\begin{tikzpicture}[
+  block/.style={circle,on grid,fill=colorBu,text=white,minimum width=2.1em,node distance=4em},
+  start/.style={block,fill=none,text=black, inner sep=1pt},
+  end/.style={block,fill=none,text=black, inner sep=1pt},
+  line/.style={draw, -stealth', very thick},
+  label/.style={text = black}
+]
+
+\node[start] (start) {start};
+\node[block,right = 5em of start] (s) {S};
+\node[block, right = 7em of s] (u0) {};
+\node[block, right = 21em of s] (v0) {};
+\node[block,right = 28em of s] (m) {M};
+\node[end,right = 5em of m] (e) {end};
+
+\node[block,below = of u0] (u1) {};
+\node[block,below = of u1] (u2) {};
+\node[block,below = of u2] (u3) {};
+\node[on grid, below = 4.25em of u3] (u4) {};
+
+\node[block,below = of v0] (v1) {};
+\node[block,below = of v1] (v2) {};
+\node[block,below = of v2] (v3) {};
+\node[on grid, below = 4.25em of v3] (v4) {};
+
+\draw[line] (start) to (s); 
+\draw[line] (m) to (e); 
+\draw[line] (m) to[bend right=30] (s);
+
+%\draw[red] (start.west) ++(0,15mm) rectangle +(86mm,-86mm);
+
+%%%%%%%%
+
+\path[spath/save = curve0] (s.center) to[curve through={(u0.center) .. (v0.center)}] (m.center);
+
+\path[spath/save = c0]
+    (s.center) circle (1.1em)
+    (u0.center) circle (1.1em)
+    (v0.center) circle (1.1em)
+    (m.center) circle (1.1em);
+
+\tikzset{
+    spath/.cd,
+    split at intersections with={curve0}{c0},
+    get components of={curve0}\cpts
+}
+
+\draw[line,spath/restore=\getComponentOf{\cpts}{2}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{4}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{6}];
+
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{2}}{0.5}] {A:A}; 
+
+\node[anchor = north] at (spath cs:{\getComponentOf{\cpts}{4}} 0.5) {A:A/P(AAA|AAA)};
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{6}}{0.5}]  {A:A};
+
+%%%%%%%%
+
+\path[spath/save = curve1] (s.center) to[curve through={(u1.center) .. (v1.center)}] (m.center);
+
+\path[spath/save = c1]
+    (s.center) circle (1.1em)
+    (u1.center) circle (1.1em)
+    (v1.center) circle (1.1em)
+    (m.center) circle (1.1em);
+
+\tikzset{
+    spath/.cd,
+    split at intersections with={curve1}{c1},
+    get components of={curve1}\cpts
+}
+
+\draw[line,spath/restore=\getComponentOf{\cpts}{2}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{4}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{6}];
+
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{2}}{0.58}] {A:A}; 
+
+\node[label, anchor = north] at (spath cs:{\getComponentOf{\cpts}{4}} 0.5) {A:A/P(AAC|AAA)};
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{6}}{0.42}]  {A:C};
+
+%%%%%%%%
+
+\path[spath/save = curve2] (s.center) to[curve through={(u2.center) .. (v2.center)}] (m.center);
+
+\path[spath/save = c2]
+    (s.center) circle (1.1em)
+    (u2.center) circle (1.1em)
+    (v2.center) circle (1.1em)
+    (m.center) circle (1.1em);
+
+\tikzset{
+    spath/.cd,
+    split at intersections with={curve2}{c2},
+    get components of={curve2}\cpts
+}
+
+\draw[line,spath/restore=\getComponentOf{\cpts}{2}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{4}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{6}];
+
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{2}}{0.67}] {A:A}; 
+
+\node[label, anchor = north] at (spath cs:{\getComponentOf{\cpts}{4}} 0.5) {A:A/P(AAG|AAA)};
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{6}}{0.33}]  {A:G};
+
+%%%%%%%%
+
+\path[spath/save = curve3] (s.center) to[curve through={(u3.center) .. (v3.center)}] (m.center);
+
+\path[spath/save = c3]
+    (s.center) circle (1.1em)
+    (u3.center) circle (1.1em)
+    (v3.center) circle (1.1em)
+    (m.center) circle (1.1em);
+
+\tikzset{
+    spath/.cd,
+    split at intersections with={curve3}{c3},
+    get components of={curve3}\cpts
+}
+
+\draw[line,spath/restore=\getComponentOf{\cpts}{2}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{4}];
+\draw[line,spath/restore=\getComponentOf{\cpts}{6}];
+
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{2}}{0.75}] {A:A}; 
+\node[label, anchor = north] at (spath cs:{\getComponentOf{\cpts}{4}} 0.5) {A:A/P(AAT|AAA)};
+
+\node[label, below, transform shape, spath/transform to={\getComponentOf{\cpts}{6}}{0.25}] {A:T}; 
+
+%%%%%%%%
+
+\path[spath/save = curve4] (s.center) to[curve through={(u4.center) .. (v4.center)}] (m.center);
+
+\path[spath/save = c4]
+    (s.center) circle (1.1em)
+    (m.center) circle (1.1em);
+
+\tikzset{
+    spath/.cd,
+    split at intersections with={curve4}{c4},
+    get components of={curve4}\cpts
+}
+
+\draw[line,draw=darkgray,dotted,spath/use=\getComponentOf{\cpts}{2}];
+
+\draw[draw=white,line width=1ex,
+spath/split at keep middle={\getComponentOf{\cpts}{2}}{0.37}{0.6},
+spath/use=\getComponentOf{\cpts}{2}];
+
+
+\path[spath/use=\getComponentOf{\cpts}{2},
+  postaction={decorate,decoration={text along path,
+  text align=center,text color=darkgray,raise=-0.5ex,
+  text={|\itshape|3717 additional arcs}}}];
+
+\end{tikzpicture}
+\end{document}
