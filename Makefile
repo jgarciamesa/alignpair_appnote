@@ -1,18 +1,22 @@
-.DEFAULT_GOAL := alignpair_letter.pdf
-
-TEX_FILES := $(addsuffix .tex, alignpair_letter header abstract introduction materials_methods results_discussion)
-FIGS := $(addprefix figures/, fig-evolution-fst.pdf fig-aln.pdf)
+FIGS = fig-fst-base-calling-new.pdf fig-aln.pdf
 TABS := $(addprefix figures/, table-comp.tex)
 SCRIPTS := $(addprefix supplementary_materials/scripts/, kaks.R number_alignments.R plot_dseq.R)
 PLOT_DATA := $(addprefix supplementary_data/,$(addsuffix /plot_distance.csv, tri-mg tri-ecm mar-mg mar-ecm))
 
-alignpair_letter.pdf: $(TEX_FILES) alignpair_letter.bib $(FIGS) $(TABS) mbe.bst
-	@latexmk -pdf $<
-	@make clean
+default: all
+
+all: alignpair_letter.pdf
+
+.PHONY: all default
+
+alignpair_letter.pdf: alignpair_letter.tex alignpair_letter.bib $(TABS) mbe.bst
+	latexmk -recorder -synctex=1 -lualatex $<
+
+alignpair_letter.pdf: $(addprefix figures/, $(FIGS))
 
 figures/fig-%.pdf: figures/fig-%.tex
-	@lualatex $<
-	@mv $(@F) figures/
+	latexmk -cd -lualatex $<
+	#@mv $(@F) figures/
 
 ALIGNERS := clustalo macse mafft prank
 
