@@ -113,10 +113,10 @@ To address current limitations of alignment software to accurately align protein
 
 \subsection*{Statistical Alignment}
 
-Statistical alignment is typically performed using pairwise hidden Markov models (pair-HMMs), which have the ability to rigorously model molecular sequence evolution \citep{bradley2007transducers}.
-Pair-HMMs are computational machines with two output tapes. Pair-HMMs contain a finite number of states---typically labeled match, insert, and delete---that emit symbols (nucleotides or amino acids) to one or both tapes.
-Each tape represents a sequence, and a path through a pair-HMM is a possible pairwise alignment.
-Conceptually, these machines generate two sequences ($\text{X}$ and $\text{Y}$) from an unknown ancestor and can calculate the probability that two sequences are related, represented by $P(\text{X}, \text{Y})$ \citep{yoon_2009_hmm}.
+In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{Lunter2005-hk}. While approaches vary, a statistical aligner for a pair of sequences $X$ and $Y$ typically finds an alignment $A$ that maximizes the joint probability $P(X, Y, A)$ or samples alignments from the posterior $P(A | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{bradley2007transducers}. Pair-HMMs are computational machines with two output tapes. Each tape represents a sequence, and a path through a pair-HMM is a possible pairwise alignment.
+Conceptually, these machines generate two sequences from an unknown ancestor and can calculate the probability that two sequences are related, i.e.\ $P(X, Y)$ \citep{yoon_2009_hmm}.
+
+While the use of pair-HMMs is ubiquitous in bioinformatics, their 
 
 A limitation of pair-HMMs is that they only model the evolution of two related sequences from an unknown ancestor.
 Finite-state transducers (FSTs) have similar benefits to pair-HMMs with the additional feature that they can model the generation of a descendant sequence given an ancestral one.
@@ -132,9 +132,19 @@ Composition allows combining two or more FSTs to create a new, more complex tran
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[scale=1]{figures/fig-fst-base-calling-new.pdf}
-    \caption[DNA Transcription via FST Composition]{DNA transcription via FST composition. The composition of (a) a codon complimenting FST and (b) an FST that replaces T with U generates (c) an FST that implements codon transcription ($a~\circ~b = c$).}
-    \label{fig:transcription}
+    \includegraphics[width=\textwidth]{figures/fig-fst-base-calling-new.pdf}
+    \caption[FSTs more the generation of sequences]{%
+    Finite state transducers (FSTs) model the generation of an output sequences based on an input sequence.
+    %
+    (a) A graph of a probabilistic FST \citep{cotterell-etal-2014-stochastic} for base-calling errors using a Mealy-machine architecture, where parameter $u$ is the error rate. This graph contains two states (S and M) connected by arcs, with labels ``input symbols~:~output symbols~/~weight''. Arcs consume symbols from the input sequence and emit symbols to the output sequence. Weights describe the probability that an arc is taken given the input symbols. Epsilon (ε) is a special symbol denoting that no symbols were either consumed or emitted.
+    %
+    (b) An FST for matching sequences against ambiguous nucleotides (N). This FST is not a true probabilistic FST and cannot be used to simulate output sequences since it is missing a parameter to control how often Ns are added to the output sequence.
+    %
+    (c) An FST that results from the composition ($∘$ operation) of the Error FST with the Ambiguity FST. As with (b), this composed FST cannot be used to simulate output sequences; however, it does properly weight the ambiguous nucleotide N as representing any other symbol.
+    %
+    %Let $x$ be a symbol in the input of (a), $y$ be a symbol in the output of (b), and $z$ be a symbol in both the output of (a) and the input of (b). An arc in the composed FST (c) has an input symbol $x$, an output symbol $y$, and a weight that is the combination over $z$ of the aggregate weights of all $x$-$z$-$y$ arc pairs.
+    %
+    }\label{fig:base-calling}
 \end{figure}
 
 COATi implements the pairwise alignment of a potentially lower-quality sequence against a high-quality sequence as a path through the Evolution FST (Fig.\ \ref{fig:evolution-fst}) \citep[c.f.][]{holmes2001evolutionary}.

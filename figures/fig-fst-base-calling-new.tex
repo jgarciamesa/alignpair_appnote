@@ -8,9 +8,8 @@
 \usepackage{fontspec}
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 \usepackage{xcolor}
-\usepackage{xfrac}
 
-\usetikzlibrary{shapes,arrows,positioning,calc}
+\usetikzlibrary{shapes,arrows.meta,positioning,calc}
 \usetikzlibrary{decorations.markings}
 \usetikzlibrary{decorations.text}
 \usetikzlibrary{hobby,spath3,intersections}
@@ -38,7 +37,7 @@
 \tikzset{
   end/.style={fill=none, text=black, inner sep=1pt},
   block/.style={circle,on grid,fill=colorBu,text=white,minimum width=2em,node distance=4em},
-  line/.style={draw, -stealth', thick},
+  line/.style={draw, -Stealth, thick},
   lab/.style={text = black, inner sep=1pt},
   title/.style={text = black, font=\bfseries}
 }
@@ -51,11 +50,11 @@
 \node[end, anchor=west] at (0,0) (start) {start};
 \node[end, anchor=east] at (86mm,0) (end) {end};
 
-\node[block,right = of start] (s) {S}; 
-\node[block,left = of end] (m) {M};
+\node[block,right = of start] (m) {M}; 
+\node[block,left = of end] (s) {S};
 
-\draw[line] (start) to (s);
-\draw[line] (m) to (end);
+\draw[line] (start) to (m);
+\draw[line] (s) to (end);
 
 \coordinate (mid) at ($(s.center)!0.5!(m.center)$);
 
@@ -65,8 +64,8 @@
 %                   (m.center) circle (1em+0.2pt);
 
 \foreach \y [count=\yi] in {
-  {A:A/$(1-e)$}, {A:C/$(e/3)$}, {A:G/$(e/3)$}, {A:T/$(e/3)$},
-  {C:A/$(e/3)$}, {C:C/$(1-e)$}, {C:G/$(e/3)$}, {C:T/$(e/3)$}
+  {A:A/$(1-u)$}, {A:C/$(u/3)$}, {A:G/$(u/3)$}, {A:T/$(u/3)$},
+  {C:A/$(u/3)$}, {C:C/$(1-u)$}, {C:G/$(u/3)$}, {C:T/$(u/3)$}
 } {
     \coordinate (y) at ($(mid) + (0, 15.5em) + \yi*(0, -1.75em)$);
     % \path[spath/save=arc] (s.center) to[curve through={(y)}] (m.center);
@@ -82,8 +81,8 @@
 }
 
 \foreach \y [count=\yi] in {
-  {G:A/$(e/3)$}, {G:C/$(e/3)$}, {G:G/$(1-e)$}, {G:T/$(e/3)$},
-  {T:A/$(e/3)$}, {T:C/$(e/3)$}, {T:G/$(e/3)$}, {T:T/$(1-e)$}
+  {G:A/$(u/3)$}, {G:C/$(u/3)$}, {G:G/$(1-u)$}, {G:T/$(u/3)$},
+  {T:A/$(u/3)$}, {T:C/$(u/3)$}, {T:G/$(u/3)$}, {T:T/$(1-u)$}
 } {
     \coordinate (y) at ($(mid) + (0, 0.25em) + \yi*(0, -1.75em)$);
     \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
@@ -99,11 +98,11 @@
 \node[end, anchor=west] at (0,-70mm) (start) {start};
 \node[end, anchor=east] at (86mm,-70mm) (end) {end};
 
-\node[block,right = of start] (s) {S}; 
-\node[block,left = of end] (m) {M};
+\node[block,right = of start] (m) {M}; 
+\node[block,left = of end] (s) {S};
 
-\draw[line] (start) to (s);
-\draw[line] (m) to (end);
+\draw[line] (start) to (m);
+\draw[line] (s) to (end);
 
 \coordinate (mid) at ($(s.center)!0.5!(m.center)$);
 
@@ -135,19 +134,19 @@
 \node[end, anchor=west] at (92mm,-3.5em) (start) {start};
 \node[end, anchor=east] at (178mm,-3.5em) (end) {end};
 
-\node[block,right = of start] (s) {S}; 
-\node[block,left = of end] (m) {M};
+\node[block,right = of start] (m) {M}; 
+\node[block,left = of end] (s) {S};
 
-\draw[line] (start) to (s);
-\draw[line] (m) to (end);
+\draw[line] (start) to (m);
+\draw[line] (s) to (end);
 
 \coordinate (mid) at ($(s.center)!0.5!(m.center)$);
 
 \draw[line] (m) to (s);
 
 \foreach \y [count=\yi] in {
-  {A:N/$1$}, {A:A/$(1-e)$}, {A:C/$(e/3)$}, {A:G/$(e/3)$}, {A:T/$(e/3)$},
-  {C:N/$1$}, {C:A/$(e/3)$}, {C:C/$(1-e)$}, {C:G/$(e/3)$}, {C:T/$(e/3)$}
+  {A:N/$1$}, {A:A/$(1-u)$}, {A:C/$(u/3)$}, {A:G/$(u/3)$}, {A:T/$(u/3)$},
+  {C:N/$1$}, {C:A/$(u/3)$}, {C:C/$(1-u)$}, {C:G/$(u/3)$}, {C:T/$(u/3)$}
 } {
     \coordinate (y) at ($(mid) + (0, 19em) + \yi*(0, -1.75em)$);
     \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);
@@ -155,8 +154,8 @@
 }
 
 \foreach \y [count=\yi] in {
-  {G:N/$1$}, {G:A/$(e/3)$}, {G:C/$(e/3)$}, {G:G/$(1-e)$}, {G:T/$(e/3)$},
-  {T:N/$1$}, {T:A/$(e/3)$}, {T:C/$(e/3)$}, {T:G/$(e/3)$}, {T:T/$(1-e)$}
+  {G:N/$1$}, {G:A/$(u/3)$}, {G:C/$(u/3)$}, {G:G/$(1-u)$}, {G:T/$(u/3)$},
+  {T:N/$1$}, {T:A/$(u/3)$}, {T:C/$(u/3)$}, {T:G/$(u/3)$}, {T:T/$(1-u)$}
 } {
     \coordinate (y) at ($(mid) + (0, 0.25em) + \yi*(0, -1.75em)$);
     \path[line,shorten <=1em+0.2pt, shorten >=1em+0.3pt] (s.center) to[curve through={(y)}] (m.center);

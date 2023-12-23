@@ -1,0 +1,185 @@
+% !TEX program=lualatex
+\documentclass[tikz]{standalone}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\usepackage{fontspec}
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{xcolor}
+
+\usetikzlibrary{shapes,arrows.meta,positioning,calc}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.text}
+%\usetikzlibrary{hobby,spath3,intersections}
+
+\setmainfont{TeX Gyre Heros}
+\setmathfont{Latin Modern Math}
+
+%%% Okabe Ito set
+\definecolor{colorO}{RGB}{230,159,0}
+\definecolor{colorSb}{RGB}{86,180,233}
+\definecolor{colorBg}{RGB}{0,158,115}
+\definecolor{colorY}{RGB}{240,228,66}
+\definecolor{colorBu}{RGB}{0,114,178}
+\definecolor{colorV}{RGB}{213,94,0}
+\definecolor{colorRp}{RGB}{204,121,167}
+\definecolor{colorBk}{RGB}{0,0,0}
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+% (86 mm) or double (178 mm) column width
+
+\tikzset{
+  end/.style={fill=none, text=black, inner sep=1pt},
+  block/.style={circle,on grid,fill=colorBu,text=white,minimum width=2em,node distance=4em},
+  line/.style={draw, -Stealth, thick},
+  lab/.style={text = black, inner sep=1pt},
+  title/.style={text = black, font=\bfseries}
+}
+
+\begin{document}
+\fontsize{8}{9}\selectfont
+\begin{tikzpicture}
+
+\node[end, anchor=west] at (0,0) (start) {start};
+\node[end, anchor=east] at (86mm,0) (end) {end};
+
+\node[block,right = of start] (m) {M}; 
+\node[block,left = of end] (s) {S};
+
+\draw[line] (start) to (m);
+\draw[line] (s) to (end);
+
+\coordinate (mid) at ($(s.center)!0.5!(m.center)$);
+
+\draw[line] (m) to (s);
+\node[lab,fill=white] at (mid) {ε:ε/$1$};
+
+\foreach \y [count=\yi] in {
+   {AAA:AAT/$P(AAT|AAA)$}, {AAA:AAG/$P(AAG|AAA)$},
+   {AAA:AAC/$P(AAC|AAA)$}, {AAA:AAA/$P(AAA|AAA)$}
+ } {
+     \coordinate (y) at ($(mid) + (0em, -0.25em) + \yi*(0, 1.75em)$);
+     \node[lab,anchor=south] (lab-\yi) at (y) {\y};
+}
+
+\path[line] (s) to[out=160,in=0] (lab-1.south) to[out=180,in=20] (m);
+\path[line] (s) to[out=140,in=0,looseness=1.2] (lab-2.south)
+                to[out=180,in=40,looseness=1.2] (m);
+\path[line] (s) to[out=120,in=0,looseness=1.2] (lab-3.south)
+                to[out=180,in=60,looseness=1.2] (m);
+\path[line] (s) to[out=100,in=0,looseness=1.3] (lab-4.south)
+                to[out=180,in=80,looseness=1.3] (m);
+
+%%%%%%%%%%%%%%%%%%%%
+
+\draw (mid) + (0em, -2em) coordinate (y);
+
+\path[line,draw=darkgray,dotted,
+    postaction={-,dash={on 9.4em off 24em phase -4.8em},
+      draw=white,line width=2pt},
+    postaction={decorate,decoration={text along path,
+      text align=center,text color=darkgray,raise=-0.5ex,
+      reverse path,
+      text={|\itshape|3717 additional arcs}}}
+] (s)
+  to[out=200,in=0,looseness=1] (y)
+  to[out=180,in=-20,looseness=1] (m);
+
+\draw (start.west) + (0, 9.25em) node[title,anchor=west] (subfig-a) {a) Codon Substitution FST};
+
+%%%%%%%%%%
+
+\node[block, anchor=west] at (92mm,0mm) (m) {M};
+\node[end, anchor=east] at (178mm,0mm) (end) {end};
+
+\node[end,above = 2em of m] (start) {start}; 
+\node[block,left = 4.2em of end] (s) {S};
+
+\draw (m.west) + (0, 9.25em) node[title,anchor=west] (subfig-b) {b) Indel FST};
+
+
+\draw[line] (start) to (m);
+\draw[line] (s) to (end);
+
+\coordinate (mid) at ($(s.center)!0.5!(m.center)$);
+
+\node[block] (w) at (mid) {W};
+
+\node[block] (h) at ($(m.center)!0.9! -90:(w.center)$) {H};
+\node[block] (i) at ($(w.center)!0.9!  90:(m.center)$) {I};
+
+\node[block] (c) at ($(w.center)!0.5!  90:(s.center)$) {C};
+\node[block] (d) at ($(s.center)!0.5! -90:(w.center)$) {D};
+
+\draw[line] (m) to node[lab,above] {ε:ε/$(1-g)$} (w);
+\draw[line] (m) to node[lab,left] {ε:ε/$g$} (h);
+
+\draw[line] (w) to node[lab,above] {ε:ε/$(1-g)$} (s);
+\draw[line] (w) to node[lab,left] {ε:ε/$g$} (c);
+
+%% Insertions
+
+\draw[line] (i) to node[lab,right,pos=0.1] {ε:ε/$(1-e)$} (w);
+\draw[line] (i) to node[lab,fill=white] {ε:ε/$e$} (h);
+\draw[line] (h) to[bend left=40] node[lab,above] {ε:A/$\pi_{\text{A}}$} (i);
+\draw[line] (h) to[bend left=15] node[lab,above] {ε:C/$\pi_{\text{C}}$} (i);
+\draw[line] (h) to[bend right=15] node[lab,below] {ε:G/$\pi_{\text{G}}$} (i);
+\draw[line] (h) to[bend right=40] node[lab,below] {ε:T/$\pi_{\text{T}}$} (i);
+
+%% Deletions
+
+\draw[line] (d) to node[lab,right] {ε:ε/$(1-e)$} (s);
+\draw[line] (d) to node[lab,fill=white] {ε:ε/$e$} (c);
+\draw[line] (c) to[bend left=40] node[lab,above] {A:ε/$1$} (d);
+\draw[line] (c) to[bend left=15] node[lab,above] {C:ε/$1$} (d);
+\draw[line] (c) to[bend right=15] node[lab,below] {G:ε/$1$} (d);
+\draw[line] (c) to[bend right=40] node[lab,below] {T:ε/$1$} (d);
+
+%% Substitutions
+
+\draw[white,line width=2pt] ($(w)!0.245!(i)$) -- +(0,4pt);
+\draw[white,line width=2pt] ($(w)!0.385!(i)$) -- +(0,4pt);
+\draw[white,line width=2pt] ($(w)!0.525!(i)$) -- +(0,4pt);
+\draw[white,line width=2pt] ($(w)!0.665!(i)$) -- +(0,4pt);
+
+\coordinate (suba) at ($(w.center)!0.30! 20:(i.center) +(2em,0.5em)$);
+\coordinate (subc) at ($(w.center)!0.45! 20:(i.center) +(2em,0.5em)$);
+\coordinate (subg) at ($(w.center)!0.60! 20:(i.center) +(2em,0.5em)$);
+\coordinate (subt) at ($(w.center)!0.75! 20:(i.center) +(2em,0.5em)$);
+
+\draw[line] (s) to[out=225,in=0] (suba) to[out=180,in=350] (m);
+\draw[line] (s) to[out=240,in=0] (subc) to[out=180,in=335] (m);
+\draw[line] (s) to[out=255,in=0] (subg) to[out=180,in=320] (m);
+\draw[line] (s) to[out=270,in=0] (subt) to[out=180,in=305] (m);
+
+\node[lab,fill=white] at (suba) {A:A/$1$};
+\node[lab,fill=white] at (subc) {C:C/$1$};
+\node[lab,fill=white] at (subg) {G:G/$1$};
+\node[lab,fill=white] at (subt) {T:T/$1$};
+
+%%%%%%%%%%%%%%%%%
+
+\node[lab,anchor=west] (intape) at (0mm,-25mm)  {input};
+\node[lab,anchor=east] (outtape) at (86mm,-25mm)  {output};
+
+\draw (intape.west) + (0, 4em) node[title,anchor=west] (subfig-c) {c) COATi FST};
+
+\draw (intape.center)
+    ++(10em, 0em) coordinate (b)
+    ++(5em, 0em) coordinate (c)
+    ++(5em, 0em) coordinate (d)
+;
+
+\draw[line] (intape) to node[lab,anchor=base,yshift=0.5em,xshift=-2pt] {Substitution} (b);
+\draw[line] (b) to node[lab,anchor=base,yshift=0.5em,xshift=-2pt] {Indel} (c);
+\draw[line] (c) to node[lab,anchor=base,yshift=0.5em,xshift=-2pt] {Error} (d);
+\draw[line] (d) to node[lab,anchor=base,yshift=0.5em,xshift=-2pt] {Ambiguity} (outtape);
+
+\draw[thick,decorate,decoration={brace,amplitude=5pt,mirror,raise=1em}]
+(intape) to node[lab,yshift=-2em, anchor=north] {COATi FST} (outtape);
+
+\end{tikzpicture}
+\end{document}
