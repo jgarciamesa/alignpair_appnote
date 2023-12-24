@@ -1,4 +1,4 @@
-FIGS = fig-fst-base-calling-new.pdf fig-aln.pdf
+FIGS = fig-fst-base-calling-new.pdf fig-aln.pdf fig-fst-coati.pdf
 TABS := $(addprefix figures/, table-comp.tex)
 SCRIPTS := $(addprefix supplementary_materials/scripts/, kaks.R number_alignments.R plot_dseq.R)
 PLOT_DATA := $(addprefix supplementary_data/,$(addsuffix /plot_distance.csv, tri-mg tri-ecm mar-mg mar-ecm))
@@ -16,7 +16,6 @@ alignpair_letter.pdf: $(addprefix figures/, $(FIGS))
 
 figures/fig-%.pdf: figures/fig-%.tex
 	latexmk -cd -lualatex $<
-	#@mv $(@F) figures/
 
 ALIGNERS := clustalo macse mafft prank
 

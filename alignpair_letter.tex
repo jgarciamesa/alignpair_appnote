@@ -111,24 +111,13 @@ To address current limitations of alignment software to accurately align protein
 
 \section*{Materials and Methods}
 
-\subsection*{Statistical Alignment}
+\subsection*{Statistical Alignment via Finite State Tranducers}
 
-In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{Lunter2005-hk}. While approaches vary, a statistical aligner for a pair of sequences $X$ and $Y$ typically finds an alignment $A$ that maximizes the joint probability $P(X, Y, A)$ or samples alignments from the posterior $P(A | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{bradley2007transducers}. Pair-HMMs are computational machines with two output tapes. Each tape represents a sequence, and a path through a pair-HMM is a possible pairwise alignment.
-Conceptually, these machines generate two sequences from an unknown ancestor and can calculate the probability that two sequences are related, i.e.\ $P(X, Y)$ \citep{yoon_2009_hmm}.
+In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{Lunter2005-hk}. An advantage of statistical alignment is that its parameters are derived from biological processes, allowing them to be estimated directly from data or extracted from previous studies. While approaches vary, a statistical aligner for a pair of sequences, $X$ and $Y$, typically finds an alignment, $Aln$, that maximizes the joint probability $P(Aln, X, Y)$ or samples alignments from the posterior $P(Aln | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{bradley2007transducers}. Pair-HMMs are computational machines with two output tapes. Each tape represents a sequence, and a path through the pair-HMM represents an alignment of the two sequences. Conceptually, Pair-HMMs generate two sequences from an unknown ancestor and can calculate the joint probability $P(Aln, X, Y)$ \citep{yoon_2009_hmm}.
 
-While the use of pair-HMMs is ubiquitous in bioinformatics, their 
+While the use of pair-HMMs is ubiquitous in bioinformatics, they are limited to modeling the evolution of two related sequences from an unknown ancestor. As an alternative, finite-state transducers (FSTs, Fig.~\ref{fig:base-calling}) allow researchers to model the evolution of a descendant sequence from an ancestral sequence. FSTs are computational machines with one input tape and one output tape and provide similar benefits to pair-HMMs, while being more suitable for evolutionary models \citep{bradley2007transducers}. FSTs consume symbols from an input tape and emit symbols to an output tape based on the symbols consumed and the structure of the FST. Conceptually, FSTs generate a descendant sequence, $D$, from a known ancestor, $A$, and can calculate the conditional probability $P(Aln, D | A)$.
 
-A limitation of pair-HMMs is that they only model the evolution of two related sequences from an unknown ancestor.
-Finite-state transducers (FSTs) have similar benefits to pair-HMMs with the additional feature that they can model the generation of a descendant sequence given an ancestral one.
-FSTs consume symbols from an input tape and emit symbols to an output tape.
-Properly weighted, an FST can calculate the probability that a descendant sequence, $\text{Y}$, evolved from an ancestral sequence, $\text{X}$, represented by $P(\text{Y} | \text{X})$.
-% Furthermore, well-established algorithms for combining FSTs in different ways allow the design of complex models by combining simpler FSTs \citembe{bradley2007transducers}.
-% A powerful and versatile algorithm for comparative sequence analysis is composition, which consists of sending the output of one FST into the input of a second FST.
-% COATi uses composition to derive a statistical alignment model from the combination of smaller FSTs, each representing a specific process.
-
-Furthermore, there are well-established algorithms for combining FSTs in different ways, including concatenation, composition, intersection, union, or reversal, allowing the design of complex models by combining simpler FSTs \citep{bradley2007transducers,silvestre2021machine}.
-Specifically, composition is a powerful and versatile algorithm for comparative sequence analysis, consisting of sending the output of one FST into the input of a second FST.
-Composition allows combining two or more FSTs to create a new, more complex transducer. Figure \ref{fig:transcription} illustrates how DNA transcription for a codon can be achieved by composing a complementing FST with a transducer that replaces thymines with uracil, where the three nucleotides are read and complemented in \ref{fig:transcription}-a, which are then used as the input of \ref{fig:transcription}-b, resulting in the transcription of the codon (Fig.~\ref{fig:transcription}-c). COATi uses composition to derive a statistical alignment model from the combination of smaller FSTs, each representing a specific process.
+There are well-established algorithms for combining FSTs in different ways allowing the design of complex models by combining simpler FSTs, including concatenation, composition, intersection, union, and reversal \citep{bradley2007transducers,silvestre2021machine}. Specifically, composition is an algorithm to combine two FSTs by sending the output of one FST into the input of another, creating a new, more complex transducer. Figure~\ref{fig:base-calling} illustrates how FSTs modeling sequencing errors (Fig.~\ref{fig:base-calling}a) and ambiguity (Fig.~\ref{fig:base-calling}b) can be combined via composition to produce an FST that does both (Fig.~\ref{fig:base-calling}c). Conceptually, composition creates an FST that generates a descendant sequence from a known ancestor via an unknown intermediate, $J$, and can calculate the conditional probability $P(D|A) = \sum_{J} P(D|J)P(J|A)$. 
 
 \begin{figure}[!ht]
     \centering
@@ -147,27 +136,25 @@ Composition allows combining two or more FSTs to create a new, more complex tran
     }\label{fig:base-calling}
 \end{figure}
 
-COATi implements the pairwise alignment of a potentially lower-quality sequence against a high-quality sequence as a path through the Evolution FST (Fig.\ \ref{fig:evolution-fst}) \citep[c.f.][]{holmes2001evolutionary}.
-Here, COATi treats the high-quality (reference) sequence as the ``ancestor'' and the potentially lower-quality sequence as the ``descendant''.
-The assumption is that the reference sequence is in-phase, which is used to help preserve the reading frame and safeguard against possible frameshifts in the ``descendant''. Therefore, the high-quality sequence must not contain incomplete codons (the number of nucleotides is multiple of three) and be free of any ambiguous nucleotides or early stop codons. In contrast, the potentially lower-quality sequence has no such restrictions and can be of any length, contain early stop codons---treated as artifacts---, and include ambiguous codons.
+\subsection*{The COATi FST}
 
-The Evolution FST is the result of composing a substitution FST that encodes a codon model (Fig.\ \ref{fig:evolution-fst}-a) and an indel FST that models insertions and deletions, including frameshifts (Fig.\ \ref{fig:evolution-fst}-b).
-A key innovation of this FST, with respect to others, is the combination of a codon substitution model with a nucleotide-based geometric indel model that allows gaps to occur at any position.
+COATi aligns pairs of sequences using a statistical alignment model, which is implemented as a finite-state transducer derived from the composition of multiple FSTs, each representing a specific biological or technical process: (1) the codon substitution FST, (2) the indel FST, (3) the error FST, and (4) the ambiguity FST \citep[Figs.~\ref{fig:base-calling}--\ref{fig:coati-fst}; c.f.][]{holmes2001evolutionary}. We call this transducer the COATi FST. A key innovation of COATi is that it combines a codon substitution model with a nucleotide-based indel model, allowing gaps to occur both between and within codons. This also allows the aligner to be robust against sequencing artifacts that produce sequences with disrupted reading frames.
+
+Since codon substitution is the first process in COATi's model, the input sequence to the COATi FST must be compatible with a codon-substitution model, i.e.\ be a multiple of three nucleotides and not contain any ambiguous symbols or stop codons. The phases, reading frames, and amino-acid contexts of alignment columns is determined by the input sequence, and better alignments will be generated if the input is of high quality and free of artifacts. Depending on context, we may refer to the input sequence as the ``ancestral'' or ``reference'' sequence. In contrast, the output sequence must be compatible with the ambiguity FST, can be of any length, and can contain any nucleotides or ``N''. This allows COATi to align lower-quality sequences that may contain artifacts against a high-quality reference sequence. We may refer to the output sequence as the ``descendant'', ``non-reference'', or ``query'' sequence.
+
+
 
 \begin{figure}[h!]
-\centering
-\setlength{\columnsep}{-3cm}
-\begin{multicols}{2}
-    \hspace*{-2.8cm}\resizebox{0.55\textwidth}{!}{\input{figures/fig-subst-fst}}
-    \columnbreak
-    \resizebox{0.55\textwidth}{!}{\input{figures/fig-indel-fst}}
-\end{multicols}
-\par
-\caption{The Evolution FST is assembled by composing a substitution FST and an indel FST.
-Each node represents a state in an FST while arcs display possible transitions between states (and their weights). Unlabeled arcs have weights of 1.
-(a) The substitution FST encodes a $61 \times 61 $ codon substitution model with 3721 arcs from S to M. These arcs consume three nucleotides from the input tape and emit three nucleotides to the output tape. The weight of each arc is a conditional probability derived from a codon substitution model.
-(b) The indel FST allows for insertions (U to I) and deletions (V to D). Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. On top of the indel FST, we add a base-calling-error FST (Supplemental Materials Figure 1) to model sequencing errors. Contiguous insertions and deletions are always arranged for insertions to precede deletions to limit equivalent alignments.}
-\label{fig:evolution-fst}
+\includegraphics[width=\textwidth]{figures/fig-fst-coati.pdf}
+\caption{The COATi FST is built from simpler FSTs via composition.
+(a) The substitution FST encodes a $61 \times 61 $ codon substitution model with 3721 arcs from S to M. These arcs consume three nucleotides from the input tape and emit three nucleotides to the output tape. The weight of each arc is a conditional probability derived from a codon substitution model. See Fig.~\ref{fig:base-calling} for more details about reading this graph.
+%
+(b) The indel FST allows for insertions (H to I) and deletions (C to D). Here $g$ is the ``gap opening parameter'' and $e$ is the ``gap extension'' parameter.
+Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. This FST is structured such that if insertions and deletions are contiguous, insertions will precede deletions.
+%
+(c) The COATi FST is derived via composition from the codon substitution, indel, error, and ambiguity FSTs.
+}
+\label{fig:coati-fst}
 \end{figure}
 
 Composing both sequences with the Evolution FST results in the transducer of all possible alignments.
