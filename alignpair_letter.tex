@@ -113,7 +113,7 @@ To address current limitations of alignment software to accurately align protein
 
 \subsection*{Statistical Alignment via Finite State Tranducers}
 
-In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{Lunter2005-hk}. An advantage of statistical alignment is that its parameters are derived from biological processes, allowing them to be estimated directly from data or extracted from previous studies. While approaches vary, a statistical aligner for a pair of sequences, $X$ and $Y$, typically finds an alignment, $Aln$, that maximizes the joint probability $P(Aln, X, Y)$ or samples alignments from the posterior $P(Aln | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{bradley2007transducers}. Pair-HMMs are computational machines with two output tapes. Each tape represents a sequence, and a path through the pair-HMM represents an alignment of the two sequences. Conceptually, Pair-HMMs generate two sequences from an unknown ancestor and can calculate the joint probability $P(Aln, X, Y)$ \citep{yoon_2009_hmm}.
+In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{Lunter2005-hk}. An advantage of statistical alignment is that its parameters are derived from biological processes, allowing them to be estimated directly from data or extracted from previous studies. While approaches vary, a statistical aligner for a pair of sequences, $X$ and $Y$, typically finds an alignment, $Aln$, that maximizes the joint probability $P(Aln, X, Y)$ or samples alignments from the posterior $P(Aln | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{bradley2007transducers}. Pair-HMMs are computational machines with two output tapes. Each tape represents one sequence, and a path through the pair-HMM represents an alignment of the two sequences. Conceptually, pair-HMMs generate two sequences from an unknown ancestor and can calculate the joint probability $P(Aln, X, Y)$ \citep{yoon_2009_hmm}.
 
 While the use of pair-HMMs is ubiquitous in bioinformatics, they are limited to modeling the evolution of two related sequences from an unknown ancestor. As an alternative, finite-state transducers (FSTs, Fig.~\ref{fig:base-calling}) allow researchers to model the evolution of a descendant sequence from an ancestral sequence. FSTs are computational machines with one input tape and one output tape and provide similar benefits to pair-HMMs, while being more suitable for evolutionary models \citep{bradley2007transducers}. FSTs consume symbols from an input tape and emit symbols to an output tape based on the symbols consumed and the structure of the FST. Conceptually, FSTs generate a descendant sequence, $D$, from a known ancestor, $A$, and can calculate the conditional probability $P(Aln, D | A)$.
 
@@ -138,11 +138,10 @@ There are well-established algorithms for combining FSTs in different ways allow
 
 \subsection*{The COATi FST}
 
-COATi aligns pairs of sequences using a statistical alignment model, which is implemented as a finite-state transducer derived from the composition of multiple FSTs, each representing a specific biological or technical process: (1) the codon substitution FST, (2) the indel FST, (3) the error FST, and (4) the ambiguity FST \citep[Figs.~\ref{fig:base-calling}--\ref{fig:coati-fst}; c.f.][]{holmes2001evolutionary}. We call this transducer the COATi FST. A key innovation of COATi is that it combines a codon substitution model with a nucleotide-based indel model, allowing gaps to occur both between and within codons. This also allows the aligner to be robust against sequencing artifacts that produce sequences with disrupted reading frames.
+COATi aligns pairs of sequences using a statistical alignment model, which is implemented as a finite-state transducer derived from the composition of multiple FSTs, each representing a specific biological or technical process: (1) the codon substitution FST, (2) the indel FST, (3) the error FST, and (4) the ambiguity FST \citep[Figs.~\ref{fig:base-calling}--\ref{fig:coati-fst}; c.f.][]{holmes2001evolutionary}. We call this transducer the COATi FST. Codon substitution models are uncommon in sequence aligners, despite their extensive use in phylogenetics. COATi implements the Muse and Gaut (\citeyear{muse_gaut_1994}) codon model (codon-triplet-mg) and the Empirical Codon Model \citep[codon-triplet-ecm;][]{kosiol_ECM_2007}.
+It also lets the user provide a codon substitution matrix. A key innovation of COATi is that it combines a codon substitution model with a nucleotide-based indel model, allowing gaps to occur both between and within codons. This also allows the aligner to be robust against sequencing artifacts that produce sequences with disrupted reading frames.
 
-Since codon substitution is the first process in COATi's model, the input sequence to the COATi FST must be compatible with a codon-substitution model, i.e.\ be a multiple of three nucleotides and not contain any ambiguous symbols or stop codons. The phases, reading frames, and amino-acid contexts of alignment columns is determined by the input sequence, and better alignments will be generated if the input is of high quality and free of artifacts. Depending on context, we may refer to the input sequence as the ``ancestral'' or ``reference'' sequence. In contrast, the output sequence must be compatible with the ambiguity FST, can be of any length, and can contain any nucleotides or ``N''. This allows COATi to align lower-quality sequences that may contain artifacts against a high-quality reference sequence. We may refer to the output sequence as the ``descendant'', ``non-reference'', or ``query'' sequence.
-
-
+Since codon substitution is the first process in COATi's model, the input sequence to the COATi FST must be compatible with a codon-substitution model, i.e.\ be a multiple of three nucleotides and not contain any ambiguous symbols or stop codons. The phases, reading frames, and amino-acid contexts of alignment columns is determined by the input sequence, and better alignments will be generated if the input is of high quality and free of artifacts. Depending on context, we may refer to the input sequence as the ``ancestral'' or ``reference'' sequence. In contrast, the output sequence must be compatible with the ambiguity FST, can be of any length, and can contain any nucleotides or ``N''. This allows COATi to align lower-quality sequences that may contain artifacts against a high-quality reference sequence. We may refer to the output sequence as the ``descendant'', ``non-reference'', or ``query'' sequence. The choice of which sequence is the input sequence and which sequence is the output sequence is left up to the user.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{figures/fig-fst-coati.pdf}
@@ -157,30 +156,20 @@ Insertion arcs are weighted according to the codon model's stationary distributi
 \label{fig:coati-fst}
 \end{figure}
 
-Composing both sequences with the Evolution FST results in the transducer of all possible alignments.
-Any path through this FST represents a pairwise alignment, while the shortest path (by weight) corresponds to the best alignment.
-When equally optimal alignments exist, ties are broken according to the FST shortest-path algorithm.
-An example of an FST-based alignment can be found in Supplementary Materials Figure 2.
-All FST operations in COATi, including model development, composition, search for the shortest path, and other optimization algorithms, are performed using the C++ openFST library \citep{allauzen2007openfst}.
-However, the Evolution FST has a large state space to keep track of codon substitution rates when codons might be interspersed with indel events. This additional state space increases the computational complexity of the alignment algorithm.
+In order to use the COATi FST to align an output sequence against an input sequence, we first convert each sequence into an acceptor, represented as a linear transducer where the input and output symbols of each transition are identical and each transition represents one nucleotide of a sequence \citep{allauzen2007openfst}. By composing the input and output acceptors with the COATi FST, we generate a transducer of all possible alignments of the two sequences. Any path through this FST represents a pairwise alignment, while the shortest path (by weight) corresponds to the best alignment. If more that one optimal alignment exists, ties are broken according to the implementation of the shortest-path algorithm. All FST operations in COATi, including model development, composition, search for the shortest path, and other optimization algorithms, are performed using the C++ openFST library \citep{allauzen2007openfst}. An example of an FST-based alignment can be found in Supplementary Materials Figure 2.
 
-\section*{Codon Substitution Models}
+\section*{The Marginal Model}
 
-Codon substitution models are uncommon in sequence aligners, despite their extensive use in phylogenetics.
-COATi implements the Muse and Gaut (\citeyear{muse_gaut_1994}) codon model (codon-triplet-mg) and the Empirical Codon Model \citep{kosiol_ECM_2007} (codon-triplet-ecm).
-It also lets the user provide a codon substitution matrix.
-The default FST model (codon-triplet-mg) does not allow early stop codons in the ancestor sequence; although, it does support mutations to (early) stop codons under the assumption that these are artifacts common in low-quality data.
+The COATi FST has a large state space to keep track of codon substitution rates when codons might be interspersed with indel events. This additional state space increases the computational complexity of the alignment algorithm. To reduce the runtime complexity of COATi, we have also developed an approximation of the COATi FST that can be implemented with standard dynamic programming techniques. This approximation uses a marginal substitution model where the output nucleotides are independent of one another and only depend on the input codon and position. This produces a $\left(61 \times 3 \right) \times 4$ substitution model and eliminates the need to track dependencies between output nucleotides.
 
-To reduce the runtime complexity of COATi, we have also developed an approximation of the Evolution FST that can be implemented with standard dynamic programming techniques. This approximation uses a marginal substitution model where the output nucleotides are independent of one another and only depend on the input codon and position. This produces a $\left(61 \times 3 \right) \times 4$ substitution model and eliminates the need to track dependencies between output nucleotides.
-
-A marginal substitution model is calculated from a standard substitution model by calculating the marginal probabilities that each ancestral codon produces specific descendant nucleotides at each reading frame position.
+A marginal substitution model is calculated from a standard substitution model by calculating the marginal probabilities that each ancestral codon produces specific descendant nucleotides at each reading frame position. Specifically, let
 %
-Specifically, let
 \[
 P_\text{cod}\left( Y_1 = y_1, Y_2 = y_2, Y_3 = y_3 |
                    X_1 = x_1, X_2 = x_2, X_3 = x_3 \right)
 \]
-represent transition probabilities from a standard codon model, and
+%
+represent transition probabilities from a codon model, and
 %
 \[
 P_\text{mar}\left(Y_p = y \middle| X_1 = x_1, X_2 = x_2, X_3 = x_3 \right)
@@ -191,7 +180,7 @@ P_\text{cod}\left( y_1, y_2, y_3 |
 \]
 %
 represent the marginal transition probabilities, where
-$p \in \{1, 2, 3\}$ is the position of the descendant nucleotide relative to the ancestral reading frame and $I$ is an indicator function.
+$p \in \{1, 2, 3\}$ is the position of the descendant nucleotide relative to the ancestral reading frame and $I()$ is an indicator function.
 COATi contains marginal models for both Muse and Gaut (\citeyear{muse_gaut_1994}) or the Empirical Codon Model, resulting in the marginal models codon-marginal-mg (default model) and codon-marginal-ecm.
 These models emphasize the position in a codon where the substitution occurs, help restrict the effects of low-quality data in the descendant sequence, and allow more than one substitution per codon.
 In combination with the indel model, alignment using the marginal model is implemented using dynamic programming.
