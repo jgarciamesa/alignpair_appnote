@@ -5,7 +5,7 @@ PLOT_DATA := $(addprefix supplementary_data/,$(addsuffix /plot_distance.csv, tri
 
 default: all
 
-all: alignpair_letter.pdf
+all: alignpair_letter.pdf response_r1.pdf 
 
 .PHONY: all default
 
@@ -26,6 +26,9 @@ supplementary_data/%/plot_distance.csv: supplementary_materials/scripts/distance
 supplementary_materials.pdf: supplementary_materials.Rmd figures/fig-base-calling-error.pdf $(PLOT_DATA)
 	@Rscript -e "rmarkdown::render('supplementary_materials.Rmd')"
 	@mv $@ supplementary_materials/
+
+response_r1.pdf: response_r1.md
+	pandoc --pdf-engine=lualatex -o $@ $<
 
 clean:
 	@rm -f *.{aux,log,fdb_latexmk,fls,bbl,bcf,blg,run.xml,out}

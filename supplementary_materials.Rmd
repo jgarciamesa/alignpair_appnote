@@ -1,5 +1,5 @@
 ---
-title: "Supplementary Materials for \"COATi: statistical pairwise alignment of protein coding sequences\""
+title: "Supplementary Materials for \"COATi: statistical pairwise alignment of protein-coding sequences\""
 author: Juan J. Garcia Mesa, Ziqi Zhu, Reed A. Cartwright
 output:
     pdf_document:

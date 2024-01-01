@@ -55,7 +55,7 @@
 \newline
 % authors go here:
 \\
-Juan J. Garcia Mesa\textsuperscript{1,2},
+Juan J. García Mesa\textsuperscript{1,2},
 Ziqi Zhu\textsuperscript{1,3},
 Reed A. Cartwright\textsuperscript{1,3,*}\\
 \bigskip
@@ -80,7 +80,9 @@ Sequence alignment is an essential method in bioinformatics and the basis of man
 Sequence alignment is a fundamental task in bioinformatics and a cornerstone step in comparative and functional genomic analysis \citep{sequence_alignment_rosenberg_2009}. While sophisticated advancements have been made, the challenge of alignment inference has not been fully solved \citep{art_morrison_2015}.
 %Modern sequence analysis began with the heuristic homology algorithms of \textcite{Needleman1970} and \textcite{identification_smith_1981} and, while the methods developed since then have improved, alignment inference is not a solved problem \citep{art_morrison_2015}. 
 %
-The alignment of protein-coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space \citep[e.g.][]{bininda2005transalign,abascal2010translatorx}. While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts, such as frameshifts and early stop codons. While some aligners can utilize codon substitution models, they are often not robust against coding-sequence artifacts. Additionally these aligners  force gaps to occur between codons, whereas in natural sequences, only about 42\% of indels occur between codons \citep{taylor2004occurrence, zhu2022profiling}. This mismatch between aligner assumptions and biology can produce sub-optimal alignments and inflated estimates of sequence divergence (Fig.\ \ref{fig:aln}).
+The alignment of protein-coding DNA sequences is one such challenge, and a common approach to this problem is to perform alignment inference in amino-acid space \citep[e.g.][]{bininda2005transalign,abascal2010translatorx}. While this approach is an improvement over DNA models, it discards information, underperforms compared to alignment at the codon level, and fails in the presence of artifacts, such as frameshifts and early stop codons. While some aligners can utilize codon substitution models, they are often not robust against coding-sequence artifacts.
+
+Within protein-coding sequences, indels may occur in between any pair of adjacent nucleotides, and therefore, gaps in alignments of natural sequences may occur both between and within codons (Fig.\ \ref{fig:aln}). Gaps that occur after the first position or second position of a codon are known as phase-1 and phase-2 gaps, respectively. Gaps that occur between codons are known as either phase-3 gaps (this study) or phase-0 gaps \citep[e.g.][]{taylor2004occurrence}. While all three phases of gaps occur in natural sequences, alignments performed in amino-acid or codon space force all gaps to be phase-3 gaps. Because only about 42\% of indels are phase-3 \citep{taylor2004occurrence, zhu2022profiling}, this mismatch between aligner assumptions and biology can produce sub-optimal alignments and inflated estimates of sequence divergence (Fig.\ \ref{fig:aln}).
 
 % Figures are 86 mm or 178 mm wide
 \begin{figure}[h!]
@@ -90,10 +92,12 @@ The alignment of protein-coding DNA sequences is one such challenge, and a commo
     \caption{
         Standard algorithms produce suboptimal alignments.
         (a) shows the true alignment of an ancestor sequence (A) and a descendant sequence (D).
-        (b), (c), and (d) are the results of different aligners.
-        Nucleotide mismatches are highlighted in red. Phase 1, phase 2, and phase 3 indels are shown in purple, orange, and gray respectively.
-        Additionally, the orange indel is type II (an amino-acid indel plus an amino-acid change) while the purple indel is type I (an amino-acid indel only).
-        COATi is the only aligner able to retrieve the biological alignment in this example.
+        (b--d) are the results of different aligners. Nucleotide mismatches are highlighted in red.---Notably, COATi is the only aligner able to retrieve the biological alignment in this example.---%
+        %
+        Indels in protein-coding sequences can be classified as having one of three difference phases and being one of two different types.
+        Phases refer the the location of the gap with respect to the reading frame, while types refer to the consequence of the indel.
+        Phase-1, phase-2, and phase-3 indels are shown in purple, orange, and gray respectively.
+        Additionally, the orange indel is type-II (an amino-acid indel plus an amino-acid change) while the purple indel is type-I (an amino-acid indel only). The difference between in-frame and frameshift indels is not displayed.
         }
     \label{fig:aln}
 \end{figure}
@@ -181,13 +185,29 @@ P_\text{cod}\left( y_1, y_2, y_3 |
 %
 represent the marginal transition probabilities, where $p \in \{1, 2, 3\}$ is the position of the descendant nucleotide relative to the ancestral reading frame and $I()$ is an indicator function. COATi contains marginal models for both Muse and Gaut (\citeyear{muse_gaut_1994}) or the Empirical Codon Model, resulting in the marginal models codon-marginal-mg and codon-marginal-ecm. These models emphasize the position in a codon where the substitution occurs, help restrict the effects of low-quality data in the descendant sequence, and allow more than one substitution per codon. In combination with the indel model, alignment using the marginal model is implemented using dynamic programming.
 
+\subsection*{Alignment Strategies}
+
+In order to compare COATi against other aligners, we evaluated five different alignment models: (1) COATi's FST model (i.e.\ codon-triplet-mg), (2) the amino-acid model of ClustalΩ v1.2.4 via translation and reverse translation, (3) the amino-acid aware nucleotide model of MACSE v2.06, (4) the DNA model of MAFFT v7.505, and (5) the codon model of PRANK v.150803 \citep{clustal_omega_sievers_2011,ranwez_macse_2018,katoh2013mafft,prank_loytynoja_2014}. Together, these five methods allow us to evaluate both different alignment strategies and different software implementations.
 
 \subsection*{Empirical Simulation Algorithm}
 
-In order to compare COATi against other aligners on realistic datasets, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previous contain indels. Briefly, we downloaded 16000 human genes and their gorilla orthologs from the ENSEMBL
-database \citep{ensembl_hubbard_2002}. After downloading, we removed 2232 sequence-pairs longer than 6000 nucleotides and aligned the remaining pairs with five alignment methods: (1) COATi's FST model (i.e.\ codon-triplet-mg), (2) the amino-acid model of ClustalΩ v1.2.4 via translation and reverse translation, (3) the amino-acid aware nucleotide model of MACSE v2.06, (4) the DNA model of MAFFT v7.505, and (5) the codon model of PRANK v.150803 \citep{clustal_omega_sievers_2011,ranwez_macse_2018,katoh2013mafft,prank_loytynoja_2014}. Next we separated sequence pairs into two sets: (1) 6048 sequence pairs for which at least one aligner added gaps, and (2) 7761 sequence pairs for which all five aligners did not introduce any gaps.
+In order to compare COATi against other aligners on realistic datasets with known alignments, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previous contain indels. Briefly, we downloaded 16000 human genes and their gorilla orthologs from the ENSEMBL database \citep{ensembl_hubbard_2002}. After downloading, we removed 2232 sequence-pairs longer than 6000 nucleotides and aligned the remaining pairs with the five alignment methods. Next we separated sequence pairs into two sets: (1) 6048 sequence pairs for which at least one aligner added gaps and (2) 7761 sequence pairs for which all five aligners did not introduce any gaps. We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark set of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 99 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if gap pattern did not fit the ungapped sequence pair.)
 
-We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark set of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 99 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if gap pattern did not fit the ungapped sequence pair.) We deleted nucleotides from the gorilla sequences of ungapped pairs to create deletions, and we inserted random nucleotides according to their stationary frequency to the gorilla sequences to create insertions. The human sequences were unchanged.
+For example, consider the gapped alignment represented by the CIGAR string
+%
+``170M 3D 10M 6I 102M'' % Can use \allowbreak{} here instead of space
+%
+applied to an ungapped alignment of human and gorilla sequences that are 300 nucleotides long. First, we modify the CIGAR string to insert flexible lengths for any match segment that is 99 or more nucleotides long while preserving phase. This results in a new CIGAR string of
+%
+``101M *M 3D 10M 6I 99M *M'',
+%
+where * represents the locations that have flexible length. Considering only matches and deletions, this CIGAR string has 213 fixed nucleotides, leaving 87 nucleotides in the human sequence to be allocated to the flexible locations. Since there are two locations of flexible length, we draw one random break point uniformly while maintaining phase, producing the final CIGAR string of
+%
+``101M 9M 3D 10M 6I 99M 78M'',
+%
+which is used to add gaps into the target, ungapped sequence pair.
+To apply deletions, we remove the corresponding nucleotides from the gorilla sequence, and to apply insertions, we add random nucleotides according to their stationary frequency to the gorilla sequence at the corresponding locations. The human sequence is left unchanged.
+
 
 % The simulation algorithm can introduce a pairwise alignment pattern to any two nucleotide sequences of equal length. The alignment pattern is given as a CIGAR string (Compact Idiosyncratic Gapped Alignment Report), a format commonly used to summarize aligned reads to a reference genome. Assigning one of the sequences as the reference, to distinguish between insertions and deletions, CIGAR strings can also summarize pairwise alignments by grouping the number of contiguous matches or mismatches `M', deletions `D', and insertions `I'. The resulting pattern combines these letters preceded by the number of characters for each section as they appear in the alignment. This pattern is introduced by replacing nucleotides with gaps as indicated by deletions on one sequence and randomly introducing residues where the CIGAR strings indicated insertions.
 
@@ -230,9 +250,19 @@ Taken together, these three statistics not only allow a direct comparison of ali
 % Ks and Ka are, respectively, the number of substitutions per synonymous site and per non-synonymous site between two protein-coding genes.
 
 \paragraph{Selection.}
-Alignment error negatively impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $k_s$ and $k_a$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment and compared them to the benchmark alignment. Briefly, $k_s$ is the number of substitutions per synonymous site and $k_a$ is the number of substitutions per non-synonymous site between two protein-coding sequences. We used the method of \cite{ka_ks_li_1993} to estimate these statistics as implemented in the R package seqinr \citep{seqinr}. 
-%
-We considered any alignment to be showing evidence of positive selection if $k_a/k_s > 1$ and negative selection if $k_a/k_s < 1$. We estimated F\textsubscript{1} scores for both positive and negative selection by comparing estimated alignments to benchmark alignments. F\textsubscript{1} is the harmonic mean of precision and recall and allows us to measure how well aligners produce alignments that correctly identify or exclude positive selection or negative selection.
+Alignment error negatively impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $K_S$ and $K_A$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment and compared them to the benchmark alignment. Briefly, $K_S$ is the number of substitutions per synonymous site and $K_A$ is the number of substitutions per non-synonymous site between two protein-coding sequences. We used the method developed by \cite{ka_ks_li_1993} and independently derived by \cite{Pamilo1993} to estimate these statistics as implemented in the R package seqinr \citep{seqinr}. 
+
+Briefly, this method takes two aligned sequences and classifies the sites in each sequence as non-degenerate, two-fold degenerate, or four-fold degenerate based on the standard genetic code. A site is non-degenerate if 0/3 possible nucleotide changes to that site are synonymous, two-fold degenerate if 1/3 of the possible changes are synonymous, and four-fold degenerate if 3/3 possible changes are synonymous. (The rare three-fold degenerate sites are treated as two-fold degenerate in this method.) First the method calculates the average numbers of sites of each type in the sequence pair ($L_0$, $L_2$, and $L_4$). Next, following \cite{Li1985}, it uses Kimura's two-parameter model \citep{kimura1980simple} and the alignment to estimate the numbers of transitions ($A_i$) and transversions ($B_i$) that occurred per each $i$-th type. Using these statistics, \cite{ka_ks_li_1993} estimated $K_S$ and $K_A$ as
+\begin{align*}
+K_S &= \frac{L_2 A_2 + L_4 A_4}{L_2 + L_4} + B_4 &
+K_A &= A_0 + \frac{L_0 B_0 + L_2 B_2}{L_0 + L_2}
+\end{align*}
+
+We considered any alignment to be showing evidence of positive selection if $K_A/K_S > 1$ and negative selection if $K_A/K_S < 1$. We estimated F\textsubscript{1} scores for both positive and negative selection by comparing estimated alignments to benchmark alignments. F\textsubscript{1} is the harmonic mean of precision and recall:
+\[
+F_1 = \frac{2 \text{TP}}{2 \text{TP} + \text{FP} + \text{FN}}
+\]
+where TP is the number of alignments that correctly predicted positive (or negative) selection, FP is the number of alignments that incorrectly predicted positive (or negative) selection, and FN is the number of alignments that incorrectly predicted the absence of positive (or negative) selection. F\textsubscript{1} allows us to measure how well aligners produce alignments that correctly identify the presence and absence of positive selection or negative selection.
 
 
 % First, this method takes two aligned homologous protein-coding sequences and classifies the nucleotide sites in a sequence as nondegenerate, twofold degenerate, and fourfold degenerate. A site is nondegenerate if all possible changes at that site are nonsynonymous, twofold degenerate if one of the three possible changes is synonymous, and fourfold degenerate if all possible changes are synonymous. Second, the nucleotide changes between the two sequences are counted and divided as transitional (A$\leftrightarrow$G, C$\leftrightarrow$T) and transversional (\{A, G\}$\leftrightarrow$\{C, T\}). Third, the Kimura two-parameter distance \citep{kimura1980simple} is used to estimate the number of transitions and transversions per site type (nondegenerate, twofold degenerate, and fourfold degenerate), which is used as a correction factor for multiple hits. Finally, $k_s$ is the estimate of the average transitional rate at twofold and fourfold degenerate sites, and $k_a$ is the estimate of the average transversional rate at nondegenerate and twofold sites. In the results, these metrics are reported as the F$_1$ score, which is the harmonic mean of precision (true positives over total positives) and recall (true positives over true positives and false negatives). This score ranges between 0 and 1, with a score of 1 representing a perfect result.
