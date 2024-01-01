@@ -29,6 +29,34 @@ omega = function(a) { #dN/dS
 	}
 }
 
+fdr_pos = function(ref, w) {
+	tp = length(intersect(which(w>1),which(ref>1)))
+	fp = length(intersect(which(w>1),which(ref<1)))
+	fn = length(intersect(which(w<1),which(ref>1)))
+	return(fp/(tp+fp))
+}
+
+fnr_pos = function(ref, w) {
+	tp = length(intersect(which(w>1),which(ref>1)))
+	fp = length(intersect(which(w>1),which(ref<1)))
+	fn = length(intersect(which(w<1),which(ref>1)))
+	return(fn/(tp+fn))
+}
+
+fdr_neg = function(ref, w) {
+	tp = length(intersect(which(w<1),which(ref<1)))
+	fp = length(intersect(which(w<1),which(ref>1)))
+	fn = length(intersect(which(w>1),which(ref<1)))
+	return(fp/(tp+fp))
+}
+
+fnr_neg = function(ref, w) {
+	tp = length(intersect(which(w<1),which(ref<1)))
+	fp = length(intersect(which(w<1),which(ref>1)))
+	fn = length(intersect(which(w>1),which(ref<1)))
+	return(fn/(tp+fn))
+}
+
 ps_accuracy = function(ref,w) {
 	tp = length(intersect(which(w>1),which(ref>1)))
 	fp = length(intersect(which(w>1),which(ref<1)))

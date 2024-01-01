@@ -1,0 +1,158 @@
+% !TEX program=lualatex
+\RequirePackage{luatex85}
+\documentclass[tikz,border=10,10pt]{standalone}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{unicode-math}
+\usepackage{fontspec}
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{xcolor}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
+\tikzset{
+  font={\fontsize{9pt}{11}\selectfont}
+}
+
+\setmainfont{TeX Gyre Heros}
+\setmathfont{Latin Modern Math}
+
+\definecolor{colorR}{RGB}{228,26,28}    % RED
+\definecolor{colorB}{RGB}{55,126,184}   % BLUE
+\definecolor{colorG}{RGB}{77,175,74}    % GREEN
+\definecolor{colorP}{RGB}{152,78,163}   % PURPLE
+\definecolor{colorO}{RGB}{255,127,0}    % ORANGE
+\definecolor{colorY}{RGB}{255,255,51}   % YELLOW
+\definecolor{colorBn}{RGB}{166,86,40}   % BROWN
+\definecolor{colorPk}{RGB}{247,129,191} % PINK
+\definecolor{colorGy}{RGB}{153,153,153} % GRAY
+
+\tikzstyle{line}=[draw, -stealth', very thick]
+\tikzstyle{block}=[circle,fill=colorB!50,on grid]
+\tikzstyle{lab}=[]
+\tikzstyle{w}=[lab,midway]
+\tikzstyle{e}=[lab,midway,auto=false,fill=colorP!50,font=\scriptsize]
+
+\begin{document}
+% \begin{tikzpicture}[node distance=25mm, auto]
+\begin{tikzpicture}[node distance=25mm, auto,
+	dottedline/.style = {ultra thick, loosely dotted,shorten >=1mm, shorten <=1mm}]
+%%% MG94 marginal substitution FST
+\node (titlea) {\textbf{a) Substitution}};
+
+\node[block,below=2cm of titlea,fill=colorG!50] (start_sub) {start};
+\node[block,right=15mm of start_sub] (S_sub) {S};
+\node[block,right=60mm of S_sub] (M_sub) {M};
+\node[block,fill=colorR!50,right=15mm of M_sub] (end_sub) {end};
+
+\draw[line] (start_sub) -- (S_sub);
+\draw[line] (S_sub) to[bend right=22.5] (M_sub);
+% \draw[line] (S_sub) -- (M_sub);
+\draw[line] (M_sub) -- (end_sub);
+
+% \draw[line] (M_sub) to[bend right=85] node[e,pos=0.5] {X\textrightarrow{}Y} (S_sub);
+% \draw[line] (M_sub) to[bend right=55] node[e,pos=0.5] {AAA1\textrightarrow{}A} (S_sub);
+\draw[line] (M_sub) to[bend right=28.5] (S_sub);
+\draw[line] (M_sub) to[bend right=16.5] (S_sub);
+\draw[line] (M_sub) to[bend right=25.5] (S_sub);
+\draw[line] (M_sub) to[bend right=19.5] (S_sub);
+\draw[line] (M_sub) to[bend right=22.5] node[e,pos=0.5]
+{X X X\textrightarrow{}Y Y Y} (S_sub);
+% \draw[line] (M_sub) to[bend right=22.5] node[e,pos=0.5] {AAA1\textrightarrow{}C} (S_sub);
+% \draw[line] (M_sub) to[bend right=8] node[e,pos=0.5] {AAA1\textrightarrow{}G} (S_sub);
+
+% \draw[line] (M_sub) to[bend right=-8] node[e,pos=0.5] {AAA1\textrightarrow{}T} (S_sub);
+% \draw[line] (M_sub) to[bend right=-22.5] node[e,pos=0.5] {AAA2\textrightarrow{}A} (S_sub);
+% \draw[line] (M_sub) to[bend right=-65] node[e,pos=0.5] {TTT3\textrightarrow{}T} (S_sub);
+
+% \draw[dottedline] (5,-3) -- node[below] {} + (0, -9mm);
+
+%%% Legend
+
+\node[below=2cm of start_sub,text width=50mm,anchor=north west] (sequences) {
+\begin{tabular}{r@{\,: }l}
+\multicolumn{2}{l}{\textbf{Sequences}}\\
+    \hline
+	X & input nucleotides\\
+	Y & intermediate nucleotides\\
+	Z & output nucleotides\\
+	\O & nothing/empty sequence\\
+\end{tabular}
+};
+
+\node[above right=-1.80cm and 5mm of sequences,text width=50mm] {
+\begin{tabular}{r@{\,: }l}
+\multicolumn{2}{l}{\textbf{Parameters}}\\
+\hline
+	$g$ & gap open weight\\
+	$e$ & gap extension weight\\
+	$\pi$ & nucleotide stationary frequency\\
+\end{tabular}
+};
+
+%%% Indel FST
+\node[right=10cm of titlea] (titleb) {\textbf{b) Insertion-Deletion}};
+
+\node[block,right=12cm of start_sub,fill=colorG!50] (start1) {start};
+\node[block,below=15mm of start1] (S1) {S};
+\node[block,below=of S1] (I1) {I};
+\node[block,right=of I1] (U1) {U};
+\node[block,above=of U1] (W1) {W};
+\node[block,above=20mm of W1] (D1) {D};
+\node[block,right=of D1] (V1) {V};
+\node[block,right=of W1] (M1) {M};
+\node[block,fill=colorR!50,right=15mm of M1] (end1) {end};
+
+\draw (D1) +(0mm,-20mm) coordinate (C1);
+\draw (D1) +(50mm,-10mm) coordinate (C2);
+
+\draw[line] (start1) -- (S1);
+\draw[line] (S1) -- node[w] {$g$} (I1);
+\draw[line] (S1) -- node[w] {$1-g$} (W1);
+\draw[line] (U1) to[out=150,in=30]  node[w,above] {$e$} (I1);
+\draw[line] (U1) -- node[w,pos=0.1,right] {$1-e$} (W1);
+\draw[line] (W1) -- node[w] {$g$} (D1);
+\draw[line] (W1) -- node[w] {$1-g$} (M1);
+\draw[line] (M1) -- (end1);
+\draw[line] (V1) to[out=150,in=30] node[w,above] {$e$} (D1);
+\draw[line] (D1) to[out=60,in=90] node[w] {$1-e$} (end1 |- D1.south) to (end1);
+\draw[line] (V1) -- node[w,swap] {$1-e$} (M1);
+
+
+\draw[line] (I1) to[bend right=20] (U1);
+\draw[line] (I1) to[bend right=25] (U1);
+\draw[line] (I1) to[bend right=35] (U1);
+\draw[line] (I1) to[bend right=40] (U1);
+\draw[line] (I1) to[bend right=30] node[e] {\O\textrightarrow{}Z} node[w,below=2mm] {$\pi_{\text{Z}}$} (U1);
+
+\draw[line] (D1) to[bend right=20] (V1);
+\draw[line] (D1) to[bend right=25] (V1);
+\draw[line] (D1) to[bend right=35] (V1);
+\draw[line] (D1) to[bend right=40] (V1);
+\draw[line] (D1) to[bend right=30] node[e] {Y\textrightarrow{}\O} (V1);
+
+\draw[line] (M1) to[bend left=39] (S1);
+\draw[line] (M1) to[bend left=42] (S1);
+\draw[line] (M1) to[bend left=48] (S1);
+\draw[line] (M1) to[bend left=51] (S1);
+
+\draw[line] (M1) to[bend left=45] node[e,pos=0.25] {Y\textrightarrow{}Z} (S1);
+
+% \node[below left=7.5mm and 1mm of I1.east,text width=50mm,anchor=north west] {
+% \begin{tabular}{r@{\,: }l}
+% \multicolumn{2}{l}{}\\
+% %\hline
+% 	X & input nucleotides\\
+% 	Y & intermediate nucleotides\\
+% 	Z & output nucleotides\\
+% 	\O & nothing/empty sequence\\
+%     \hline
+% 	$g$ & gap open weight\\
+% 	$e$ & gap extension weight\\
+% \end{tabular}
+% };
+
+\end{tikzpicture}
+\end{document}
