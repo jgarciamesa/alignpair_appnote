@@ -1,0 +1,70 @@
+digraph FST {
+rankdir = LR;
+size = "7,7";
+center = 1;
+orientation = Portrait;
+ranksep = "0.4";
+nodesep = "0.25";
+0 [label = "0", shape = circle, style = bold, fontsize = 14]
+	0 -> 13 [label = "C:C/5.8138", fontsize = 14];
+	0 -> 6 [label = "ε:C/22.487", fontsize = 14];
+	0 -> 1 [label = "C:ε/20.575", fontsize = 14];
+1 [label = "1", shape = circle, style = solid, fontsize = 14]
+	1 -> 4 [label = "T:ε/0.000112", fontsize = 14];
+	1 -> 2 [label = "T:C/9.0998", fontsize = 14];
+2 [label = "2", shape = circle, style = solid, fontsize = 14]
+	2 -> 20 [label = "C:T/0.33981", fontsize = 14];
+	2 -> 3 [label = "ε:T/1.2445", fontsize = 14];
+3 [label = "3", shape = circle, style = solid, fontsize = 14]
+	3 -> 21 [label = "C:G/0.009065", fontsize = 14];
+	3 -> 17 [label = "ε:G/4.7079", fontsize = 14];
+4 [label = "4", shape = circle, style = solid, fontsize = 14]
+	4 -> 5 [label = "C:C/0", fontsize = 14];
+5 [label = "5", shape = circle, style = solid, fontsize = 14]
+	5 -> 20 [label = "ε:T/0", fontsize = 14];
+6 [label = "6", shape = circle, style = solid, fontsize = 14]
+	6 -> 11 [label = "C:ε/2.4023", fontsize = 14];
+	6 -> 10 [label = "C:T/7.4449", fontsize = 14];
+	6 -> 7 [label = "ε:T/0.09551", fontsize = 14];
+7 [label = "7", shape = circle, style = solid, fontsize = 14]
+	7 -> 9 [label = "C:ε/3.8454", fontsize = 14];
+	7 -> 16 [label = "C:G/5.4451", fontsize = 14];
+	7 -> 8 [label = "ε:G/0.026031", fontsize = 14];
+8 [label = "8", shape = circle, style = solid, fontsize = 14]
+	8 -> 16 [label = "C:ε/0", fontsize = 14];
+9 [label = "9", shape = circle, style = solid, fontsize = 14]
+	9 -> 18 [label = "T:ε/2.2e-05", fontsize = 14];
+	9 -> 17 [label = "T:G/10.706", fontsize = 14];
+10 [label = "10", shape = circle, style = solid, fontsize = 14]
+	10 -> 18 [label = "T:ε/0.045692", fontsize = 14];
+	10 -> 16 [label = "ε:G/5.6821", fontsize = 14];
+	10 -> 17 [label = "T:G/3.1879", fontsize = 14];
+11 [label = "11", shape = circle, style = solid, fontsize = 14]
+	11 -> 19 [label = "T:ε/9.1381", fontsize = 14];
+	11 -> 12 [label = "T:T/0.000108", fontsize = 14];
+12 [label = "12", shape = circle, style = solid, fontsize = 14]
+	12 -> 21 [label = "C:G/2e-06", fontsize = 14];
+	12 -> 17 [label = "ε:G/13.213", fontsize = 14];
+13 [label = "13", shape = circle, style = solid, fontsize = 14]
+	13 -> 19 [label = "T:ε/17.651", fontsize = 14];
+	13 -> 15 [label = "ε:T/14.724", fontsize = 14];
+	13 -> 14 [label = "T:T/0", fontsize = 14];
+14 [label = "14", shape = circle, style = solid, fontsize = 14]
+	14 -> 21 [label = "C:G/2e-06", fontsize = 14];
+	14 -> 17 [label = "ε:G/13.21", fontsize = 14];
+15 [label = "15", shape = circle, style = solid, fontsize = 14]
+	15 -> 18 [label = "T:ε/3.8468", fontsize = 14];
+	15 -> 16 [label = "ε:G/0.024034", fontsize = 14];
+	15 -> 17 [label = "T:G/6.0329", fontsize = 14];
+16 [label = "16", shape = circle, style = solid, fontsize = 14]
+	16 -> 17 [label = "T:ε/0", fontsize = 14];
+17 [label = "17", shape = circle, style = solid, fontsize = 14]
+	17 -> 21 [label = "C:ε/0", fontsize = 14];
+18 [label = "18", shape = circle, style = solid, fontsize = 14]
+	18 -> 21 [label = "C:G/0", fontsize = 14];
+19 [label = "19", shape = circle, style = solid, fontsize = 14]
+	19 -> 20 [label = "C:T/0", fontsize = 14];
+20 [label = "20", shape = circle, style = solid, fontsize = 14]
+	20 -> 21 [label = "ε:G/0", fontsize = 14];
+21 [label = "21/0", shape = doublecircle, style = solid, fontsize = 14]
+}

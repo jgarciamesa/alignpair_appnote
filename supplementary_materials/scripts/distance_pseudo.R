@@ -13,15 +13,15 @@ distance_main = function(metric, coati_model, aligners) {
     }
     
     distances = data.frame(filename = character(), aligner = character(), distance = numeric())
-    ref_alns = list.files(paste0("supplementary_data/", coati_model, "/data/ref_alignments/"))
+    ref_alns = list.files(paste0("data/", coati_model, "/data/ref_alignments/"))
     for(filename in ref_alns) {
-        ref = paste0("supplementary_data/", coati_model, "/data/ref_alignments/", filename)
+        ref = paste0("data/", coati_model, "/data/ref_alignments/", filename)
         # calculate distance between reference for each method
         file_distances = c()
         for(model in aligners) {
-            aln = paste0("supplementary_data/", coati_model, "/aln/ref/", model, "/", filename)
+            aln = paste0("data/", coati_model, "/aln/ref/", model, "/", filename)
             # call metal to calculate distance
-            d = system(paste("supplementary_materials/bin/metal", flag, ref, aln), intern = TRUE, ignore.stderr = TRUE)
+            d = system(paste("bin/metal", flag, ref, aln), intern = TRUE, ignore.stderr = TRUE)
             
             if(length(d) == 0) {
                 break
@@ -38,7 +38,7 @@ distance_main = function(metric, coati_model, aligners) {
     }
     colnames(distances) = c("filename", "aligner", metric)
     write.csv(x = distances,
-              file = paste0("supplementary_data/", coati_model, "/plot_distance.csv"),
+              file = paste0("data/", coati_model, "/plot_distance.csv"),
               col.names = TRUE,
               quote = FALSE,
               row.names = FALSE)
