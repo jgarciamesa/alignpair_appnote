@@ -72,8 +72,8 @@ pal <- pal[-5]
 seq_id <- k2p_sum |> filter(all_same == FALSE) |> pull(sequence)
 
 k2p_data <- aln_data |>
-    mutate(k2p_norm = k2p - k2p[method == "tri-mg"], .by = "sequence") |>
-    filter(method != "tri-mg")
+    mutate(k2p_norm = k2p - k2p[method == "coati-tri-mg"], .by = "gene") |>
+    filter(method != "coati-tri-mg")
 
 #k2p_data <- k2p_data |> filter(sequence %in% seq_id)
 

@@ -19,8 +19,8 @@ aln_data <- read_csv(here("data/aln_data.csv.gz"))
 
 omega_data <- aln_data |>
     mutate(neg_sel = omega < 1) |>
-    pivot_wider(id_cols = "sequence", names_from = "method", values_from = "neg_sel") |>
-    rename(coati = "tri-mg")
+    pivot_wider(id_cols = "gene", names_from = "method", values_from = "neg_sel") |>
+    rename(coati = "coati-tri-mg")
 
 gg1 <- upset(omega_data, c("clustalo", "macse", "mafft", "prank", "coati"),
     wrap = TRUE,
@@ -48,8 +48,8 @@ gg1 <- upset(omega_data, c("clustalo", "macse", "mafft", "prank", "coati"),
 
 omega_data <- aln_data |>
     mutate(neg_sel = omega > 1) |>
-    pivot_wider(id_cols = "sequence", names_from = "method", values_from = "neg_sel") |>
-    rename(coati = "tri-mg")
+    pivot_wider(id_cols = "gene", names_from = "method", values_from = "neg_sel") |>
+    rename(coati = "coati-tri-mg")
 
 gg2 <- upset(omega_data, c("clustalo", "macse", "mafft", "prank", "coati"),
     n_intersections=10, set_sizes = FALSE, sort_sets = FALSE,
