@@ -7,7 +7,7 @@ PDF_WIDTH <- 7 # 178mm
 PDF_HEIGHT <- PDF_WIDTH/2
 
 # load data
-aln_data <- read_csv(here("data/aln_data.csv.gz"))
+aln_data <- read_csv(here("data/raw_fasta_aligned_stats.csv.gz"))
 
 # omega_data <- aln_data |>
 #     mutate(neg_sel = (!is.na(omega) & omega < 1)) |>
