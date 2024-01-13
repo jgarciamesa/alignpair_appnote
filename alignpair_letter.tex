@@ -185,15 +185,41 @@ P_\text{cod}\left( y_1, y_2, y_3 |
 %
 represent the marginal transition probabilities, where $p \in \{1, 2, 3\}$ is the position of the descendant nucleotide relative to the ancestral reading frame and $I()$ is an indicator function. COATi contains marginal models for both Muse and Gaut (\citeyear{muse_gaut_1994}) or the Empirical Codon Model, resulting in the marginal models codon-marginal-mg and codon-marginal-ecm. These models emphasize the position in a codon where the substitution occurs, help restrict the effects of low-quality data in the descendant sequence, and allow more than one substitution per codon. In combination with the indel model, alignment using the marginal model is implemented using dynamic programming.
 
-\subsection*{Empirical Dataset}
+\subsection*{Empirical Dataset and Alignments}
 
 Humans and gorillas are two closely related species with very different levels of genome curation. The human reference genome has been revised dozens of times and is currently on version GRCh38.p14, while the gorilla reference genome has only been revised a handful of times and is currently on version gorGor4 \citep[cf.\ ENSEMBL database v110;][]{ensembl_hubbard_2002}. Additionally significant levels of investment have been made to correctly identify and annotate human genes, while gorilla annotations have received limited support in comparison. Together, these reference genomes provide a good opportunity to compare COATi against other aligner as they offer one genome that is high-quality (human) and sister genome that is lower-quality (gorilla).
 
 We used ENSEMBL database v110 \citep{ensembl_hubbard_2002} to create an empirical dataset of protein-coding sequences for both human genes and their gorilla orthologs. We first selected human protein-coding genes that belonged to the Consensus Coding Sequence Set, that were located on an autosomal chromosome, and that had a one-to-one gorilla ortholog. We selected the canonical isoform for both species and removed any pair in which the total nucleotide length was larger larger than 6,000 nucleotides. This resulted in 14,127 sequence pairs and corresponding FASTA files containing CDS sequences. Due to the way that canonical isoforms are identified, there is no guarantee that the isoforms are orthologous even though the genes are. Therefore, a subset of the sequence pairs in this dataset contain human and gorilla sequences with different exon compositions. We have made no attempt to correct these sequence pairs because in our experience genome-wide studies rarely control for such artifacts.
 
-\subsection*{Alignment Strategies}
+\paragraph{Alignment Methods.}
 
-In order to compare COATi against other aligners, we evaluated five different alignment models: (1) COATi's FST model (i.e.\ codon-triplet-mg), (2) the amino-acid model of ClustalΩ v1.2.4 via translation and reverse translation, (3) the amino-acid aware nucleotide model of MACSE v2.06, (4) the DNA model of MAFFT v7.505, and (5) the codon model of PRANK v.150803 \citep{clustal_omega_sievers_2011,ranwez_macse_2018,katoh2013mafft,prank_loytynoja_2014}. Together, these five methods allow us to evaluate both different alignment strategies and different software implementations.
+In order to compare COATi against other aligners, we evaluated five different alignment models: (1) COATi's FST model (i.e.\ codon-triplet-mg), (2) the amino-acid model of ClustalΩ via translation and reverse translation, (3) the amino-acid aware nucleotide model of MACSE, (4) the DNA model of MAFFT, and (5) the codon model of PRANK \citep{clustal_omega_sievers_2011,ranwez_macse_2018,katoh2013mafft,prank_loytynoja_2014}. 
+COATi is not a symmetric pairwise aligner, as reference sequences are more constrained than non-reference sequences. In order to evaluate the importance of the choice for reference sequence, we also aligned sequences pairs using (6) COATi with gorilla sequences as the reference (i.e.\ COATI-rev). Together, these six methods allow us to evaluate both different alignment strategies and different software implementations. See Supplemental Materials for additional details, including results for COATi's marginal and ECM models.
+
+We aligned our dataset of human-gorilla orthologs using all six alignment methods and calculated multiple biological and technical statistics on each alignment in order to compare how different alignment methods influence biological conclusions.
+%
+Additionally, we checked alignments to ensure that our pipeline did not introduce any artifacts into the results, including unexpected characters, empty columns, and aligned sequences of different lengths. We also generated checksums of our sequences to ensure that they were not modified during alignment.
+
+\paragraph{Evolutionary Distances and Gaps.}
+
+Alignment inference impacts the estimation of evolutionary distances. To quantify the impact of aligners on the estimation of evolutionary distances, we calculated Kimura's 2-parameter distance \citep[K2P;][]{kimura1980simple} for each sequence-pair and aligner combination. K2P corrects for multiple mutations at a site and takes into account differences in transition and transversion rates. It also assumes equal nucleotide frequencies and no variations in the rate of substitution across sites. While Kimura's 2-parameter distance is more suitable for non-coding sequences, it is straight forward to calculate and provides a quantitative measure of the evolutionary divergence between sequences. We used the R software package ape \citep{paradis2019ape} to calculate K2P distances.
+%
+Since aligners influence evolutionary distances based on their tendencies to insert gaps into sequences, we also quantified the lengths and phases of gaps introduced by each method as well as the fraction of nucleotides that are aligned against a gap.
+
+\paragraph{Selection.}
+Alignment inference also impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $K_S$ and $K_A$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment. Briefly, $K_S$ is the number of substitutions per synonymous site and $K_A$ is the number of substitutions per non-synonymous site between two protein-coding sequences. We used the method developed by \cite{ka_ks_li_1993} and independently derived by \cite{Pamilo1993} to estimate these statistics as implemented in the R package seqinr \citep{seqinr}. 
+
+Briefly, this method takes two aligned sequences and classifies the sites in each sequence as non-degenerate, two-fold degenerate, or four-fold degenerate based on the standard genetic code. A site is non-degenerate if 0/3 possible nucleotide changes to that site are synonymous, two-fold degenerate if 1/3 of the possible changes are synonymous, and four-fold degenerate if 3/3 possible changes are synonymous. (The rare three-fold degenerate sites are treated as two-fold degenerate in this method.) First the method calculates the average numbers of sites of each type in the sequence pair ($L_0$, $L_2$, and $L_4$). Next, following \cite{Li1985}, it uses Kimura's two-parameter model \citep{kimura1980simple} and the alignment to estimate the numbers of transitions ($A_i$) and transversions ($B_i$) that occurred per each $i$-th type. Using these statistics, \cite{ka_ks_li_1993} estimated $K_S$ and $K_A$ as
+\begin{align*}
+K_S &= \frac{L_2 A_2 + L_4 A_4}{L_2 + L_4} + B_4 &
+K_A &= A_0 + \frac{L_0 B_0 + L_2 B_2}{L_0 + L_2}
+\end{align*}
+
+We considered any alignment to be showing evidence of positive selection if $K_A/K_S > 1$ and negative selection if $K_A/K_S < 1$. We estimated F\textsubscript{1} scores for both positive and negative selection by comparing estimated alignments to benchmark alignments. F\textsubscript{1} is the harmonic mean of precision and recall:
+\[
+F_1 = \frac{2 \text{TP}}{2 \text{TP} + \text{FP} + \text{FN}}
+\]
+where TP is the number of alignments that correctly predicted positive (or negative) selection, FP is the number of alignments that incorrectly predicted positive (or negative) selection, and FN is the number of alignments that incorrectly predicted the absence of positive (or negative) selection. F\textsubscript{1} allows us to measure how well aligners produce alignments that correctly identify the presence and absence of positive selection or negative selection.
 
 \subsection*{Empirical Simulation Algorithm}
 
@@ -230,6 +256,12 @@ To apply deletions, we remove the corresponding nucleotides from the gorilla seq
 
 We used multiple statistics to to quantify the similarity between each alignment in the benchmark and the corresponding output obtained by the different tools.
 
+Alignment error also negatively impacts the estimation of evolutionary distances and phylogenetic trees. To quantify the impact of aligners on the estimation of evolutionary distances, we compared Kimura's 2-parameter distance \citep[K2P;][]{kimura1980simple} calculated for the estimated and benchmark alignments. 
+
+Alignment error negatively impacts the identification of genes that have experienced positive and negative selection.
+
+Alignment error negatively impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $K_S$ and $K_A$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment and compared them to the benchmark alignment. 
+
 \paragraph{Alignment Error.}
 To quantify the error between estimated alignments and the benchmark alignments, we used the alignment error metric $d_{seq}$ \citep{metrics_blackburne_whelan_2011}. Intuitively, $d_{seq}$ ranges between zero and one and can be interpreted as the fraction of nucleotides in the sequence pair that are aligned differently between estimated and benchmark alignments. This metric summarizes each alignment by building homology sets for each nucleotide in the sequence pair. Briefly, if an alignment column contains position $i$ from the first sequence and position $j$ from the second sequence, then $\{j\}$ is the homology set for position $i$ in the first sequence and $\{i\}$ is the homology set for position $j$ in the second sequence. If a position is aligned against a gap, then its homology set is simply $\{\text{gap}\}$. This treats all gaps equally as the location of the gap is not recorded. Finally, $d_{seq}$ is calculated  between an estimated and a benchmark alignment as the average, normalized Hamming distance between the homology sets for each nucleotide in the sequence pair. See \cite{metrics_blackburne_whelan_2011} for further details.
 
@@ -255,30 +287,32 @@ Taken together, these three statistics not only allow a direct comparison of ali
 
 % Ks and Ka are, respectively, the number of substitutions per synonymous site and per non-synonymous site between two protein-coding genes.
 
-\paragraph{Selection.}
-Alignment error negatively impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $K_S$ and $K_A$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment and compared them to the benchmark alignment. Briefly, $K_S$ is the number of substitutions per synonymous site and $K_A$ is the number of substitutions per non-synonymous site between two protein-coding sequences. We used the method developed by \cite{ka_ks_li_1993} and independently derived by \cite{Pamilo1993} to estimate these statistics as implemented in the R package seqinr \citep{seqinr}. 
-
-Briefly, this method takes two aligned sequences and classifies the sites in each sequence as non-degenerate, two-fold degenerate, or four-fold degenerate based on the standard genetic code. A site is non-degenerate if 0/3 possible nucleotide changes to that site are synonymous, two-fold degenerate if 1/3 of the possible changes are synonymous, and four-fold degenerate if 3/3 possible changes are synonymous. (The rare three-fold degenerate sites are treated as two-fold degenerate in this method.) First the method calculates the average numbers of sites of each type in the sequence pair ($L_0$, $L_2$, and $L_4$). Next, following \cite{Li1985}, it uses Kimura's two-parameter model \citep{kimura1980simple} and the alignment to estimate the numbers of transitions ($A_i$) and transversions ($B_i$) that occurred per each $i$-th type. Using these statistics, \cite{ka_ks_li_1993} estimated $K_S$ and $K_A$ as
-\begin{align*}
-K_S &= \frac{L_2 A_2 + L_4 A_4}{L_2 + L_4} + B_4 &
-K_A &= A_0 + \frac{L_0 B_0 + L_2 B_2}{L_0 + L_2}
-\end{align*}
-
-We considered any alignment to be showing evidence of positive selection if $K_A/K_S > 1$ and negative selection if $K_A/K_S < 1$. We estimated F\textsubscript{1} scores for both positive and negative selection by comparing estimated alignments to benchmark alignments. F\textsubscript{1} is the harmonic mean of precision and recall:
-\[
-F_1 = \frac{2 \text{TP}}{2 \text{TP} + \text{FP} + \text{FN}}
-\]
-where TP is the number of alignments that correctly predicted positive (or negative) selection, FP is the number of alignments that incorrectly predicted positive (or negative) selection, and FN is the number of alignments that incorrectly predicted the absence of positive (or negative) selection. F\textsubscript{1} allows us to measure how well aligners produce alignments that correctly identify the presence and absence of positive selection or negative selection.
 
 
 % First, this method takes two aligned homologous protein-coding sequences and classifies the nucleotide sites in a sequence as nondegenerate, twofold degenerate, and fourfold degenerate. A site is nondegenerate if all possible changes at that site are nonsynonymous, twofold degenerate if one of the three possible changes is synonymous, and fourfold degenerate if all possible changes are synonymous. Second, the nucleotide changes between the two sequences are counted and divided as transitional (A$\leftrightarrow$G, C$\leftrightarrow$T) and transversional (\{A, G\}$\leftrightarrow$\{C, T\}). Third, the Kimura two-parameter distance \citep{kimura1980simple} is used to estimate the number of transitions and transversions per site type (nondegenerate, twofold degenerate, and fourfold degenerate), which is used as a correction factor for multiple hits. Finally, $k_s$ is the estimate of the average transitional rate at twofold and fourfold degenerate sites, and $k_a$ is the estimate of the average transversional rate at nondegenerate and twofold sites. In the results, these metrics are reported as the F$_1$ score, which is the harmonic mean of precision (true positives over total positives) and recall (true positives over true positives and false negatives). This score ranges between 0 and 1, with a score of 1 representing a perfect result.
 
-\paragraph{Evolutionary Distance.}
-Alignment error also negatively impacts the estimation of evolutionary distances and phylogenetic trees. To quantify the impact of aligners on the estimation of evolutionary distances, we compared Kimura's 2-parameter distance \citep[K2P;][]{kimura1980simple} calculated for the estimated and benchmark alignments. This distance corrects for multiple mutations at a site and takes into account differences in transition and transversion rates. It also assumes equal nucleotide frequencies and no variations in the rate of substitution across sites. While Kimura's 2-parameter distance is more suitable for non-coding sequences, it is straight forward to calculate and provides a quantitative measure of the evolutionary divergence between sequences. We used the R software package ape \citep{paradis2019ape} to calculate K2P distances.
 
 % e compared the estimated evolutionary distance between the reference and inferred alignments using the Kimura's 2-parameter distance \citep{kimura1980simple}. The calculation of the Kimura 2-parameter model involves considering the rates of nucleotide transitions and transversions. The formula used for distance calculation is $D = -0.5 \cdot \log((1 - 2P - Q) \cdot \sqrt{1 - 2Q})$, where $P$ represents the proportion of transitional substitutions and $Q$ represents the proportion of transversional substitutions. 
 
-\section*{Results and Discussion}
+\section*{Results}
+
+\paragraph{Empirical Data and Alignments.}
+
+We generated 14,127 sequence pairs containing the coding sequences of a human gene and the orthologous gorilla gene. 22 human sequences contained early stop codons. These were not artifacts, but rather UGA codons which encoded for selenocysteine. 1 human sequence had a length that was not a multiple of 3, and no human sequences contained ambiguous nucleotides. Conversely, no gorilla sequences contained early stop codons (i.e.\ proteins containing selenocysteines were improperly annotated). 20 gorilla sequences had lengths that were not multiples of 3, and 173 sequences contained ambiguous nucleotides.
+
+COATi was not able to align 23 sequence pairs, PRANK was not able to align 24 sequence pairs, and COATi-rev was not able to align 193 sequence pairs. MAFFT, MACSE, and ClustalΩ were able to align all sequence pairs, although the latter received some help from our wrapper script.
+
+\begin{figure}[h!]
+    \centering%
+    \includegraphics{figures/fig-k2p-empirical.pdf}
+    \par
+    \caption{COATi.}
+    \label{fig:k2p-empirical}
+\end{figure}
+
+
+
+\section*{Discussion}
 % Using 16000 human genes and their gorilla orthologs from the ENSEMBL
 % database \citembe{ensembl_hubbard_2002}, we simulated a data set of pairwise
 % alignments with empirical gap patterns.

@@ -17,6 +17,9 @@ alignpair_letter.pdf: $(addprefix figures/, $(FIGS))
 figures/fig-%.pdf: figures/fig-%.tex
 	latexmk -cd -lualatex $<
 
+figures/fig-%.pdf: figures/fig-%.R
+	Rscript --vanilla $<
+
 ALIGNERS = clustalo macse mafft prank
 
 supplementary_materials/data/%/plot_distance.csv: supplementary_materials/scripts/distance_pseudo.R
