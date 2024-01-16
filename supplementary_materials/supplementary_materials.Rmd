@@ -23,7 +23,18 @@ library(tidyverse)
 library(kableExtra)
 library(here)
 
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
+    "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
+set.seed(17761)
+
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(dev = "cairo_pdf")
+
+# Alignment stats
+ALN_DATA <- read_csv(here("data", "raw_fasta_aligned_stats.csv.gz"))
+
+# Preprocessed cigar strings from alignment stats
+GAP_DATA <- read_csv(here("supplementary_materials", "data", "gaps.csv.gz"))
 ```
 
 ```{r}
@@ -147,9 +158,11 @@ knitr::include_graphics("figures/aln-example-path.pdf")
 
 \newpage
 
-# Gap Patterns
+# Empirical Results
 
-## Lengths
+## Gap Patterns
+
+### Lengths
 
 We quantified the lengths of gaps produced by each method across the empirical dataset of human-gorilla protein-coding-sequence pairs (Tab. \@ref(tab:gap-table-1)). Here the gap type is either "D" for gaps introduced into the gorilla sequence or "I" for gaps introduced in the human sequence. "COATi" refers to the full COATi FST model with a MG substitution model (i.e. tri-mg). "COATi-rev" refers to the same model, but using gorilla as the reference and human as the non-reference sequence. Gap lengths of 1--6 nucleotides were binned into their respective columns. Gap lengths longer than 6 nucleotides were binned into columns 7+, 8+, and 9+ depending on whether their lengths were 1, 2, or 3 nucleotides longer than a multiple of three.
 
@@ -158,12 +171,17 @@ We also quantified the lengths of gaps produced by different COATi models (Tab. 
 Note that ClustalΩ gaps with lengths that are not a multiple of 3 are created by how our wrapper script handles DNA sequences with lengths that are not multiple of 3.
 
 ```{r gap-table-1, results = 'asis', message = FALSE}
-gap_data <- read_csv(here("supplementary_materials/data/gap-lengths.csv"))
+gap_len_data <- GAP_DATA |> filter(op %in% c("I", "D")) |>
+    mutate(length = if_else(length <= 6, length, 7 + ((length-1) %% 3))) |>
+    arrange(length) |>
+    count(method, length, op) |>
+    complete(method, op, length = full_seq(length, 1), fill = list(n = 0)) |>
+    pivot_wider(names_from = "length", values_from = "n")
 
-gap_data <- gap_data |> rename("Gap Type" = "values", "Method" = "method",
+gap_len_data <- gap_len_data |> rename("Gap Type" = "op", "Method" = "method",
   "7+" = "7", "8+" = "8", "9+" = "9")
 
-gap_data1 <- gap_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
+tab <- gap_len_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
     "macse", "mafft", "prank", "rev-coati-tri-mg")) |>
     mutate(Method = fct_relevel(Method, c("coati-tri-mg", "rev-coati-tri-mg"))) |>
     mutate(Method = case_match(Method,
@@ -176,14 +194,14 @@ gap_data1 <- gap_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
         )) |>
     arrange(Method, "Gap Type")
 
-k <- kable(gap_data1, align = "lcrrrrrrrrr", caption="Number of gaps introduced by each method separated by length and type.", booktabs = TRUE, linesep = c("", "\\addlinespace"))
+k <- kable(tab, align = "lcrrrrrrrrr", caption="Number of gaps introduced by each method separated by length and type.", booktabs = TRUE, linesep = c("", "\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
   add_header_above(c(" " = 2L, "Gap Lengths" = 9L))
 ```
 
 ```{r gap-table-2, results = 'asis', message = FALSE}
-gap_data2 <- gap_data |> filter(Method %in% c("coati-tri-mg",
+tab <- gap_len_data |> filter(Method %in% c("coati-tri-mg",
     "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna")) |>
     mutate(Method = fct_relevel(Method, c("coati-tri-mg",
         "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna"))) |>
@@ -197,24 +215,32 @@ gap_data2 <- gap_data |> filter(Method %in% c("coati-tri-mg",
         "DNA" = "coati-dna"
     ))
 
-k <- kable(gap_data2, align = "lcrrrrrrrrr", caption="Number of gaps introduced by different COATi models separated by length and type.", booktabs = TRUE, linesep = c("", "\\addlinespace"))
+k <- kable(tab, align = "lcrrrrrrrrr", caption="Number of gaps introduced by different COATi models separated by length and type.", booktabs = TRUE, linesep = c("", "\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
   add_header_above(c(" " = 2L, "Gap Lengths" = 9L))
 ```
 
-## Phases
+### Phases
 
 We quantified the phases of gaps produced by different aligners and COATi models (Tab. \@ref(tab:gap-table-3) and \@ref(tab:gap-table-4)). Phase 1 gaps begin after the 1st position in a codon in the reference sequence, phase 2 gaps begin after the 2nd position in a codon, and phase 3 begin after the 3rd position in a codon (i.e. between codons). Phase 3 gaps are also known as phase 0 gaps.
 
 Note that ClustalΩ gaps with phases of 1 and 2 are created by how our wrapper script handles DNA sequences with lengths that are not multiple of 3.
 
 ```{r gap-table-3, results = 'asis', message = FALSE}
-gap_data <- read_csv(here("supplementary_materials/data/gap-phases.csv"))
+gap_phase_data <- GAP_DATA |> 
+    mutate(mlen = if_else(op == "I", 0L, length)) |>
+    mutate(pos = cumsum(mlen) - mlen, .by=c(gene, method)) |>
+    mutate(phase = ((pos-1) %% 3) + 1) |>
+    filter(op %in% c("I", "D")) |>
+    count(method, phase) |>
+    drop_na(phase) |>
+    complete(method, phase = full_seq(phase, 1), fill = list(n = 0)) |>
+    pivot_wider(names_from = "phase", values_from = "n")
 
-gap_data <- gap_data |> rename("Method" = "method")
+gap_phase_data <- gap_phase_data |> rename("Method" = "method")
 
-gap_data1 <- gap_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
+tab <- gap_phase_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
     "macse", "mafft", "prank", "rev-coati-tri-mg")) |>
     mutate(Method = fct_relevel(Method, c("coati-tri-mg", "rev-coati-tri-mg"))) |>
     mutate(Method = case_match(Method,
@@ -227,14 +253,14 @@ gap_data1 <- gap_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
         )) |>
     arrange(Method)
 
-k <- kable(gap_data1, align = "lrrr", caption="Number of gaps introduced by each alignment method separated by phase.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab, align = "lrrr", caption="Number of gaps introduced by each alignment method separated by phase.", booktabs = TRUE, linesep = c("\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
   add_header_above(c(" " = 1L, "Gap Phases" = 3L))
 ```
 
 ```{r gap-table-4, results = 'asis', message = FALSE}
-gap_data2 <- gap_data |> filter(Method %in% c("coati-tri-mg",
+tab <- gap_phase_data |> filter(Method %in% c("coati-tri-mg",
     "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna")) |>
     mutate(Method = fct_relevel(Method, c("coati-tri-mg",
         "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna"))) |>
@@ -248,24 +274,168 @@ gap_data2 <- gap_data |> filter(Method %in% c("coati-tri-mg",
         "DNA" = "coati-dna"
     ))
 
-k <- kable(gap_data2, align = "lrrr", caption="Number of gaps introduced by different COATi models separated by phase.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab, align = "lrrr", caption="Number of gaps introduced by different COATi models separated by phase.", booktabs = TRUE, linesep = c("\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
   add_header_above(c(" " = 1L, "Gap Phases" = 3L))
 ```
 
-## Gapiness
+## Homology Patterns
 
-We quantified the gapiness of different aligners and COATi models (Tab. \@ref(tab:gap-table-5) and \@ref(tab:gap-table-6)). Here we define gapiness as the tendency of an aligner to introduce gaps into an alignment, and we measure it by calculating the percentage of nucleotides aligned with a gap. Note that this is different than the percent of columns that contain a gap.
+We quantified the homology patterns of residues for different aligners and COATi models (Tab. \@ref(tab:gap-table-5), Tab. \@ref(tab:gap-table-6), and Fig. \@ref(fig:gap-figure-1)). Here we define the match, mismatch, and gap percentages as the percent of nucleotides aligned against a match, mismatch, and gap respectively. Note that this is different than the percent of columns that contain a match, mismatch, or gap because match and mismatch columns are counted twice.
 
 ```{r gap-table-5, results = 'asis', message = FALSE}
-gap_data <- read_csv(here("supplementary_materials/data/gapiness.csv"))
+gap_count_data <- GAP_DATA |>
+    count(gene, method, op, wt = length) |>
+    drop_na(op) |>
+    pivot_wider(id_cols=c(gene, method),
+        values_from=n, names_from=op,
+        values_fill = 0) |>
+    rename(A = `=`)
 
-gap_data <- gap_data |> rename("Method" = "method") |>
-    mutate("Gapiness" = sprintf("%0.2f%%",round(p * 100, 2))) |>
-    select(-p)
+gap_count_data <- gap_count_data |> mutate(
+    anc_len = A + X + D,
+    dec_len = A + X + I,
+    Pa = (A + A)/(anc_len + dec_len),
+    Px = (X + X)/(anc_len + dec_len),
+    Pg = (D + I)/(anc_len + dec_len),
+)
 
-gap_data1 <- gap_data |>
+gap_frac_data <- gap_count_data |> 
+    summarize(Matches = mean(Pa), Mismatches = mean(Px), Gaps = mean(Pg), .by = method) |>
+    mutate(across(Matches:Gaps,  \(x) scales::percent(x, accuracy = 0.01))) |>
+    rename(Method = method)
+
+tab <- gap_frac_data |>
+    filter(Method %in% c("clustalo", "coati-tri-mg",
+    "macse", "mafft", "prank", "rev-coati-tri-mg")) |>
+    mutate(Method = fct_relevel(Method, c("coati-tri-mg", "rev-coati-tri-mg"))) |>
+    mutate(Method = case_match(Method,
+        "clustalo" ~ "ClustalΩ",
+        "coati-tri-mg" ~ "COATi",
+        "macse" ~ "MACSE",
+        "mafft" ~ "MAFFT",
+        "prank" ~ "PRANK",
+        "rev-coati-tri-mg" ~ "COATi-rev"
+        )) |>
+    arrange(Method)
+
+k <- kable(tab, align = "rccc", caption="Average homology percentages of alignments separated by alignment method.", booktabs = TRUE, linesep = c("\\addlinespace"))
+
+k |> kable_styling(latex_options = "HOLD_position")
+```
+
+```{r gap-table-6, results = 'asis', message = FALSE}
+tab <- gap_frac_data  |> filter(Method %in% c("coati-tri-mg",
+    "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna")) |>
+    mutate(Method = fct_relevel(Method, c("coati-tri-mg",
+        "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna"))) |>
+    arrange(Method) |>
+    rename(Model = Method) |>
+    mutate(Model = fct_recode(Model,
+        "TRI-MG" = "coati-tri-mg",
+        "TRI-ECM" = "coati-tri-ecm",
+        "MAR-MG" = "coati-mar-mg",
+        "MAR-ECM" = "coati-mar-ecm",
+        "DNA" = "coati-dna"
+    ))
+
+k <- kable(tab, align = "rccc", caption="Average homology percentages of alignments separated by COATi model.", booktabs = TRUE, linesep = c("\\addlinespace"))
+
+k |> kable_styling(latex_options = "HOLD_position")
+```
+
+```{r gap-figure-1, fig.cap="Gap fractions of COATi vs other aligners. Each panel is a scatter plot where the x coordinate is the gap fraction of a COATi alignment and y coordinate is the gap fraction of the corresponding alignment from another aligner.", message = FALSE, warning = FALSE}
+
+# Pg
+
+tab <- gap_count_data |>
+    filter(method %in% c(c("clustalo", "coati-tri-mg",
+    "macse", "mafft", "prank", "rev-coati-tri-mg"))) |>
+    pivot_wider(id_cols=gene, names_from=method, values_from=Pg) |>
+    rename(coati = `coati-tri-mg`, `coati-rev` = `rev-coati-tri-mg`) |>
+    relocate(gene, coati)
+
+tab <- tab |> pivot_longer(cols = clustalo:`coati-rev`,
+    names_to="method", values_to="other") |>
+    mutate(method = fct_relevel(method, "clustalo", "macse", "mafft",
+        "prank", "coati-rev")) |>
+    mutate(method = fct_recode(method,
+        "vs ClustalΩ" = "clustalo",
+        "vs MACSE" = "macse",
+        "vs MAFFT" = "mafft",
+        "vs PRANK" = "prank",
+        "vs COATI-rev" = "coati-rev"
+    ))
+
+gg <- ggplot(tab, aes(x = coati, y = other, color = method)) + facet_wrap(vars(method))
+gg <- gg + geom_point(alpha = 0.2, show.legend = FALSE)
+gg <- gg + xlab("COATi") + ylab("Other")
+gg <- gg + scale_color_manual(values = cbbPalette[c(2,4,6,7,8)])
+gg <- gg + scale_x_continuous(trans = scales::transform_pseudo_log(0.0003, base=10),
+    breaks=c(0, 0.001, 0.01, 0.1, 1), limits = c(0, 1.2))
+gg <- gg + scale_y_continuous(trans = scales::transform_pseudo_log(0.0003, base=10),
+    breaks=c(0, 0.001, 0.01, 0.1, 1))
+
+gg <- gg + theme_grey(9) + theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank()
+)
+
+gg
+
+
+```
+
+\newpage
+
+## Evolutionary Distances
+
+We quantified the evolutionary distances inferred by different aligners and COATi models (Fig. \@ref(fig:k2p-figure-1), Tab. \@ref(tab:k2p-table-1), and Tab. \@ref(tab:k2p-table-2)). 
+
+```{r k2p-figure-1, fig.cap="COATi produced shorter evolutionary distances than other aligners. Each panel is a scatter plot where the x coordinate is the K2P distance from a COATi alignment and y coordinate is the K2P distance from the corresponding alignment from another aligner.", warning = FALSE}
+k2p_data <- ALN_DATA |>
+    filter(method %in% c(c("clustalo", "coati-tri-mg",
+    "macse", "mafft", "prank", "rev-coati-tri-mg"))) |>
+    pivot_wider(id_cols=gene, names_from=method, values_from=k2p) |>
+    rename(coati = `coati-tri-mg`, `coati-rev` = `rev-coati-tri-mg`) |>
+    relocate(gene, coati)
+
+k2p_data1 <- k2p_data |> pivot_longer(cols = clustalo:`coati-rev`,
+    names_to="method", values_to="other") |>
+    mutate(method = fct_relevel(method, "clustalo", "macse", "mafft",
+        "prank", "coati-rev")) |>
+    mutate(method = fct_recode(method,
+        "vs ClustalΩ" = "clustalo",
+        "vs MACSE" = "macse",
+        "vs MAFFT" = "mafft",
+        "vs PRANK" = "prank",
+        "vs COATI-rev" = "coati-rev"
+    ))
+
+
+gg <- ggplot(k2p_data1, aes(x = coati, y = other, color = method)) + facet_wrap(vars(method))
+gg <- gg + geom_point(alpha = 0.2, show.legend = FALSE)
+gg <- gg + xlab("COATi") + ylab("Other")
+gg <- gg + scale_color_manual(values = cbbPalette[c(2,4,6,7,8)])
+gg <- gg + scale_x_continuous(trans = scales::transform_pseudo_log(0.0004, base=10),
+    breaks=c(0, 0.001, 0.01, 0.1, 1))
+gg <- gg + scale_y_continuous(trans = scales::transform_pseudo_log(0.0004, base=10),
+    breaks=c(0, 0.001, 0.01, 0.1, 1))
+
+gg <- gg + theme_grey(9) + theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank()
+)
+
+gg
+```
+
+```{r k2p-table-1, results = 'asis', message = FALSE}
+tab <- ALN_DATA |> summarize(m = mean(k2p, na.rm = TRUE), .by = "method") |>
+    rename(Method = method)
+
+tab_data1 <- tab |>
     filter(Method %in% c("clustalo", "coati-tri-mg",
     "macse", "mafft", "prank", "rev-coati-tri-mg")) |>
     mutate(Method = fct_relevel(Method, c("coati-tri-mg", "rev-coati-tri-mg"))) |>
@@ -278,15 +448,16 @@ gap_data1 <- gap_data |>
         "rev-coati-tri-mg" ~ "COATi-rev"
         )) |>
     arrange(Method) |>
-    pivot_wider(names_from = "Method", values_from = "Gapiness")
+    pivot_wider(names_from = "Method", values_from = "m")
 
-k <- kable(gap_data1, align = "ccccc", caption="Average gapiness of alignments separated by alignment method.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab_data1, digits = 4, align = "ccccc", caption="Average K2P distances of alignments for each method.", booktabs = TRUE, linesep = c("\\addlinespace"), format.args = list(nsmall = 4))
 
 k |> kable_styling(latex_options = "HOLD_position")
+
 ```
 
-```{r gap-table-6, results = 'asis', message = FALSE}
-gap_data2 <- gap_data |> filter(Method %in% c("coati-tri-mg",
+```{r k2p-table-2, results = 'asis', message = FALSE}
+tab_data2 <- tab |> filter(Method %in% c("coati-tri-mg",
     "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna")) |>
     mutate(Method = fct_relevel(Method, c("coati-tri-mg",
         "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna"))) |>
@@ -299,9 +470,9 @@ gap_data2 <- gap_data |> filter(Method %in% c("coati-tri-mg",
         "MAR-ECM" = "coati-mar-ecm",
         "DNA" = "coati-dna"
     ))  |>
-    pivot_wider(names_from = "Model", values_from = "Gapiness")
+    pivot_wider(names_from = "Model", values_from = "m")
 
-k <- kable(gap_data2, align = "ccccc", caption="Average gapiness of alignments separated by COATi model.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab_data2, digits = 4, align = "ccccc", caption="Average K2P distances of alignments for each COATi model.", booktabs = TRUE, linesep = c("\\addlinespace"), format.args = list(nsmall = 4))
 
 k |> kable_styling(latex_options = "HOLD_position")
 ```

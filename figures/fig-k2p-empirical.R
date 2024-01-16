@@ -22,6 +22,10 @@ methods <- c("clustalo", "macse", "mafft", "prank", "coati-tri-mg", "rev-coati-t
 aln_data2 <- aln_data |> filter(method %in% methods)
 aln_data2 <- aln_data2 |> mutate(method = fct_relevel(method, "coati-tri-mg"))
 
+mean_k2p <- aln_data2 |>
+    summarize(avg = mean(k2p, na.rm = TRUE), .by = "method") |>
+    arrange(desc(avg))
+
 gg1 <- ggplot(aln_data2, aes(x = k2p, color =  fct_rev(method))) + geom_density(linewidth = 1)
 gg1 <- gg1 + scale_x_continuous(trans = transform_pseudo_log(0.0005, base=10),
     breaks=c(0, 0.001, 0.01, 0.1, 1))
@@ -37,6 +41,10 @@ gg1 <- gg1 + scale_color_manual(values = pal,
      "rev-coati-tri-mg" = "COATi-rev"
      )
     )
+
+gg1 <- gg1 + geom_vline(aes(xintercept = avg, color = method), data = mean_k2p,
+    linewidth = 0.5, linetype = 2, show.legend = FALSE)
+
 gg1 <- gg1 + guides(color = guide_legend(override.aes=list(fill=rev(pal)), reverse = TRUE))
 gg1 <- gg1 + theme_minimal(9) + theme(
     legend.position = c(1,1),
