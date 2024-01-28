@@ -30,6 +30,7 @@
 \usepackage[left]{lineno}
 \usepackage{colortbl}
 \usepackage{multicol}
+\usepackage{booktabs}
 
 \pagenumbering{arabic}
 \newcommand*\pct{\scalebox{.9}{\%}}
@@ -187,7 +188,7 @@ represent the marginal transition probabilities, where $p \in \{1, 2, 3\}$ is th
 
 \subsection*{Empirical Dataset and Alignments}
 
-Humans and gorillas are two closely related species with very different levels of genome curation. The human reference genome has been revised dozens of times and is currently on version GRCh38.p14, while the gorilla reference genome has only been revised a handful of times and is currently on version gorGor4 \citep[cf.\ ENSEMBL database v110;][]{ensembl_hubbard_2002}. Additionally significant levels of investment have been made to correctly identify and annotate human genes, while gorilla annotations have received limited support in comparison. Together, these reference genomes provide a good opportunity to compare COATi against other aligner as they offer one genome that is high-quality (human) and sister genome that is lower-quality (gorilla).
+Humans and gorillas are two closely related species with very different levels of genome curation. The human reference genome has been revised dozens of times and is currently on version GRCh38.p14, while the gorilla reference genome has only been revised a handful of times and is currently on version gorGor4 \citep[cf.\ ENSEMBL database v110;][]{ensembl_hubbard_2002}. Additionally significant levels of investment have been made to correctly identify and annotate human genes, while gorilla annotations have received limited support in comparison. Together, these reference genomes provide a good opportunity to compare COATi against other aligners as they offer one genome that is high-quality (human) and sister genome that is lower-quality (gorilla).
 
 We used ENSEMBL database v110 \citep{ensembl_hubbard_2002} to create an empirical dataset of protein-coding sequences for both human genes and their gorilla orthologs. We first selected human protein-coding genes that belonged to the Consensus Coding Sequence Set, that were located on an autosomal chromosome, and that had a one-to-one gorilla ortholog. We selected the canonical isoform for both species and removed any pair in which the total nucleotide length was larger larger than 6,000 nucleotides. This resulted in 14,127 sequence pairs and corresponding FASTA files containing CDS sequences. Due to the way that canonical isoforms are identified, there is no guarantee that the isoforms are orthologous even though the genes are. Therefore, a subset of the sequence pairs in this dataset contain human and gorilla sequences with different exon compositions. We have made no attempt to correct these sequence pairs because in our experience genome-wide studies rarely control for such artifacts.
 
@@ -198,13 +199,13 @@ COATi is not a symmetric pairwise aligner, as reference sequences are more const
 
 We aligned our dataset of human-gorilla orthologs using all six alignment methods and calculated multiple biological and technical statistics on each alignment in order to compare how different alignment methods influence biological conclusions.
 %
-Additionally, we checked alignments to ensure that our pipeline did not introduce any artifacts into the results, including unexpected characters, empty columns, and aligned sequences of different lengths. We also generated checksums of our sequences to ensure that they were not modified during alignment.
+Additionally, we checked alignments to ensure that our pipeline did not introduce any artifacts into the results, including unexpected characters, empty columns, and aligned sequences of different lengths. We also generated checksums of our sequences with gaps removed to ensure that they were not modified during alignment.
 
 \paragraph{Evolutionary Distances and Gaps.}
 
-Alignment inference impacts the estimation of evolutionary distances. To quantify the impact of aligners on the estimation of evolutionary distances, we calculated Kimura's 2-parameter distance \citep[K2P;][]{kimura1980simple} for each sequence-pair and aligner combination. K2P corrects for multiple mutations at a site and takes into account differences in transition and transversion rates. It also assumes equal nucleotide frequencies and no variations in the rate of substitution across sites. While Kimura's 2-parameter distance is more suitable for non-coding sequences, it is straight forward to calculate and provides a quantitative measure of the evolutionary divergence between sequences. We used the R software package ape \citep{paradis2019ape} to calculate K2P distances.
+Alignment inference impacts the estimation of evolutionary distances. To quantify the impact of aligners on the estimation of evolutionary distances, we calculated Kimura's 2-parameter distance \citep[K2P;][]{kimura1980simple} for each sequence-pair and aligner combination. K2P corrects for multiple mutations at a site and takes into account differences in transition and transversion rates. It also assumes equal nucleotide frequencies and no variation in the rate of substitution across sites. While Kimura's 2-parameter distance is more suitable for non-coding sequences, it is straight forward to calculate and provides a quantitative measure of the evolutionary divergence between sequences. We used the R software package ape \citep{paradis2019ape} to calculate K2P distances.
 %
-Since aligners influence evolutionary distances based on their tendencies to insert gaps into sequences, we also quantified the lengths and phases of gaps introduced by each method as well as the fraction of nucleotides that are aligned against a gap.
+Since aligners influence evolutionary distances based on their tendencies to insert gaps into sequences, we also quantified the phases and lengths of gaps introduced by each method as well as the fraction of nucleotides that are aligned against a match, mismatch, or gap.
 
 \paragraph{Selection.}
 Alignment inference also impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $K_S$ and $K_A$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment. Briefly, $K_S$ is the number of substitutions per synonymous site and $K_A$ is the number of substitutions per non-synonymous site between two protein-coding sequences. We used the method developed by \cite{ka_ks_li_1993} and independently derived by \cite{Pamilo1993} to estimate these statistics as implemented in the R package seqinr \citep{seqinr}. 
@@ -221,28 +222,28 @@ F_1 = \frac{2 \text{TP}}{2 \text{TP} + \text{FP} + \text{FN}}
 \]
 where TP is the number of alignments that correctly predicted positive (or negative) selection, FP is the number of alignments that incorrectly predicted positive (or negative) selection, and FN is the number of alignments that incorrectly predicted the absence of positive (or negative) selection. F\textsubscript{1} allows us to measure how well aligners produce alignments that correctly identify the presence and absence of positive selection or negative selection.
 
-\subsection*{Empirical Simulation Algorithm}
+\subsection*{Simulated Benchmark Alignments}
 
-% 8263 gapless genes.
-% 5864 gapped genes.
-
-In order to compare COATi against other aligners on realistic datasets with known alignments, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previous contain indels. Briefly, we downloaded 16000 human genes and their gorilla orthologs from the ENSEMBL database \citep{ensembl_hubbard_2002}. After downloading, we removed 2232 sequence-pairs longer than 6000 nucleotides and aligned the remaining pairs with the five alignment methods. Next we separated sequence pairs into two sets: (1) 6048 sequence pairs for which at least one aligner added gaps and (2) 7761 sequence pairs for which all five aligners did not introduce any gaps. We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark set of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 99 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if gap pattern did not fit the ungapped sequence pair.)
+In order to compare COATi against other aligners on realistic datasets with known alignments, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previous contain indels. We separated our 14,127 empirical sequence pairs into two sets: %
+(1) 8261 sequence pairs that did not contain any gaps when aligned by COATi FST, ClustalΩ, MACSE, MAFFT, and PRANK, and (2) 5821 sequence pairs for which at least one of these five aligners added gaps.
+(45 pairs that could not be aligned by at least one aligner were dropped.) We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark set of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 96 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if gap pattern did not fit the ungapped sequence pair.)
 
 For example, consider the gapped alignment represented by the CIGAR string
 %
 ``170M 3D 10M 6I 102M'' % Can use \allowbreak{} here instead of space
 %
-applied to an ungapped alignment of human and gorilla sequences that are 300 nucleotides long. First, we modify the CIGAR string to insert flexible lengths for any match segment that is 99 or more nucleotides long while preserving phase. This results in a new CIGAR string of
+applied to an ungapped alignment of human and gorilla sequences that are 300 nucleotides long. First, we modified the CIGAR string to insert flexible lengths for any match segment that is 96 or more nucleotides long while preserving phase. This results in a new CIGAR string of
 %
-``101M *M 3D 10M 6I 99M *M'',
+``98M *M 3D 10M 6I 96M *M'',
 %
-where * represents the locations that have flexible length. Considering only matches and deletions, this CIGAR string has 213 fixed nucleotides, leaving 87 nucleotides in the human sequence to be allocated to the flexible locations. Since there are two locations of flexible length, we draw one random break point uniformly while maintaining phase, producing the final CIGAR string of
+where * represents the locations that have flexible length. Considering only matches and deletions, this CIGAR string has 207 fixed nucleotides, leaving 93 nucleotides in the human sequence to be allocated to the flexible locations. Since there are two locations of flexible length, we drew one random break point uniformly while maintaining phase, producing the final CIGAR string of
 %
-``101M 9M 3D 10M 6I 99M 78M'',
+``98M 12M 3D 10M 6I 96M 81M'',
 %
-which is used to add gaps into the target, ungapped sequence pair.
-To apply deletions, we remove the corresponding nucleotides from the gorilla sequence, and to apply insertions, we add random nucleotides according to their stationary frequency to the gorilla sequence at the corresponding locations. The human sequence is left unchanged.
-
+which was used to add gaps into the target, ungapped sequence pair.
+To apply deletions, we removed the corresponding nucleotides from the gorilla sequence, and to apply insertions, we added nucleotides to the gorilla sequence by sampling codons from their stationary frequency while respecting gap phases. The human sequence was left unchanged.
+%
+We generated a benchmark of 8261 sequence pairs with known alignments using this strategy.
 
 % The simulation algorithm can introduce a pairwise alignment pattern to any two nucleotide sequences of equal length. The alignment pattern is given as a CIGAR string (Compact Idiosyncratic Gapped Alignment Report), a format commonly used to summarize aligned reads to a reference genome. Assigning one of the sequences as the reference, to distinguish between insertions and deletions, CIGAR strings can also summarize pairwise alignments by grouping the number of contiguous matches or mismatches `M', deletions `D', and insertions `I'. The resulting pattern combines these letters preceded by the number of characters for each section as they appear in the alignment. This pattern is introduced by replacing nucleotides with gaps as indicated by deletions on one sequence and randomly introducing residues where the CIGAR strings indicated insertions.
 
@@ -255,18 +256,11 @@ To apply deletions, we remove the corresponding nucleotides from the gorilla seq
 % MACSE v2.06 \citep{ranwez_macse_2011}, MAFFT v7.505
 % \citep{katoh2013mafft}, and PRANK v.150803 \citep{prank_loytynoja_2014}.
 
-\subsection*{Alignment Accuracy Measures}
+\subsection*{Measuring Aligner Accuracy}
 
-We used multiple statistics to to quantify the similarity between each alignment in the benchmark and the corresponding output obtained by the different tools.
+We aligned our benchmark alignments using our suite of aligners and quantified the similarity of each alignment that was produced to its respective benchmark. As above, we measured Kimura's 2-parameter distance \citep{kimura1980simple} and $K_A/K_S$ \citep{ka_ks_li_1993} for the benchmark and estimated alignments. Additionally, we quantified the error of estimated alignments using the $d_{seq}$ metric \citep{metrics_blackburne_whelan_2011}.
 
-Alignment error also negatively impacts the estimation of evolutionary distances and phylogenetic trees. To quantify the impact of aligners on the estimation of evolutionary distances, we compared Kimura's 2-parameter distance \citep[K2P;][]{kimura1980simple} calculated for the estimated and benchmark alignments. 
-
-Alignment error negatively impacts the identification of genes that have experienced positive and negative selection.
-
-Alignment error negatively impacts the identification of genes that have experienced positive and negative selection. To evaluate the impact of aligners on selection identification, we estimated $K_S$ and $K_A$ statistics (also known as $d_s$ and $d_n$) for each estimated alignment and compared them to the benchmark alignment. 
-
-\paragraph{Alignment Error.}
-To quantify the error between estimated alignments and the benchmark alignments, we used the alignment error metric $d_{seq}$ \citep{metrics_blackburne_whelan_2011}. Intuitively, $d_{seq}$ ranges between zero and one and can be interpreted as the fraction of nucleotides in the sequence pair that are aligned differently between estimated and benchmark alignments. This metric summarizes each alignment by building homology sets for each nucleotide in the sequence pair. Briefly, if an alignment column contains position $i$ from the first sequence and position $j$ from the second sequence, then $\{j\}$ is the homology set for position $i$ in the first sequence and $\{i\}$ is the homology set for position $j$ in the second sequence. If a position is aligned against a gap, then its homology set is simply $\{\text{gap}\}$. This treats all gaps equally as the location of the gap is not recorded. Finally, $d_{seq}$ is calculated  between an estimated and a benchmark alignment as the average, normalized Hamming distance between the homology sets for each nucleotide in the sequence pair. See \cite{metrics_blackburne_whelan_2011} for further details.
+Intuitively, $d_{seq}$ ranges between zero and one and can be interpreted as the fraction of nucleotides in the sequence pair that are aligned differently between estimated and benchmark alignments. This metric summarizes each alignment by building homology sets for each nucleotide in the sequence pair. Briefly, if an alignment column contains position $i$ from the first sequence and position $j$ from the second sequence, then $\{j\}$ is the homology set for position $i$ in the first sequence and $\{i\}$ is the homology set for position $j$ in the second sequence. If a position is aligned against a gap, then its homology set is simply $\{\text{gap}\}$. This treats all gaps equally as the location of the gap is not recorded. Finally, $d_{seq}$ is calculated  between an estimated and a benchmark alignment as the average, normalized Hamming distance between the homology sets for each nucleotide in the sequence pair. See \cite{metrics_blackburne_whelan_2011} for further details.
 
 % The computation of $d_{seq}$ involves characterizing the gaps present in the alignment. Then, a site-wise homology set $H(A)^i_j$ is calculated for each alignment $A$, sequence $i$, and character $j$. The distance between two alignments $A$ and $B$ is the average across all characters of the symmetric difference (or Hamming distance), represented as `$\triangle$' between homology sets over the length of such sets:
 
@@ -276,8 +270,7 @@ To quantify the error between estimated alignments and the benchmark alignments,
 
 % \noindent where $c$ is the sum of the sequence lengths.
 
-\paragraph{Perfect, Imperfect, and Best Alignments.}
-We quantified the number of perfect, imperfect and best alignments each aligner produced. We define perfect alignments as alignments with a distance of zero to their benchmark alignment ($d_{seq} = 0$) or any alignment that is evolutionary equivalent to an alignment with a distance of zero. Equivalency was included in our definition of perfect alignments to prevent the manner by which aligners break ties between multiple optimal alignments from impacting our results. Evolutionary equivalence was determined by scoring alignments using COATi's marginal model. Any alignment that had a score which matched the score of its benchmark alignment was considered perfect even if its distance to the benchmark was greater than zero.
+Using $d_{seq}$ we quantified the number of perfect, imperfect and best alignments each aligner produced. We define perfect alignments as alignments with a distance of zero to their benchmark alignment ($d_{seq} = 0$) or any alignment that is evolutionary equivalent to an alignment with a distance of zero. Equivalency was included in our definition of perfect alignments to prevent the manner by which aligners break ties between multiple optimal alignments from influencing our results. Evolutionary equivalence was determined by scoring alignments using COATi's marginal model. Any alignment that had a score which matched the score of its benchmark alignment was considered perfect even if its distance to the benchmark was greater than zero.
 %
 Imperfect alignments are defined as alignments that are not perfect when another method successfully produces a perfect alignment for the same pair of sequences.
 %
@@ -303,15 +296,49 @@ Taken together, these three statistics not only allow a direct comparison of ali
 
 We generated 14,127 sequence pairs containing the coding sequences of a human gene and the orthologous gorilla gene. 22 human sequences contained early stop codons. These were not artifacts, but rather UGA codons which encoded for selenocysteine. 1 human sequence had a length that was not a multiple of 3, and no human sequences contained ambiguous nucleotides. Conversely, no gorilla sequences contained early stop codons (i.e.\ proteins containing selenocysteines were improperly annotated). 20 gorilla sequences had lengths that were not multiples of 3, and 173 sequences contained ambiguous nucleotides.
 
-COATi was not able to align 23 sequence pairs, PRANK was not able to align 24 sequence pairs, and COATi-rev was not able to align 193 sequence pairs. MAFFT, MACSE, and ClustalΩ were able to align all sequence pairs, although the latter received some help from our wrapper script.
+As expected, COATi was not able to align 23 sequence pairs and COATi-rev was not able to align 193 sequence pairs. PRANK was not able to align 24 sequence pairs. MAFFT, MACSE, and ClustalΩ were able to align all sequence pairs, although the latter received some help from its wrapper script. Additionally, MAFFT produced alignments with columns that contained only gaps, which were removed by its wrapper script.
+A total of 10296 sequence pairs were aligned equivalently by all five methods, including 8261 sequence pairs that did not contain any gaps, 664 that had identical alignments, and another 1371 that had identical scores.
 
-\begin{figure}[h!]
-    \centering%
-    \includegraphics{figures/fig-k2p-empirical.pdf}
-    \par
-    \caption{COATi's alignments produce biologically reasonable evolutionary distances. (a) The distribution of K2P distances inferred from alignments generated by each method. The averages of each distribution are indicated by vertical lines. The averages are COATi = 0.0084, ClustalΩ = 0.0178, MACSE = 0.0149, MAFFT = 0.0154, PRANK = 0.0092, and COATi-rev = 0.0084. (b) The distribution of the differences between distances inferred by COATi and other methods. The X-axes of both plots have been pseudo-log transformed using the inverse hyperbolic sine.}
-    \label{fig:k2p-empirical}
-\end{figure}
+Compared to other aligners, COATi inferred more indels and aligned more nucleotides against a gap while producing fewer mismatches (Tab.~\ref{tab:gaps-empirical}). Additionally, COATi inferred that 60\% indels occurred in phase 1 or phase 2 in our coding sequences. MACSE's amino-acid aware nucleotide model inferred 7\%, while MAFFT's non-coding DNA model inferred 48\%. PRANK's codon and ClustalΩ's amino-acid models were constrained by their assumptions and inferred no phase 1 or phase 2 gaps. Note that ClustalΩ's gaps with phases of 1 and 2 were created by our wrapper script handling DNA sequences with lengths that are not multiples of 3.  
+
+\begin{table}[h]
+\caption{\label{tab:gaps-empirical}COATi produced more indels and fewer mismatches compared to other aligners.}
+\centering
+\begin{tabular}[t]{lrrrccc}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Indel Phases\textsuperscript{1}} & \multicolumn{3}{c}{Homology Patterns\textsuperscript{2}}\\
+\cmidrule(l{3pt}r{3pt}){2-4}
+\cmidrule(l{3pt}r{3pt}){5-7}
+Method & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & Matches & Mismatches & Gaps\\
+\midrule
+COATi & 4493 & 3962 & 5822 & 95.93\% & 0.79\% & 3.28\%\\
+\addlinespace
+ClustalΩ & 8 & 6 & 10230 & 95.93\% & 1.54\% & 2.52\%\\
+\addlinespace
+MACSE & 455 & 497 & 13017 & 96.13\% & 1.33\% & 2.54\%\\
+\addlinespace
+MAFFT & 2317 & 2631 & 5458 & 96.12\% & 1.36\% & 2.52\%\\
+\addlinespace
+PRANK & 0 & 0 & 10862 & 95.64\% & 0.84\% & 3.52\%\\
+\addlinespace
+COATi-rev & 3992 & 3775 & 6176 & 95.95\% & 0.79\% & 3.25\%\\
+\bottomrule
+\addlinespace
+\multicolumn{7}{p{30em}}{\footnotesize\textsuperscript{1}Total number of indels inferred by each aligner separated by phase.}\\
+\multicolumn{7}{p{30em}}{\footnotesize\textsuperscript{2}The percent of nucleotides that were aligned against a match, mismatch, and gap respectively. This is different than the percent of columns that contain a match, mismatch, or gap because match and mismatch columns are counted twice.}
+
+\end{tabular}
+
+% The homology pattern columns contain the percent of nucleotides that were aligned
+% against a match, mismatch, and gap respectively. Note that this is different than the percent of columns that
+% contain a match, mismatch, or gap because match and mismatch columns are counted twice.
+\end{table}
+
+\paragraph{Evolutionary Distances.}
+
+The distribution of evolutionary distances for COATi, COATi-rev, and PRANK were biologically reasonable  for human-gorilla gene pairs, with means 0.8\%--0.9\% (Fig.~\ref{fig:k2p-empirical}a). Conversely, the means for ClustalΩ, MACSE, and MAFFT were much higher, 1.5\%--1.8\%. These larger means are due to the fact that the right tails of the distributions for ClustalΩ, MACSE, and MAFFT were larger than the other methods. The differences between the distances inferred by COATi and other methods also shows ClustalΩ, MACSE, and MAFFT producing higher distance estimates for a subset of sequences (Fig.~\ref{fig:k2p-empirical}b).
+%
+COATi's alignments produced significantly lower K2P distances than ClustalΩ, MACSE, MAFFT, and PRANK. Single-tailed Wilcoxon signed-rank tests on matched data produced p-values $< 2.2\times10^{-16}$. Additionally, COATi's K2P distances did not depend on whether human or gorilla was used as the reference sequence (p-value of $0.4212$ for a two-sided test). Additional analysis of the empirical alignments can be found in Supplementary Methods.
 
 % Wilcoxon signed rank test
 % coati vs rev-coati: p-value: 0.4212 (two.sided)
@@ -319,6 +346,64 @@ COATi was not able to align 23 sequence pairs, PRANK was not able to align 24 se
 % coati vs macse: p-value: < 2.2e-16 (less)
 % coati vs mafft: p-value: < 2.2e-16 (less)
 % coati vs clustalo: p-value: < 2.2e-16 (less)
+
+\begin{figure}[h!]
+    \centering%
+    \includegraphics{figures/fig-k2p-empirical.pdf}
+    \par
+    \caption{COATi's alignments produce biologically reasonable evolutionary distances. (a) The distribution of K2P distances inferred from alignments generated by each method. The averages of each distribution are indicated by vertical lines. The averages are COATi = 0.0084, ClustalΩ = 0.0178, MACSE = 0.0149, MAFFT = 0.0154, PRANK = 0.0092, and COATi-rev = 0.0084. (b) The distribution of the differences between distances inferred by COATi and other methods. The X-axes of both plots have been pseudo-log transformed using the inverse hyperbolic sine.\label{fig:k2p-empirical}}
+\end{figure}
+
+\paragraph{Selection.}
+
+The vast majority of sequence pairs (12,344) were identified as showing evidence of negative selection when they were aligned using COATi, ClustalΩ, MACSE, MAFFT, PRANK, and COATi-rev (Fig.~\ref{fig:sel-empirical}). Another 1087 sequence pairs were identified as showing evidence of positive selection when they were aligned using all 6 strategies. The most common pattern that showed disagreement between aligners were 91 sequence pairs that were identified as positively selected by COATi, PRANK, and COATi-rev. The most common singleton pattern was 64 sequence pairs identified as positively selected only by MAFFT. Notably, 36 sequence pairs were identified as positively selected and 9 sequence pairs were identified as negatively selected by by COATi and COATi-rev only.
+%
+In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence of positive selection. ClustalΩ identified 1,228. MACSE identified 1,183. MAFFT identified 1,340. And PRANK identified 1,349.
+
+\begin{figure}[h!]
+    \centering%
+    \includegraphics{figures/fig-sel-empirical.pdf}
+    \par
+    \caption{Aligners varied in which sequence pairs they identified as undergoing positive selection.
+    In this UpSet plot, the bottom panel displays the 16 most frequent intersection patterns among aligners. A black circle represents positive selection. The most frequent pattern was that no aligner found positive selection while the second most frequent pattern was that all aligners found positive selection. Other patterns involved a disagreement between aligners about whether a sequence pair showed evidence of positive or negative selection. The top panel displays the number of sequence pairs in each grouping.
+%
+    \label{fig:sel-empirical}}
+\end{figure}
+
+\subsection*{Benchmark Results}
+
+% Software comparison table
+\begin{table}[!ht]
+\definecolor{bestcolor}{RGB}{230,230,230}%
+\centering
+\caption{COATi generates better alignments than other alignment algorithms on semi-empirical benchmarks.\label{table:comp}}
+%
+% Copied from tables/benchmarks.tex
+% footnotes and \addlinespace are manually added
+\begin{tabular}{rccccc}
+  \toprule
+ & COATi & ClustalΩ & MACSE & MAFFT & PRANK \\ 
+  \midrule
+Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.37\% & 1.67\% & 1.02\% \\
+\addlinespace 
+  Number of Best\textsuperscript{1} Alignments & \cellcolor{bestcolor}7050 & 3988 & 5226 & 5918 & 6128 \\ 
+  Number of Perfect\textsuperscript{2} Alignments & \cellcolor{bestcolor}6795 & 3954 & 5138 & 5840 & 5860 \\ 
+  Number of Imperfect\textsuperscript{3} Alignments & \cellcolor{bestcolor} 850 & 3691 & 2507 & 1805 & 1785 \\
+  \addlinespace 
+  RMSE for K2P Distances & \cellcolor{bestcolor}0.000694 & 0.0920 & 0.0528 & 0.0561 & 0.0305 \\ 
+  Overestimated K2P Distances & \cellcolor{bestcolor}10.3\% & 52.7\% & 38.0\% & 26.2\% & 25.6\% \\ 
+  \addlinespace
+  F\textsubscript{1} for Negative Selection & \cellcolor{bestcolor}99.8\% & 97.6\% & 98.4\% & 98.3\% & 99.1\% \\ 
+  F\textsubscript{1} for Positive Selection & \cellcolor{bestcolor}97.8\% & 77.2\% & 84.9\% & 85.5\% & 91.8\% \\ 
+   \bottomrule
+   \addlinespace
+\multicolumn{6}{p{40em}}{\textsuperscript{1}Best alignments have the lowest $d_{seq}$ (including equivalent alignments)}\\
+\multicolumn{6}{p{40em}}{\textsuperscript{2}Perfect alignments have $d_{seq} = 0$ (including equivalent alignments)}\\
+\multicolumn{6}{p{40em}}{\textsuperscript{3}Imperfect alignments are alignments that are not perfect when at least one method found a perfect alignment.}\\
+\end{tabular}
+\end{table}
+
+\clearpage
 
 \section*{Discussion}
 % Using 16000 human genes and their gorilla orthologs from the ENSEMBL
@@ -342,15 +427,7 @@ COATi obtained better results compared to a wide variety of alignment strategies
 
 Aligning sequences using amino-acid translation via ClustalΩ obtained the highest average alignment error and also had difficulties correctly identifying positive selection and estimating evolutionary distances. These results are not surprising because alignments in amino-acid space only permit phase-3 gaps and are sensitive to frameshift artifacts, which inflate divergence estimates and impact selection detection. Conversely, we obtained better results when aligning in nucleotide space using both amino-acid aware MACSE and amino-acid agnostic MAFFT. These results indicate that aligning protein-coding sequences in nucleotide space works reasonably well if the sequences come from closely related species, such as humans and gorillas, as it supports all three gap phases and is robust to frameshift artifacts. If the sequences were further apart, we predict that amino-acid agnostic approaches would begin to produce unreasonable alignments. And finally, our PRANK protocol used a codon substitution model which should have been an improvement over both amino-acid and nucleotide models; however, PRANK's codon model only permits phase-3 gaps and is very sensitive to frameshift artifacts. In fact, PRANK refuses to align any sequence using a codon model if its length is not a multiple of three.
 
-% Software comparison table
-\begin{table}[!ht]
-\centering
-\input{figures/table-comp}
- \vspace{1mm}
- \footnotesize{\textsuperscript{*}PRANK produced 42 empty alignments, calculations are based on 7719 alignments.}
- \caption{COATi generates better alignments than other alignment algorithms. Results of COATi, PRANK, MAFFT, Clustal$\Omega$, and MACSE aligning 7761 empirically simulated sequence pairs. Best alignments have the lowest $d_{seq}$ (including ties), perfect alignments have the same score as the true alignment, and imperfect alignments have a different score than the true alignment when at least one method found a perfect alignment.}
- \label{table:comp}
-\end{table}
+
 
 COATi is not a symmetric pairwise aligner, as reference sequences are more constrained than non-reference sequences. To test how well COATi performs when the roles of sequences are reversed, we realigned the 7761 benchmark sequence alignments using gorilla as the reference. Notably, COATi was only able to align 4003 sequence pairs due to the presence of early stop codons or other artifacts in 3758 simulated gorilla sequences. While the simulation algorithm prevents disrupting the reading frame and introducing frameshifts, it does not prevent early stop codons from being formed in the descendant sequence. Despite this limitation, we analyzed the 4003 alignments and compared the results across methods, including COATi using the human sequence as the reference. The results show a decrease, albeit small, in accuracy across all metrics when the low-quality sequence is used as the reference in comparison to the reverse (Supplementary Materials Tab. 6). However, the results for COATi continue to be a significant improvement over other aligners.
 
@@ -359,7 +436,7 @@ COATi uses finite-state transducers to align pairs of sequences using a codon-aw
 COATi is under active development. We plan on extending it to support more complex gap models, e.g.\ mixtures of single-nucleotide and triple-nucleotide indel models and weighing gap openings to reflect known selection on indel phases \citep{zhu2022profiling}. We plan on improving its multiple-sequence alignment and alignment sampling capabilities, as well as implement new models for aligning long-read sequences of genes against reference genomes. Our goal is to develop COATi into a user-friendly suite of tools that will allow researchers to analyze more data with higher accuracy and facilitate the study of important biological processes that shape genomic data.
 
 \section*{Availability}
-The source code for COATi, along with documentation, is freely available on GitHub: \url{https://github.com/CartwrightLab/coati} and is implemented in C++. Additional information, code, and workflows to replicate the analysis can be found on GitHub: \url{https://github.com/jgarciamesa/coati-testing}.
+The source code for COATi, along with documentation, is freely available on GitHub: \url{https://github.com/CartwrightLab/coati} and is implemented in C++. COATi is released under an MIT license. Additional information, code, and workflows to replicate the analysis can be found on GitHub: \url{https://github.com/jgarciamesa/coati-testing} and \url{https://github.com/jgarciamesa/alignpair_letter}.
 
 % \section*{Supplementary information}
 
