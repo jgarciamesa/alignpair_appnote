@@ -222,7 +222,7 @@ F_1 = \frac{2 \text{TP}}{2 \text{TP} + \text{FP} + \text{FN}}
 \]
 where TP is the number of alignments that correctly predicted positive (or negative) selection, FP is the number of alignments that incorrectly predicted positive (or negative) selection, and FN is the number of alignments that incorrectly predicted the absence of positive (or negative) selection. F\textsubscript{1} allows us to measure how well aligners produce alignments that correctly identify the presence and absence of positive selection or negative selection.
 
-\subsection*{Simulated Benchmark Alignments}
+\subsection*{Semi-Empirical Benchmark Alignments}
 
 In order to compare COATi against other aligners on realistic datasets with known alignments, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previous contain indels. We separated our 14,127 empirical sequence pairs into two sets: %
 (1) 8261 sequence pairs that did not contain any gaps when aligned by COATi FST, ClustalΩ, MACSE, MAFFT, and PRANK, and (2) 5821 sequence pairs for which at least one of these five aligners added gaps.
@@ -270,7 +270,7 @@ Intuitively, $d_{seq}$ ranges between zero and one and can be interpreted as the
 
 % \noindent where $c$ is the sum of the sequence lengths.
 
-Using $d_{seq}$ we quantified the number of perfect, imperfect and best alignments each aligner produced. We define perfect alignments as alignments with a distance of zero to their benchmark alignment ($d_{seq} = 0$) or any alignment that is evolutionary equivalent to an alignment with a distance of zero. Equivalency was included in our definition of perfect alignments to prevent the manner by which aligners break ties between multiple optimal alignments from influencing our results. Evolutionary equivalence was determined by scoring alignments using COATi's marginal model. Any alignment that had a score which matched the score of its benchmark alignment was considered perfect even if its distance to the benchmark was greater than zero.
+Using $d_{seq}$ we quantified the number of perfect, imperfect and best alignments each aligner produced. We define perfect alignments as alignments with a distance of zero to the benchmark alignment ($d_{seq} = 0$) or any alignment that is evolutionary equivalent to an alignment with a distance of zero. Equivalency was included in our definition of perfect alignments to prevent the manner by which aligners break ties between multiple optimal alignments from influencing our results. Evolutionary equivalence was determined by scoring alignments using COATi's marginal model. Any alignment that had a score which matched the score of its benchmark alignment was considered perfect even if its distance to the benchmark was greater than zero.
 %
 Imperfect alignments are defined as alignments that are not perfect when another method successfully produces a perfect alignment for the same pair of sequences.
 %
@@ -292,7 +292,7 @@ Taken together, these three statistics not only allow a direct comparison of ali
 
 \section*{Results}
 
-\paragraph{Empirical Data and Alignments.}
+\subsection*{Empirical Data and Alignments}
 
 We generated 14,127 sequence pairs containing the coding sequences of a human gene and the orthologous gorilla gene. 22 human sequences contained early stop codons. These were not artifacts, but rather UGA codons which encoded for selenocysteine. 1 human sequence had a length that was not a multiple of 3, and no human sequences contained ambiguous nucleotides. Conversely, no gorilla sequences contained early stop codons (i.e.\ proteins containing selenocysteines were improperly annotated). 20 gorilla sequences had lengths that were not multiples of 3, and 173 sequences contained ambiguous nucleotides.
 
@@ -358,7 +358,7 @@ COATi's alignments produced significantly lower K2P distances than ClustalΩ, MA
 
 The vast majority of sequence pairs (12,344) were identified as showing evidence of negative selection when they were aligned using COATi, ClustalΩ, MACSE, MAFFT, PRANK, and COATi-rev (Fig.~\ref{fig:sel-empirical}). Another 1087 sequence pairs were identified as showing evidence of positive selection when they were aligned using all 6 strategies. The most common pattern that showed disagreement between aligners were 91 sequence pairs that were identified as positively selected by COATi, PRANK, and COATi-rev. The most common singleton pattern was 64 sequence pairs identified as positively selected only by MAFFT. Notably, 36 sequence pairs were identified as positively selected and 9 sequence pairs were identified as negatively selected by by COATi and COATi-rev only.
 %
-In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence of positive selection. ClustalΩ identified 1,228. MACSE identified 1,183. MAFFT identified 1,340. And PRANK identified 1,349.
+In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence of positive selection. ClustalΩ identified 1,228. MACSE identified 1,183. MAFFT identified 1,340. And PRANK identified 1,349. Note that we did not explore whether any of these inferences were biologically or statistically significant.
 
 \begin{figure}[h!]
     \centering%
@@ -370,13 +370,21 @@ In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence
     \label{fig:sel-empirical}}
 \end{figure}
 
-\subsection*{Benchmark Results}
+\subsection*{Semi-Empirical Benchmark}
+
+COATi produced better alignments than ClustalΩ, MACSE, MAFFT, and PRANK when evaluated by our benchmark data set. It produced more best alignments, more perfect alignments, and less imperfect alignments (Tab.~\ref{table:comp}).
+%
+COATi was significantly more accurate (lower $d_{seq}$) at inferring the benchmark alignments compared to the other methods (Tab.~\ref{table:comp}). All p-values were significant according to the one-tailed, paired Wilcoxon signed-rank tests. (P-value of COATi vs PRANK was $5.1 \times 10^{-8}$, and p-values of COATi vs the other aligners were $< 2.2 \times 10^{-16}$). Notably, the average alignment error of the second best protocol was four times larger than COATi's. We also calculated the average distance of alignments between aligners and used principle coordinate analysis (PCoA) to project the resulting distance matrix into two dimensions (Fig.~\ref{fig:dseq-benchmarks}). COATi was the closest aligner to the benchmark, and other aligners tended to diverge from the benchmark in different directions. Because benchmark alignments were derived from gap patterns estimated by different aligners, we also performed separate PCoA analyses for each source of gap patterns (Supplementary Materials, Fig.~S5). While all aligners, except ClustalΩ, do exceptionally well on their own patterns, COATi does exceptionally well on every set of patterns.
+
+For evolutionary distances, COATi had the lowest root-mean-square error (0.000694) relative to the benchmark alignments (Tab.~\ref{table:comp}). The second lowest aligner, PRANK, had a root-mean-square error that was over 400 times larger than COATi's. COATi only overestimated  10\% of its evolutionary distances, while other aligners overestimated 26\%--53\% of their evolutionary distances.
+%
+Additionally, COATi more accurately inferred events of positive and negative selection (Tab.~\ref{table:comp}).
 
 % Software comparison table
 \begin{table}[!ht]
 \definecolor{bestcolor}{RGB}{230,230,230}%
 \centering
-\caption{COATi generates better alignments than other alignment algorithms on semi-empirical benchmarks.\label{table:comp}}
+\caption{COATi generates better alignments than other alignment algorithms on semi-empirical benchmarks.\textsuperscript{1}\label{table:comp}}
 %
 % Copied from tables/benchmarks.tex
 % footnotes and \addlinespace are manually added
@@ -386,20 +394,19 @@ In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence
   \midrule
 Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.37\% & 1.67\% & 1.02\% \\
 \addlinespace 
-  Number of Best\textsuperscript{1} Alignments & \cellcolor{bestcolor}7050 & 3988 & 5226 & 5918 & 6128 \\ 
+  Number of Best\textsuperscript{2} Alignments & \cellcolor{bestcolor}7050 & 3988 & 5226 & 5918 & 6128 \\ 
   Number of Perfect\textsuperscript{2} Alignments & \cellcolor{bestcolor}6795 & 3954 & 5138 & 5840 & 5860 \\ 
-  Number of Imperfect\textsuperscript{3} Alignments & \cellcolor{bestcolor} 850 & 3691 & 2507 & 1805 & 1785 \\
+  Number of Imperfect\textsuperscript{2} Alignments & \cellcolor{bestcolor} 850 & 3691 & 2507 & 1805 & 1785 \\
   \addlinespace 
   RMSE for K2P Distances & \cellcolor{bestcolor}0.000694 & 0.0920 & 0.0528 & 0.0561 & 0.0305 \\ 
   Overestimated K2P Distances & \cellcolor{bestcolor}10.3\% & 52.7\% & 38.0\% & 26.2\% & 25.6\% \\ 
   \addlinespace
-  F\textsubscript{1} for Negative Selection & \cellcolor{bestcolor}99.8\% & 97.6\% & 98.4\% & 98.3\% & 99.1\% \\ 
-  F\textsubscript{1} for Positive Selection & \cellcolor{bestcolor}97.8\% & 77.2\% & 84.9\% & 85.5\% & 91.8\% \\ 
+  F\textsubscript{1} Score for Negative Selection & \cellcolor{bestcolor}99.8\% & 97.6\% & 98.4\% & 98.3\% & 99.1\% \\ 
+  F\textsubscript{1} Score for Positive Selection & \cellcolor{bestcolor}97.8\% & 77.2\% & 84.9\% & 85.5\% & 91.8\% \\ 
    \bottomrule
    \addlinespace
-\multicolumn{6}{p{40em}}{\textsuperscript{1}Best alignments have the lowest $d_{seq}$ (including equivalent alignments)}\\
-\multicolumn{6}{p{40em}}{\textsuperscript{2}Perfect alignments have $d_{seq} = 0$ (including equivalent alignments)}\\
-\multicolumn{6}{p{40em}}{\textsuperscript{3}Imperfect alignments are alignments that are not perfect when at least one method found a perfect alignment.}\\
+\multicolumn{6}{p{40em}}{\textsuperscript{1}Total number of sequence pairs in the benchmark was 8,261.}\\
+\multicolumn{6}{p{40em}}{\textsuperscript{2}Best alignments have the lowest $d_{seq}$ (including equivalent alignments). Perfect alignments have $d_{seq} = 0$ (including equivalent alignments). Imperfect alignments are alignments that are not perfect when at least one method found a perfect alignment. }\\
 \end{tabular}
 \end{table}
 
@@ -407,7 +414,7 @@ Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.3
     \centering%
     \includegraphics{figures/fig-dseq-benchmarks.pdf}
     \par
-    \caption{COATi's alignments were closer to the semi-empirical benchmark than other methods. A principal coordinates analysis of the average alignment distance ($d_{seq}$) between alignments generated by different methods. Not only were COATi's alignments on average closest to the benchmark, but other aligners tended to diverge from the benchmark in different directions.
+    \caption{COATi's alignments were closer to the semi-empirical benchmark than other methods. A principal coordinates analysis (PCoA) of the average alignment distance ($d_{seq}$) between alignments generated by different methods.
 %
     \label{fig:dseq-benchmarks}}
 \end{figure}
@@ -434,18 +441,23 @@ Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.3
 
 % NOTES:
 % - Benchmark only contains seqeunces with gaps, which will make alignes look more different than they are in practice
-% - Parameters and optimization
 % - simulalation contained a lot of frameshifts that produed stop codons. Probably too many.
 % - redo colors of figures 1 - 3.
 % - define an equivalent alignment again in the benchmark results
 
-COATi obtained better results compared to a wide variety of alignment strategies. It was significantly more accurate (lower $d_{seq}$) at inferring the empirically simulated alignments compared to other methods; all p-values were less than $1.3 \cdot 10^{-76}$ according to the one-tailed, paired Wilcoxon signed-rank tests (Supplementary Materials Figure 1). Notably, the average alignment error of the second best protocol was six times larger than COATi's. In addition, COATi produced more perfect alignments, less imperfect alignments, and more accurately inferred events of positive and negative selection (Table \ref{table:comp}). Furthermore, the estimated evolutionary divergence from the alignments retrieved by COATi was substantially less overestimated than other methods (Table \ref{table:comp}, Supplemental Materials Figure 8).
+We have developed a statistical alignment program using finite-state transducers called COATi. On empirical data, COATi produced alignments that provided reasonable biological inferences. On semi-empirical, simulated benchmarks COATi was more accurate than the other aligners/alignment strategies that we tested: ClustalΩ's amino-acid model, MACSE's amino-acid away nucleotide model, MAFFT's DNA model, and PRANK's codon model. COATi's advantage over other aligners in our tests is at least partially due to its default parameters fitting the human-gorilla coding sequences better than the other aligner's default settings. Different data sets may show different results. However, because COATi uses a statistical model with biologically meaningful parameters, users can easily optimize COATi by using parameters estimated by previous studies or estimating parameters themselves \citep[e.g.][]{zhu2022profiling}.
 
-Aligning sequences using amino-acid translation via ClustalΩ obtained the highest average alignment error and also had difficulties correctly identifying positive selection and estimating evolutionary distances. These results are not surprising because alignments in amino-acid space only permit phase-3 gaps and are sensitive to frameshift artifacts, which inflate divergence estimates and impact selection detection. Conversely, we obtained better results when aligning in nucleotide space using both amino-acid aware MACSE and amino-acid agnostic MAFFT. These results indicate that aligning protein-coding sequences in nucleotide space works reasonably well if the sequences come from closely related species, such as humans and gorillas, as it supports all three gap phases and is robust to frameshift artifacts. If the sequences were further apart, we predict that amino-acid agnostic approaches would begin to produce unreasonable alignments. And finally, our PRANK protocol used a codon substitution model which should have been an improvement over both amino-acid and nucleotide models; however, PRANK's codon model only permits phase-3 gaps and is very sensitive to frameshift artifacts. In fact, PRANK refuses to align any sequence using a codon model if its length is not a multiple of three.
+COATi's primary disadvantage is that its FST model was slower and consumed more resources than other methods. However, COATi's marginal model produces results similar to the FST model, was the fastest method tested, and consumed reasonable amounts of memory \citep{garcia2023dissertation}. COATi is also not a symmetric pairwise aligner, as reference sequences are more constrained than non-reference sequences.
+%
+In order to test whether the choice of a reference sequence impact's COATi's results, we aligned our empirical sequence pairs with COATi using gorilla as the reference. We found no biologically or statistically significant differences between the results. The most noticeable difference was that with gorilla as the reference COATi rejected more sequence pairs due to the presence of ambiguous nucleotides in gorilla sequences.
 
+After COATi, PRANK's codon model was the second most accurate alignment method. Like COATi, PRANK also uses statistical models and supports aligning protein-coding sequences using codon models developed for phylogenetics. However, PRANK's codon model only permits phase-3 gaps and is very sensitive to frameshift artifacts. In fact, PRANK refuses to align any sequence using a codon model if its length is not a multiple of three. Similarly, ClustalΩ amino-acid model also only permits phase-3 gaps and is very sensitive to frameshift artifacts; however, it was the worst performing protocol that we tested. It had the highest average alignment error and also had difficulties correctly identifying positive selection and estimating evolutionary distances.  --- It even performed poorly on its own gap patterns. --- ClustalΩ's relatively poor performance likely derives from its default assumptions being a poor fit for our data set and from the loss of information that occurred when we translated protein-coding DNA sequences into protein sequences.
 
+We obtained better results when aligning in nucleotide space using both amino-acid aware MACSE and amino-acid agnostic MAFFT. These results indicate that aligning protein-coding sequences in nucleotide space works reasonably well if the sequences come from closely related species, such as humans and gorillas, as it supports all three gap phases and is robust to frameshift artifacts. If the sequences were further apart, we predict that amino-acid agnostic approaches would begin to produce unreasonable alignments. 
 
-COATi is not a symmetric pairwise aligner, as reference sequences are more constrained than non-reference sequences. To test how well COATi performs when the roles of sequences are reversed, we realigned the 7761 benchmark sequence alignments using gorilla as the reference. Notably, COATi was only able to align 4003 sequence pairs due to the presence of early stop codons or other artifacts in 3758 simulated gorilla sequences. While the simulation algorithm prevents disrupting the reading frame and introducing frameshifts, it does not prevent early stop codons from being formed in the descendant sequence. Despite this limitation, we analyzed the 4003 alignments and compared the results across methods, including COATi using the human sequence as the reference. The results show a decrease, albeit small, in accuracy across all metrics when the low-quality sequence is used as the reference in comparison to the reverse (Supplementary Materials Tab. 6). However, the results for COATi continue to be a significant improvement over other aligners.
+We can look at distances between alignments generated by different aligners to understand the diversity of approaches use by our alignment protocols. Aside from the cluster of different COATi methods, we detected no clusters in our analysis. Different aligners tended to spread out from one another and in different directions from the benchmark. This indicates that each protocol approached alignment inference from a different section of ``aligner space''. While each aligner, except ClustalΩ, performed well on its own gap patterns, MACSE also did well on ClustalΩ and MAFFT gap patterns, and PRANK also did well on ClustalΩ patterns. COATi did well on all patterns.
+
+% COATi is not a symmetric pairwise aligner, as reference sequences are more constrained than non-reference sequences. To test how well COATi performs when the roles of sequences are reversed, we realigned the 7761 benchmark sequence alignments using gorilla as the reference. Notably, COATi was only able to align 4003 sequence pairs due to the presence of early stop codons or other artifacts in 3758 simulated gorilla sequences. While the simulation algorithm prevents disrupting the reading frame and introducing frameshifts, it does not prevent early stop codons from being formed in the descendant sequence. Despite this limitation, we analyzed the 4003 alignments and compared the results across methods, including COATi using the human sequence as the reference. The results show a decrease, albeit small, in accuracy across all metrics when the low-quality sequence is used as the reference in comparison to the reverse (Supplementary Materials Tab. 6). However, the results for COATi continue to be a significant improvement over other aligners.
 
 COATi uses finite-state transducers to align pairs of sequences using a codon-aware statistical model. While COATi has multiple modes and models, here we have focused on evaluating the utility of COATi FST for estimating pairwise alignments. We have shown that COATi offers a biologically significant improvement over other methods when aligning pairs of sequences separated by short evolutionary distances in the presence of genomic artifacts. In other work, we have begun to explore application of COATi to more divergent sequences and the accuracy of the marginal approximation of the COATi FST \citep{garcia2023dissertation}. 
 
