@@ -27,16 +27,23 @@
 \definecolor{colorGy}{RGB}{153,153,153} % GRAY
 \definecolor{asublue}{RGB}{0,163,224}
 
+\definecolor{TolVibrantBlue}{RGB}{0,119,187}
+\definecolor{TolVibrantOrange}{RGB}{238,119,51}
+\definecolor{TolVibrantTeal}{RGB}{0,153,136}
+\definecolor{TolVibrantRed}{RGB}{204,51,17}
+\definecolor{TolVibrantGrey}{RGB}{187,187,187}
+\definecolor{TolVibrantGray}{RGB}{187,187,187}
+
 \tikzstyle{aln}=[matrix of nodes, nodes in empty cells]
 %\tikzstyle{best}=[fill=asublue!20,rounded corners]
 \tikzstyle{best}=[rounded corners]
 \tikzstyle{lab}=[font=\normalsize]
 \tikzstyle{indel}=[ultra thick, rounded corners]
-\tikzstyle{phase0}=[draw=colorGy]
-\tikzstyle{phase1}=[draw=colorP]
-\tikzstyle{phase2}=[draw=colorO]
+\tikzstyle{phase0}=[draw=TolVibrantTeal]
+\tikzstyle{phase1}=[draw=TolVibrantBlue]
+\tikzstyle{phase2}=[draw=TolVibrantOrange]
 
-\newcommand{\e}[1]{\textbf{\textcolor{colorR}{#1}}}
+\newcommand{\e}[1]{\textbf{\textcolor{TolVibrantRed}{#1}}}
 
 \begin{document}
 \begin{tikzpicture}[node distance=5mm,font=\footnotesize]

@@ -32,11 +32,14 @@
 \definecolor{colorBk}{RGB}{0,0,0}
 \definecolor{colorGy}{RGB}{153,153,153} % GRAY
 
+\definecolor{TolHighContrastBlue}{RGB}{0,68,136}
+\definecolor{TolVibrantBlue}{RGB}{0,119,187}
+
 % (86 mm) or double (178 mm) column width
 
 \tikzset{
   end/.style={fill=none, text=black, inner sep=1pt},
-  block/.style={circle,on grid,fill=colorBu,text=white,minimum width=2em,node distance=4em},
+  block/.style={circle,on grid,fill=TolVibrantBlue,text=white,minimum width=2em,node distance=4em},
   line/.style={draw, -Stealth, thick},
   lab/.style={text = black, inner sep=1pt},
   title/.style={text = black, font=\bfseries}
