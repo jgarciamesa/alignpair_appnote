@@ -49,103 +49,37 @@ ALN_DATA <- read_csv(here("data", "raw_fasta_aligned_stats.csv.gz"))
 GAP_DATA <- read_csv(here("supplementary_materials", "data", "gaps.csv.gz"))
 ```
 
-```{r}
-
-summary_table = function(results_file, coati_model) {
-    # read results_summary data
-    results = read.csv(results_file)
-    
-    # extract dseq values for each aligner
-    coati = results |> filter(aligner == coati_model) |> select(dseq)
-    clustal = results |> filter(aligner == "clustalo") |> select(dseq)
-    macse = results |> filter(aligner == "macse") |> select(dseq)
-    mafft = results |> filter(aligner == "mafft") |> select(dseq)
-    prank = results |> filter(aligner == "prank") |> select(dseq)
-    
-    stats_table = data.frame(dseq = c(mean(coati$dseq, na.rm = TRUE),
-                          mean(mafft$dseq, na.rm = TRUE),
-                          mean(prank$dseq, na.rm = TRUE),
-                          mean(macse$dseq, na.rm = TRUE),
-                          mean(clustal$dseq, na.rm = TRUE)), row.names = c(coati_model, "mafft", "prank", "macse", "clustalo"))
-    
-    ###########################################################################
-    # perfect, best, and imperfect alignments
-    source("scripts/number_alignments.R")
-    alns = num_alns(results_file)
-    
-    # fix row and column names and add to stats table
-    colnames(alns) = c("Perfect alns", "Best alns", "Imperfect alns")
-    alns = alns[c(coati_model, "mafft", "prank", "macse", "clustalo"), ]
-    stats_table = cbind(stats_table, alns)
-    
-    ############################################################################
-    # selection (ka ks)
-    source("scripts/kaks.R")
-    
-    aligners = c(coati_model, "mafft", "prank", "macse", "clustalo")
-    selection = data.frame("F1.pos" = double(),
-                           "F1.neg" = double())
-    
-    # calculate F1 score for positive and negative selection for each aligner
-    for(model in aligners) {
-        model_rows = results[which(results$aligner == model), ]
-        pos = ps_accuracy(model_rows$ref_omega, model_rows$aln_omega)
-        neg = ns_accuracy(model_rows$ref_omega, model_rows$aln_omega)
-        
-        selection[nrow(selection) + 1, ] = c(pos, neg)
-    }
-    
-    # fix row and column names and add to stats table
-    colnames(selection) = c("F1 pos selection", "F1 neg selection")
-    rownames(selection) = c("coati", "mafft", "prank", "macse", "clustalo")
-    stats_table = cbind(stats_table, selection)
-    if(coati_model == "tri-mg") {
-        coati_model = "Triplet-MG94"
-    } else if(coati_model == "tri-ecm") {
-        coati_model = "Triplet-ECM"
-    } else if(coati_model == "mar-mg") {
-        coati_model = "Marginal-MG94"
-    } else if(coati_model == "mar-ecm") {
-        coati_model = "Marginal-ECM"
-    }
-    rownames(stats_table) = c(coati_model, "MAFFT", "PRANK*", "MACSE", "ClustalOmega")
-    
-    # display stats table
-    stats_table
-}
-
-wilcoxon_test = function(results_file, coati_model) {
-    # read results_summary data
-    results = read.csv(results_file)
-
-    # extract dseq values for each aligner
-    coati = results$dseq[which(results$aligner == coati_model)]
-    clustalomega = results$dseq[which(results$aligner == "clustalo")]
-    macse = results$dseq[which(results$aligner == "macse")]
-    mafft = results$dseq[which(results$aligner == "mafft")]
-    prank = results$dseq[which(results$aligner == "prank")]
-
-    # one-side paired wilcoxon rank test
-    wtp = wilcox.test(x = coati, y = prank, paired = TRUE, alternative = "less")
-    wtmf = wilcox.test(x = coati, y = mafft, paired = TRUE, alternative = "less")
-    wtc = wilcox.test(x = coati, y = clustalomega, paired = TRUE, alternative = "less")
-    wtmc = wilcox.test(x = coati, y = macse, paired = TRUE, alternative = "less")
-    w = c(wtp$p.value, wtmf$p.value, wtc$p.value, wtmc$p.value)
-    w
-}
-```
-
 # Aligner Commands
 
-We evaluated five different aligners. Below are the commands that we used to run them. We have abbreviated the commands for clarity, stripping out unimportant arguments. Complete workflows can be found in our coati-testing repository on Github.
+We evaluated five different aligners. Below are the commands that we used to run
+them. We have abbreviated the commands for clarity, stripping out unimportant
+arguments. Complete workflows can be found in our coati-testing repository on
+Github.
 
-- COATi: `coati alignpair -m tri-mg ...`; We used COATi two different ways. The primary way used human as the reference sequence. The secondary way, COATi-rev, used gorilla as the reference, via a wrapper script that reversed the order of sequences before alignment and reversed the order back afterwards.
-- ClustalΩ v1.2.4: `clustalo --seqtype=Protein ...`; We wrapped ClustalΩ with a script that translates DNA sequences into amino acid sequences (including stops) before alignment. Any codons that were partial or containing ambiguous characters were translated as "X". The script then aligned these translated sequences with ClustalΩ, and then created a DNA alignment that was consistent with the amino-acid alignment.
-- MACSE v2.06: `java -jar macse.jar -prog alignSequences -seq human.fasta -seq_lr gorilla.fasta ...`; We wrapped MACSE with a script that created two temporary fasta files, one containing the human sequence and another containing the gorilla sequence. The human sequence was specified as the reliable sequence and the gorilla sequence was specified as the less-reliable sequence. MACSE uses "!" to mark gaps that result from frameshifts, and the wrapper script replaced these with "-". Additionally, MACSE sometimes produced columns that only contained gaps, and these columns were removed.
+- COATi: `coati alignpair -m tri-mg ...`; We used COATi two different ways. The
+  primary way used human as the reference sequence. The secondary way,
+  COATi-rev, used gorilla as the reference, via a wrapper script that reversed
+  the order of sequences before alignment and reversed the order back
+  afterwards.
+- ClustalΩ v1.2.4: `clustalo --seqtype=Protein ...`; We wrapped ClustalΩ with a
+  script that translates DNA sequences into amino acid sequences (including
+  stops) before alignment. Any codons that were partial or containing ambiguous
+  characters were translated as "X". The script then aligned these translated
+  sequences with ClustalΩ, and then created a DNA alignment that was consistent
+  with the amino-acid alignment.
+- MACSE v2.06: `java -jar macse.jar -prog alignSequences -seq human.fasta
+  -seq_lr gorilla.fasta ...`; We wrapped MACSE with a script that created two
+  temporary fasta files, one containing the human sequence and another
+  containing the gorilla sequence. The human sequence was specified as the
+  reliable sequence and the gorilla sequence was specified as the less-reliable
+  sequence. MACSE uses "!" to mark gaps that result from frameshifts, and the
+  wrapper script replaced these with "-". Additionally, MACSE sometimes produced
+  columns that only contained gaps, and these columns were removed.
 - PRANK v.150803: `prank -codon ...`
 - MAFFT v7.520: `mafft --preservecase --globalpair --maxiterate 1000 ...`
 
-COATi can use different alignment models for pairwise alignment. Below are the commands that we used to run different models.
+COATi can use different alignment models for pairwise alignment. Below are the
+commands that we used to run different models.
 
 - tri-mg: `coati alignpair -m tri-mg ...`
 - tri-ecm: `coati alignpair -m tri-ecm ...`
@@ -154,11 +88,24 @@ COATi can use different alignment models for pairwise alignment. Below are the c
 
 # FST Alignment Example
 
-When using the triplet models (tri-mg and tri-ecm), COATi uses the OpenFST library to generate best alignments by composing the input and output sequences with the COATi FST model. While the COATi FST model is too large to display, we can show the result of a composition.
+When using the triplet models (tri-mg and tri-ecm), COATi uses the OpenFST
+library to generate best alignments by composing the input and output sequences
+with the COATi FST model. While the COATi FST model is too large to display, we
+can show the result of a composition.
 
-Fig. \@ref(fig:aln-example-a) shows a graph depicting the FST that results from composing the COATi FST with the input sequence "CTC" and the output sequence "CTG". Every path through this FST represents one possible way to align "CTC" and "CTG", and the sum of all weights along a path is the total weight of the respective alignment. Here, the weights of each arc are in negative-log space. Note that this graph has been optimized, and weight has been pushed towards the initial state. The weight of any specific arc may not be directly mapable to a weight described in the model.
+Fig. \@ref(fig:aln-example-a) shows a graph depicting the FST that results from
+composing the COATi FST with the input sequence "CTC" and the output sequence
+"CTG". Every path through this FST represents one possible way to align "CTC"
+and "CTG", and the sum of all weights along a path is the total weight of the
+respective alignment. Here, the weights of each arc are in negative-log space.
+Note that this graph has been optimized, and weight has been pushed towards the
+initial state. The weight of any specific arc may not be directly mapable to a
+weight described in the model.
 
-Fig. \@ref(fig:aln-example-b) is the best alignment between "CTC" and "CTG", as determined by the shortest path algorithm.  Figs. \@ref(fig:aln-example-a) and \@ref(fig:aln-example-b) were produced by the OpenFST library. A bold circle represents a starting node, and a double circle represents a termination node.
+Fig. \@ref(fig:aln-example-b) is the best alignment between "CTC" and "CTG", as
+determined by the shortest path algorithm.  Figs. \@ref(fig:aln-example-a) and
+\@ref(fig:aln-example-b) were produced by the OpenFST library. A bold circle
+represents a starting node, and a double circle represents a termination node.
 
 ```{r aln-example-a, fig.align='center', fig.cap="The FST of all possible alignments between \"CTC\" and \"CTG\"."}
 knitr::include_graphics("figures/aln-example-graph.pdf")
@@ -176,11 +123,23 @@ knitr::include_graphics("figures/aln-example-path.pdf")
 
 ### Lengths
 
-We quantified the lengths of gaps produced by each method across the empirical dataset of human-gorilla protein-coding-sequence pairs (Tab. \@ref(tab:gap-table-1)). Here the gap type is either "D" for gaps introduced into the gorilla sequence or "I" for gaps introduced in the human sequence. "COATi" refers to the full COATi FST model with a MG substitution model (i.e. tri-mg). "COATi-rev" refers to the same model, but using gorilla as the reference and human as the non-reference sequence. Gap lengths of 1--6 nucleotides were binned into their respective columns. Gap lengths longer than 6 nucleotides were binned into columns 7+, 8+, and 9+ depending on whether their lengths were 1, 2, or 3 nucleotides longer than a multiple of three.
+We quantified the lengths of gaps produced by each method across the empirical
+dataset of human-gorilla protein-coding-sequence pairs (Tab. \@ref
+(tab:gap-table-1)). Here the gap type is either "D" for gaps introduced into
+the gorilla sequence or "I" for gaps introduced in the human sequence. "COATi"
+refers to the full COATi FST model with a MG substitution model
+(i.e. tri-mg). "COATi-rev" refers to the same model, but using gorilla as the
+reference and human as the non-reference sequence. Gap lengths of 1--6
+nucleotides were binned into their respective columns. Gap lengths longer than
+6 nucleotides were binned into columns 7+, 8+, and 9+ depending on whether
+their lengths were 1, 2, or 3 nucleotides longer than a multiple of three.
 
-We also quantified the lengths of gaps produced by different COATi models (Tab. \@ref(tab:gap-table-2)).
+We also quantified the lengths of gaps produced by different COATi models
+(Tab. \@ref(tab:gap-table-2)).
 
-Note that ClustalΩ gaps with lengths that are not a multiple of 3 are created by how our wrapper script handles DNA sequences with lengths that are not multiple of 3.
+Note that ClustalΩ gaps with lengths that are not a multiple of 3 are created by
+how our wrapper script handles DNA sequences with lengths that are not multiple
+of 3.
 
 ```{r gap-table-1, results = 'asis', message = FALSE}
 gap_len_data <- GAP_DATA |> filter(op %in% c("I", "D")) |>
@@ -191,7 +150,7 @@ gap_len_data <- GAP_DATA |> filter(op %in% c("I", "D")) |>
     pivot_wider(names_from = "length", values_from = "n")
 
 gap_len_data <- gap_len_data |> rename("Gap Type" = "op", "Method" = "method",
-  "7+" = "7", "8+" = "8", "9+" = "9")
+    "7+" = "7", "8+" = "8", "9+" = "9")
 
 tab <- gap_len_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
     "macse", "mafft", "prank", "rev-coati-tri-mg")) |>
@@ -206,10 +165,12 @@ tab <- gap_len_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
         )) |>
     arrange(Method, "Gap Type")
 
-k <- kable(tab, align = "lcrrrrrrrrr", caption="Number of gaps introduced by each method separated by length and type.", booktabs = TRUE, linesep = c("", "\\addlinespace"))
+k <- kable(tab, align = "lcrrrrrrrrr",
+    caption="Number of gaps introduced by each method separated by length and type.",
+    booktabs = TRUE, linesep = c("", "\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
-  add_header_above(c(" " = 2L, "Gap Lengths" = 9L))
+    add_header_above(c(" " = 2L, "Gap Lengths" = 9L))
 ```
 
 ```{r gap-table-2, results = 'asis', message = FALSE}
@@ -227,17 +188,25 @@ tab <- gap_len_data |> filter(Method %in% c("coati-tri-mg",
         "DNA" = "coati-dna"
     ))
 
-k <- kable(tab, align = "lcrrrrrrrrr", caption="Number of gaps introduced by different COATi models separated by length and type.", booktabs = TRUE, linesep = c("", "\\addlinespace"))
+k <- kable(tab, align = "lcrrrrrrrrr",
+    caption="Number of gaps introduced by different COATi models separated by length and type.",
+    booktabs = TRUE, linesep = c("", "\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
-  add_header_above(c(" " = 2L, "Gap Lengths" = 9L))
+    add_header_above(c(" " = 2L, "Gap Lengths" = 9L))
 ```
 
 ### Phases
 
-We quantified the phases of gaps produced by different aligners and COATi models (Tab. \@ref(tab:gap-table-3) and \@ref(tab:gap-table-4)). Phase 1 gaps begin after the 1st position in a codon in the reference sequence, phase 2 gaps begin after the 2nd position in a codon, and phase 3 begin after the 3rd position in a codon (i.e. between codons). Phase 3 gaps are also known as phase 0 gaps.
+We quantified the phases of gaps produced by different aligners and COATi
+models (Tab. \@ref(tab:gap-table-3) and \@ref(tab:gap-table-4)). Phase 1 gaps
+begin after the 1st position in a codon in the reference sequence, phase 2 gaps
+begin after the 2nd position in a codon, and phase 3 begin after the 3rd
+position in a codon (i.e. between codons). Phase 3 gaps are also known as phase
+0 gaps.
 
-Note that ClustalΩ gaps with phases of 1 and 2 are created by how our wrapper script handles DNA sequences with lengths that are not multiple of 3.
+Note that ClustalΩ gaps with phases of 1 and 2 are created by how our wrapper
+script handles DNA sequences with lengths that are not multiple of 3.
 
 ```{r gap-table-3, results = 'asis', message = FALSE}
 gap_phase_data <- GAP_DATA |> 
@@ -265,10 +234,12 @@ tab <- gap_phase_data |> filter(Method %in% c("clustalo", "coati-tri-mg",
         )) |>
     arrange(Method)
 
-k <- kable(tab, align = "lrrr", caption="Number of gaps introduced by each alignment method separated by phase.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab, align = "lrrr",
+    caption="Number of gaps introduced by each alignment method separated by phase.",
+    booktabs = TRUE, linesep = c("\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
-  add_header_above(c(" " = 1L, "Gap Phases" = 3L))
+    add_header_above(c(" " = 1L, "Gap Phases" = 3L))
 ```
 
 ```{r gap-table-4, results = 'asis', message = FALSE}
@@ -286,15 +257,23 @@ tab <- gap_phase_data |> filter(Method %in% c("coati-tri-mg",
         "DNA" = "coati-dna"
     ))
 
-k <- kable(tab, align = "lrrr", caption="Number of gaps introduced by different COATi models separated by phase.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab, align = "lrrr",
+    caption="Number of gaps introduced by different COATi models separated by phase.",
+    booktabs = TRUE, linesep = c("\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position") |>
-  add_header_above(c(" " = 1L, "Gap Phases" = 3L))
+    add_header_above(c(" " = 1L, "Gap Phases" = 3L))
 ```
 
 ## Homology Patterns
 
-We quantified the homology patterns of residues for different aligners and COATi models (Tab. \@ref(tab:gap-table-5), Tab. \@ref(tab:gap-table-6), and Fig. \@ref(fig:gap-figure-1)). Here we define the match, mismatch, and gap percentages as the percent of nucleotides aligned against a match, mismatch, and gap respectively. Note that this is different than the percent of columns that contain a match, mismatch, or gap because match and mismatch columns are counted twice.
+We quantified the homology patterns of residues for different aligners and COATi
+models (Tab. \@ref(tab:gap-table-5), Tab. \@ref(tab:gap-table-6), and
+Fig. \@ref(fig:gap-figure-1)). Here we define the match, mismatch, and gap
+percentages as the percent of nucleotides aligned against a match, mismatch,
+and gap respectively. Note that this is different than the percent of columns
+that contain a match, mismatch, or gap because match and mismatch columns are
+counted twice.
 
 ```{r gap-table-5, results = 'asis', message = FALSE}
 gap_count_data <- GAP_DATA |>
@@ -332,7 +311,9 @@ tab <- gap_frac_data |>
         )) |>
     arrange(Method)
 
-k <- kable(tab, align = "rccc", caption="Average homology percentages of alignments separated by alignment method.", booktabs = TRUE, linesep = c("\\addlinespace"))
+k <- kable(tab, align = "rccc",
+    caption="Average homology percentages of alignments separated by alignment method.",
+    booktabs = TRUE, linesep = c("\\addlinespace"))
 
 k |> kable_styling(latex_options = "HOLD_position")
 ```
@@ -398,15 +379,114 @@ gg <- gg + theme_grey(9) + theme(
 )
 
 gg
+```
 
+\newpage
 
+## Sequence Distances
+
+We quantified the raw sequence distances (p-distance) inferred by different
+aligners and COATi models (Fig. \@ref(fig:p-figure-1),
+Tab. \@ref(tab:p-table-1), and Tab. \@ref(tab:p-table-2)). 
+
+```{r p-figure-1, fig.cap="COATi produced shorter sequence distances than other aligners. Each panel is a scatter plot where the x coordinate is the p-distance from a COATi alignment and y coordinate is the p-distance from the corresponding alignment from another aligner.", warning = FALSE}
+p_data <- ALN_DATA |>
+    filter(method %in% c(c("clustalo", "coati-tri-mg",
+    "macse", "mafft", "prank", "rev-coati-tri-mg"))) |>
+    pivot_wider(id_cols=gene, names_from=method, values_from=pdist) |>
+    rename(coati = `coati-tri-mg`, `coati-rev` = `rev-coati-tri-mg`) |>
+    relocate(gene, coati)
+
+p_data1 <- p_data |> pivot_longer(cols = clustalo:`coati-rev`,
+    names_to="method", values_to="other") |>
+    mutate(method = fct_relevel(method, "clustalo", "macse", "mafft",
+        "prank", "coati-rev")) |>
+    mutate(method = fct_recode(method,
+        "vs ClustalΩ" = "clustalo",
+        "vs MACSE" = "macse",
+        "vs MAFFT" = "mafft",
+        "vs PRANK" = "prank",
+        "vs COATi-rev" = "coati-rev"
+    ))
+
+pal <- cbbPalette
+names(pal) <- str_c("vs ", names(pal))
+
+gg <- ggplot(p_data1, aes(x = coati, y = other, color = method)) + facet_wrap(vars(method))
+gg <- gg + geom_point(alpha = 0.2, show.legend = FALSE)
+gg <- gg + xlab("COATi") + ylab("Other")
+gg <- gg + scale_color_manual(values = pal)
+gg <- gg + scale_x_continuous(trans = scales::transform_pseudo_log(0.0004, base=10),
+    breaks=c(0, 0.001, 0.01, 0.1, 1))
+gg <- gg + scale_y_continuous(trans = scales::transform_pseudo_log(0.0004, base=10),
+    breaks=c(0, 0.001, 0.01, 0.1, 1))
+
+gg <- gg + theme_grey(9) + theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank()
+)
+
+gg
+```
+
+```{r p-table-1, results = 'asis', message = FALSE}
+tab <- ALN_DATA |> summarize(m = mean(pdist, na.rm = TRUE), .by = "method") |>
+    rename(Method = method)
+
+tab_data1 <- tab |>
+    filter(Method %in% c("clustalo", "coati-tri-mg",
+    "macse", "mafft", "prank", "rev-coati-tri-mg")) |>
+    mutate(Method = fct_relevel(Method, c("coati-tri-mg", "rev-coati-tri-mg"))) |>
+    mutate(Method = case_match(Method,
+        "clustalo" ~ "ClustalΩ",
+        "coati-tri-mg" ~ "COATi",
+        "macse" ~ "MACSE",
+        "mafft" ~ "MAFFT",
+        "prank" ~ "PRANK",
+        "rev-coati-tri-mg" ~ "COATi-rev"
+        )) |>
+    arrange(Method) |>
+    pivot_wider(names_from = "Method", values_from = "m")
+
+k <- kable(tab_data1, digits = 4, align = "ccccc",
+  caption="Average p-distance of alignments for each method.",
+  booktabs = TRUE, linesep = c("\\addlinespace"),
+  format.args = list(nsmall = 4))
+
+k |> kable_styling(latex_options = "HOLD_position")
+```
+
+```{r p-table-2, results = 'asis', message = FALSE}
+tab_data2 <- tab |> filter(Method %in% c("coati-tri-mg",
+    "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna")) |>
+    mutate(Method = fct_relevel(Method, c("coati-tri-mg",
+        "coati-tri-ecm", "coati-mar-mg", "coati-mar-ecm", "coati-dna"))) |>
+    arrange(Method) |>
+    rename(Model = Method) |>
+    mutate(Model = fct_recode(Model,
+        "TRI-MG" = "coati-tri-mg",
+        "TRI-ECM" = "coati-tri-ecm",
+        "MAR-MG" = "coati-mar-mg",
+        "MAR-ECM" = "coati-mar-ecm",
+        "DNA" = "coati-dna"
+    ))  |>
+    pivot_wider(names_from = "Model", values_from = "m")
+
+k <- kable(tab_data2, digits = 4, align = "ccccc",
+    caption="Average p-distance of alignments for each COATi model.",
+    booktabs = TRUE, linesep = c("\\addlinespace"),
+    format.args = list(nsmall = 4))
+
+k |> kable_styling(latex_options = "HOLD_position")
 ```
 
 \newpage
 
 ## Evolutionary Distances
 
-We quantified the evolutionary distances inferred by different aligners and COATi models (Fig. \@ref(fig:k2p-figure-1), Tab. \@ref(tab:k2p-table-1), and Tab. \@ref(tab:k2p-table-2)). 
+We quantified the evolutionary distances inferred by different aligners and
+COATi models (Fig. \@ref(fig:k2p-figure-1), Tab. \@ref(tab:k2p-table-1), and
+Tab. \@ref(tab:k2p-table-2)). 
 
 ```{r k2p-figure-1, fig.cap="COATi produced shorter evolutionary distances than other aligners. Each panel is a scatter plot where the x coordinate is the K2P distance from a COATi alignment and y coordinate is the K2P distance from the corresponding alignment from another aligner.", warning = FALSE}
 k2p_data <- ALN_DATA |>
@@ -467,10 +547,12 @@ tab_data1 <- tab |>
     arrange(Method) |>
     pivot_wider(names_from = "Method", values_from = "m")
 
-k <- kable(tab_data1, digits = 4, align = "ccccc", caption="Average K2P distances of alignments for each method.", booktabs = TRUE, linesep = c("\\addlinespace"), format.args = list(nsmall = 4))
+k <- kable(tab_data1, digits = 4, align = "ccccc",
+  caption="Average K2P-distance of alignments for each method.",
+  booktabs = TRUE, linesep = c("\\addlinespace"),
+  format.args = list(nsmall = 4))
 
 k |> kable_styling(latex_options = "HOLD_position")
-
 ```
 
 ```{r k2p-table-2, results = 'asis', message = FALSE}
@@ -489,7 +571,10 @@ tab_data2 <- tab |> filter(Method %in% c("coati-tri-mg",
     ))  |>
     pivot_wider(names_from = "Model", values_from = "m")
 
-k <- kable(tab_data2, digits = 4, align = "ccccc", caption="Average K2P distances of alignments for each COATi model.", booktabs = TRUE, linesep = c("\\addlinespace"), format.args = list(nsmall = 4))
+k <- kable(tab_data2, digits = 4, align = "ccccc",
+    caption="Average K2P-distance of alignments for each COATi model.",
+    booktabs = TRUE, linesep = c("\\addlinespace"),
+    format.args = list(nsmall = 4))
 
 k |> kable_styling(latex_options = "HOLD_position")
 ```
@@ -498,9 +583,20 @@ k |> kable_styling(latex_options = "HOLD_position")
 
 ## Alignment Distances
 
-For each sequence pair in the benchmark, we calculated the alignment distance (d~seq~) between the benchmark alignment and the alignments generated by COATi, ClustalΩ, MACSE, MAFFT, and PRANK. We also calculated distances between all pairs of aligners. Our benchmark contained gap patterns extracted from alignments generated by different aligners. Figure \@ref(fig:bench-pcoa-split) contains the results of a metric multidimensional scaling (principle coordinate analysis; PCoA) of the matrix of average distances between aligners, separated by what type of gap patterns was used in the benchmark alignment.
+For each sequence pair in the benchmark, we calculated the alignment distance
+(d~seq~) between the benchmark alignment and the alignments generated by COATi,
+ClustalΩ, MACSE, MAFFT, and PRANK. We also calculated distances between all
+pairs of aligners. Our benchmark contained gap patterns extracted from
+alignments generated by different aligners. Figure
+\@ref(fig:bench-pcoa-split) contains the results of a metric multidimensional
+scaling (principle coordinate analysis; PCoA) of the matrix of average
+distances between aligners, separated by what type of gap patterns was used in
+the benchmark alignment.
 
-Figure \@ref(fig:bench-pcoa-all) contains a principle coordinate analysis of each aligner, including different COATi models, across the entire benchmark dataset. COATi's different models produced similar alignments and cluster together along with the benchmarks.
+Figure \@ref(fig:bench-pcoa-all) contains a principle coordinate analysis of
+each aligner, including different COATi models, across the entire benchmark
+dataset. COATi's different models produced similar alignments and cluster
+together along with the benchmarks.
 
 ```{r bench-pcoa-split, message = FALSE, fig.cap="COATi produced accurate alignments regardless of whether the underlying gap pattern was extracted from an alignment generated by another program. Each panel is a metric multidimensional scaling of the average distances between aligners."}
 tab_dist <- read_csv(here("supplementary_materials", "data", "benchmarks-dseq-split.csv"))

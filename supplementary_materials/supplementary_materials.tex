@@ -113,26 +113,44 @@
 \setcounter{tocdepth}{2}
 \tableofcontents
 }
-\hypertarget{aligner-commands}{%
-\section{Aligner Commands}\label{aligner-commands}}
+\section{Aligner Commands}\label{aligner-commands}
 
-We evaluated five different aligners. Below are the commands that we used to run them. We have abbreviated the commands for clarity, stripping out unimportant arguments. Complete workflows can be found in our coati-testing repository on Github.
+We evaluated five different aligners. Below are the commands that we used to run
+them. We have abbreviated the commands for clarity, stripping out unimportant
+arguments. Complete workflows can be found in our coati-testing repository on
+Github.
 
 \begin{itemize}
 \tightlist
 \item
-  COATi: \texttt{coati\ alignpair\ -m\ tri-mg\ ...}; We used COATi two different ways. The primary way used human as the reference sequence. The secondary way, COATi-rev, used gorilla as the reference, via a wrapper script that reversed the order of sequences before alignment and reversed the order back afterwards.
+  COATi: \texttt{coati\ alignpair\ -m\ tri-mg\ ...}; We used COATi two different ways. The
+  primary way used human as the reference sequence. The secondary way,
+  COATi-rev, used gorilla as the reference, via a wrapper script that reversed
+  the order of sequences before alignment and reversed the order back
+  afterwards.
 \item
-  ClustalΩ v1.2.4: \texttt{clustalo\ -\/-seqtype=Protein\ ...}; We wrapped ClustalΩ with a script that translates DNA sequences into amino acid sequences (including stops) before alignment. Any codons that were partial or containing ambiguous characters were translated as ``X''. The script then aligned these translated sequences with ClustalΩ, and then created a DNA alignment that was consistent with the amino-acid alignment.
+  ClustalΩ v1.2.4: \texttt{clustalo\ -\/-seqtype=Protein\ ...}; We wrapped ClustalΩ with a
+  script that translates DNA sequences into amino acid sequences (including
+  stops) before alignment. Any codons that were partial or containing ambiguous
+  characters were translated as ``X''. The script then aligned these translated
+  sequences with ClustalΩ, and then created a DNA alignment that was consistent
+  with the amino-acid alignment.
 \item
-  MACSE v2.06: \texttt{java\ -jar\ macse.jar\ -prog\ alignSequences\ -seq\ human.fasta\ -seq\_lr\ gorilla.fasta\ ...}; We wrapped MACSE with a script that created two temporary fasta files, one containing the human sequence and another containing the gorilla sequence. The human sequence was specified as the reliable sequence and the gorilla sequence was specified as the less-reliable sequence. MACSE uses ``!'' to mark gaps that result from frameshifts, and the wrapper script replaced these with ``-''. Additionally, MACSE sometimes produced columns that only contained gaps, and these columns were removed.
+  MACSE v2.06: \texttt{java\ -jar\ macse.jar\ -prog\ alignSequences\ -seq\ human.fasta\ \ \ -seq\_lr\ gorilla.fasta\ ...}; We wrapped MACSE with a script that created two
+  temporary fasta files, one containing the human sequence and another
+  containing the gorilla sequence. The human sequence was specified as the
+  reliable sequence and the gorilla sequence was specified as the less-reliable
+  sequence. MACSE uses ``!'' to mark gaps that result from frameshifts, and the
+  wrapper script replaced these with ``-''. Additionally, MACSE sometimes produced
+  columns that only contained gaps, and these columns were removed.
 \item
   PRANK v.150803: \texttt{prank\ -codon\ ...}
 \item
   MAFFT v7.520: \texttt{mafft\ -\/-preservecase\ -\/-globalpair\ -\/-maxiterate\ 1000\ ...}
 \end{itemize}
 
-COATi can use different alignment models for pairwise alignment. Below are the commands that we used to run different models.
+COATi can use different alignment models for pairwise alignment. Below are the
+commands that we used to run different models.
 
 \begin{itemize}
 \tightlist
@@ -146,14 +164,26 @@ COATi can use different alignment models for pairwise alignment. Below are the c
   mar-ecm: \texttt{coati\ alignpair\ -m\ mar-ecm\ ...}
 \end{itemize}
 
-\hypertarget{fst-alignment-example}{%
-\section{FST Alignment Example}\label{fst-alignment-example}}
+\section{FST Alignment Example}\label{fst-alignment-example}
 
-When using the triplet models (tri-mg and tri-ecm), COATi uses the OpenFST library to generate best alignments by composing the input and output sequences with the COATi FST model. While the COATi FST model is too large to display, we can show the result of a composition.
+When using the triplet models (tri-mg and tri-ecm), COATi uses the OpenFST
+library to generate best alignments by composing the input and output sequences
+with the COATi FST model. While the COATi FST model is too large to display, we
+can show the result of a composition.
 
-Fig. \ref{fig:aln-example-a} shows a graph depicting the FST that results from composing the COATi FST with the input sequence ``CTC'' and the output sequence ``CTG''. Every path through this FST represents one possible way to align ``CTC'' and ``CTG'', and the sum of all weights along a path is the total weight of the respective alignment. Here, the weights of each arc are in negative-log space. Note that this graph has been optimized, and weight has been pushed towards the initial state. The weight of any specific arc may not be directly mapable to a weight described in the model.
+Fig. \ref{fig:aln-example-a} shows a graph depicting the FST that results from
+composing the COATi FST with the input sequence ``CTC'' and the output sequence
+``CTG''. Every path through this FST represents one possible way to align ``CTC''
+and ``CTG'', and the sum of all weights along a path is the total weight of the
+respective alignment. Here, the weights of each arc are in negative-log space.
+Note that this graph has been optimized, and weight has been pushed towards the
+initial state. The weight of any specific arc may not be directly mapable to a
+weight described in the model.
 
-Fig. \ref{fig:aln-example-b} is the best alignment between ``CTC'' and ``CTG'', as determined by the shortest path algorithm. Figs. \ref{fig:aln-example-a} and \ref{fig:aln-example-b} were produced by the OpenFST library. A bold circle represents a starting node, and a double circle represents a termination node.
+Fig. \ref{fig:aln-example-b} is the best alignment between ``CTC'' and ``CTG'', as
+determined by the shortest path algorithm. Figs. \ref{fig:aln-example-a} and
+\ref{fig:aln-example-b} were produced by the OpenFST library. A bold circle
+represents a starting node, and a double circle represents a termination node.
 
 \begin{figure}
 
@@ -175,23 +205,32 @@ Fig. \ref{fig:aln-example-b} is the best alignment between ``CTC'' and ``CTG'', 
 
 \newpage
 
-\hypertarget{empirical-results}{%
-\section{Empirical Results}\label{empirical-results}}
+\section{Empirical Results}\label{empirical-results}
 
-\hypertarget{gap-patterns}{%
-\subsection{Gap Patterns}\label{gap-patterns}}
+\subsection{Gap Patterns}\label{gap-patterns}
 
-\hypertarget{lengths}{%
-\subsubsection{Lengths}\label{lengths}}
+\subsubsection{Lengths}\label{lengths}
 
-We quantified the lengths of gaps produced by each method across the empirical dataset of human-gorilla protein-coding-sequence pairs (Tab. \ref{tab:gap-table-1}). Here the gap type is either ``D'' for gaps introduced into the gorilla sequence or ``I'' for gaps introduced in the human sequence. ``COATi'' refers to the full COATi FST model with a MG substitution model (i.e.~tri-mg). ``COATi-rev'' refers to the same model, but using gorilla as the reference and human as the non-reference sequence. Gap lengths of 1--6 nucleotides were binned into their respective columns. Gap lengths longer than 6 nucleotides were binned into columns 7+, 8+, and 9+ depending on whether their lengths were 1, 2, or 3 nucleotides longer than a multiple of three.
+We quantified the lengths of gaps produced by each method across the empirical
+dataset of human-gorilla protein-coding-sequence pairs (Tab. @ref
+(tab:gap-table-1)). Here the gap type is either ``D'' for gaps introduced into
+the gorilla sequence or ``I'' for gaps introduced in the human sequence. ``COATi''
+refers to the full COATi FST model with a MG substitution model
+(i.e.~tri-mg). ``COATi-rev'' refers to the same model, but using gorilla as the
+reference and human as the non-reference sequence. Gap lengths of 1--6
+nucleotides were binned into their respective columns. Gap lengths longer than
+6 nucleotides were binned into columns 7+, 8+, and 9+ depending on whether
+their lengths were 1, 2, or 3 nucleotides longer than a multiple of three.
 
-We also quantified the lengths of gaps produced by different COATi models (Tab. \ref{tab:gap-table-2}).
+We also quantified the lengths of gaps produced by different COATi models
+(Tab. \ref{tab:gap-table-2}).
 
-Note that ClustalΩ gaps with lengths that are not a multiple of 3 are created by how our wrapper script handles DNA sequences with lengths that are not multiple of 3.
+Note that ClustalΩ gaps with lengths that are not a multiple of 3 are created by
+how our wrapper script handles DNA sequences with lengths that are not multiple
+of 3.
 
 \begin{table}[H]
-
+\centering
 \caption{\label{tab:gap-table-1}Number of gaps introduced by each method separated by length and type.}
 \centering
 \begin{tabular}[t]{lcrrrrrrrrr}
@@ -222,7 +261,7 @@ PRANK & I & 0 & 0 & 467 & 0 & 0 & 178 & 0 & 0 & 4686\\
 \end{table}
 
 \begin{table}[H]
-
+\centering
 \caption{\label{tab:gap-table-2}Number of gaps introduced by different COATi models separated by length and type.}
 \centering
 \begin{tabular}[t]{lcrrrrrrrrr}
@@ -249,15 +288,20 @@ DNA & I & 79 & 79 & 520 & 78 & 99 & 239 & 1369 & 1316 & 3107\\
 \end{tabular}
 \end{table}
 
-\hypertarget{phases}{%
-\subsubsection{Phases}\label{phases}}
+\subsubsection{Phases}\label{phases}
 
-We quantified the phases of gaps produced by different aligners and COATi models (Tab. \ref{tab:gap-table-3} and \ref{tab:gap-table-4}). Phase 1 gaps begin after the 1st position in a codon in the reference sequence, phase 2 gaps begin after the 2nd position in a codon, and phase 3 begin after the 3rd position in a codon (i.e.~between codons). Phase 3 gaps are also known as phase 0 gaps.
+We quantified the phases of gaps produced by different aligners and COATi
+models (Tab. \ref{tab:gap-table-3} and \ref{tab:gap-table-4}). Phase 1 gaps
+begin after the 1st position in a codon in the reference sequence, phase 2 gaps
+begin after the 2nd position in a codon, and phase 3 begin after the 3rd
+position in a codon (i.e.~between codons). Phase 3 gaps are also known as phase
+0 gaps.
 
-Note that ClustalΩ gaps with phases of 1 and 2 are created by how our wrapper script handles DNA sequences with lengths that are not multiple of 3.
+Note that ClustalΩ gaps with phases of 1 and 2 are created by how our wrapper
+script handles DNA sequences with lengths that are not multiple of 3.
 
 \begin{table}[H]
-
+\centering
 \caption{\label{tab:gap-table-3}Number of gaps introduced by each alignment method separated by phase.}
 \centering
 \begin{tabular}[t]{lrrr}
@@ -282,7 +326,7 @@ PRANK & 0 & 0 & 10862\\
 \end{table}
 
 \begin{table}[H]
-
+\centering
 \caption{\label{tab:gap-table-4}Number of gaps introduced by different COATi models separated by phase.}
 \centering
 \begin{tabular}[t]{lrrr}
@@ -304,13 +348,18 @@ DNA & 4228 & 3974 & 6005\\
 \end{tabular}
 \end{table}
 
-\hypertarget{homology-patterns}{%
-\subsection{Homology Patterns}\label{homology-patterns}}
+\subsection{Homology Patterns}\label{homology-patterns}
 
-We quantified the homology patterns of residues for different aligners and COATi models (Tab. \ref{tab:gap-table-5}, Tab. \ref{tab:gap-table-6}, and Fig. \ref{fig:gap-figure-1}). Here we define the match, mismatch, and gap percentages as the percent of nucleotides aligned against a match, mismatch, and gap respectively. Note that this is different than the percent of columns that contain a match, mismatch, or gap because match and mismatch columns are counted twice.
+We quantified the homology patterns of residues for different aligners and COATi
+models (Tab. \ref{tab:gap-table-5}, Tab. \ref{tab:gap-table-6}, and
+Fig. \ref{fig:gap-figure-1}). Here we define the match, mismatch, and gap
+percentages as the percent of nucleotides aligned against a match, mismatch,
+and gap respectively. Note that this is different than the percent of columns
+that contain a match, mismatch, or gap because match and mismatch columns are
+counted twice.
 
 \begin{table}[H]
-
+\centering
 \caption{\label{tab:gap-table-5}Average homology percentages of alignments separated by alignment method.}
 \centering
 \begin{tabular}[t]{rccc}
@@ -333,7 +382,7 @@ PRANK & 95.64\% & 0.84\% & 3.52\%\\
 \end{table}
 
 \begin{table}[H]
-
+\centering
 \caption{\label{tab:gap-table-6}Average homology percentages of alignments separated by COATi model.}
 \centering
 \begin{tabular}[t]{rccc}
@@ -361,10 +410,51 @@ DNA & 95.93\% & 0.79\% & 3.27\%\\
 
 \newpage
 
-\hypertarget{evolutionary-distances}{%
-\subsection{Evolutionary Distances}\label{evolutionary-distances}}
+\subsection{Sequence Distances}\label{sequence-distances}
 
-We quantified the evolutionary distances inferred by different aligners and COATi models (Fig. \ref{fig:k2p-figure-1}, Tab. \ref{tab:k2p-table-1}, and Tab. \ref{tab:k2p-table-2}).
+We quantified the raw sequence distances (p-distance) inferred by different
+aligners and COATi models (Fig. \ref{fig:p-figure-1},
+Tab. \ref{tab:p-table-1}, and Tab. \ref{tab:p-table-2}).
+
+\begin{figure}
+\centering
+\includegraphics{supplementary_materials_files/figure-latex/p-figure-1-1.pdf}
+\caption{\label{fig:p-figure-1}COATi produced shorter sequence distances than other aligners. Each panel is a scatter plot where the x coordinate is the p-distance from a COATi alignment and y coordinate is the p-distance from the corresponding alignment from another aligner.}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{\label{tab:p-table-1}Average p-distance of alignments for each method.}
+\centering
+\begin{tabular}[t]{cccccc}
+\toprule
+COATi & COATi-rev & ClustalΩ & MACSE & MAFFT & PRANK\\
+\midrule
+0.0083 & 0.0083 & 0.0168 & 0.0142 & 0.0147 & 0.0089\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{\label{tab:p-table-2}Average p-distance of alignments for each COATi model.}
+\centering
+\begin{tabular}[t]{ccccc}
+\toprule
+TRI-MG & TRI-ECM & MAR-MG & MAR-ECM & DNA\\
+\midrule
+0.0083 & 0.0083 & 0.0083 & 0.0083 & 0.0083\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\subsection{Evolutionary Distances}\label{evolutionary-distances}
+
+We quantified the evolutionary distances inferred by different aligners and
+COATi models (Fig. \ref{fig:k2p-figure-1}, Tab. \ref{tab:k2p-table-1}, and
+Tab. \ref{tab:k2p-table-2}).
 
 \begin{figure}
 \centering
@@ -373,8 +463,8 @@ We quantified the evolutionary distances inferred by different aligners and COAT
 \end{figure}
 
 \begin{table}[H]
-
-\caption{\label{tab:k2p-table-1}Average K2P distances of alignments for each method.}
+\centering
+\caption{\label{tab:k2p-table-1}Average K2P-distance of alignments for each method.}
 \centering
 \begin{tabular}[t]{cccccc}
 \toprule
@@ -386,8 +476,8 @@ COATi & COATi-rev & ClustalΩ & MACSE & MAFFT & PRANK\\
 \end{table}
 
 \begin{table}[H]
-
-\caption{\label{tab:k2p-table-2}Average K2P distances of alignments for each COATi model.}
+\centering
+\caption{\label{tab:k2p-table-2}Average K2P-distance of alignments for each COATi model.}
 \centering
 \begin{tabular}[t]{ccccc}
 \toprule
@@ -398,15 +488,24 @@ TRI-MG & TRI-ECM & MAR-MG & MAR-ECM & DNA\\
 \end{tabular}
 \end{table}
 
-\hypertarget{benchmark-results}{%
-\section{Benchmark Results}\label{benchmark-results}}
+\section{Benchmark Results}\label{benchmark-results}
 
-\hypertarget{alignment-distances}{%
-\subsection{Alignment Distances}\label{alignment-distances}}
+\subsection{Alignment Distances}\label{alignment-distances}
 
-For each sequence pair in the benchmark, we calculated the alignment distance (d\textsubscript{seq}) between the benchmark alignment and the alignments generated by COATi, ClustalΩ, MACSE, MAFFT, and PRANK. We also calculated distances between all pairs of aligners. Our benchmark contained gap patterns extracted from alignments generated by different aligners. Figure \ref{fig:bench-pcoa-split} contains the results of a metric multidimensional scaling (principle coordinate analysis; PCoA) of the matrix of average distances between aligners, separated by what type of gap patterns was used in the benchmark alignment.
+For each sequence pair in the benchmark, we calculated the alignment distance
+(d\textsubscript{seq}) between the benchmark alignment and the alignments generated by COATi,
+ClustalΩ, MACSE, MAFFT, and PRANK. We also calculated distances between all
+pairs of aligners. Our benchmark contained gap patterns extracted from
+alignments generated by different aligners. Figure
+\ref{fig:bench-pcoa-split} contains the results of a metric multidimensional
+scaling (principle coordinate analysis; PCoA) of the matrix of average
+distances between aligners, separated by what type of gap patterns was used in
+the benchmark alignment.
 
-Figure \ref{fig:bench-pcoa-all} contains a principle coordinate analysis of each aligner, including different COATi models, across the entire benchmark dataset. COATi's different models produced similar alignments and cluster together along with the benchmarks.
+Figure \ref{fig:bench-pcoa-all} contains a principle coordinate analysis of
+each aligner, including different COATi models, across the entire benchmark
+dataset. COATi's different models produced similar alignments and cluster
+together along with the benchmarks.
 
 \begin{figure}
 \centering
