@@ -34,6 +34,9 @@ supplementary_materials/supplementary_materials.pdf: $(addprefix supplementary_m
 response_r1.pdf: response_r1.md
 	pandoc --pdf-engine=lualatex -o $@ $<
 
+response_r2.pdf: response_r2.md
+	pandoc --pdf-engine=lualatex -o $@ $<
+
 clean:
 	@rm -f *.{aux,log,fdb_latexmk,fls,bbl,bcf,blg,run.xml,out}
 	@rm -f figures/*.{aux,log,fdb_latexmk,fls,bbl,bcf,blg,run.xml,out}

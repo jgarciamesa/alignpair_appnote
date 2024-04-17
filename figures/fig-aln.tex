@@ -1,12 +1,11 @@
 % !TEX program=lualatex
-\RequirePackage{luatex85}
+%\RequirePackage{luatex85}
 \documentclass[11pt,tikz]{standalone}
 
-\usepackage{luatextra} % also loads fixltx2e, fontspec, xunicode
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 \usepackage{mathtools}
 \usepackage{amsmath}
-\usepackage{unicode-math}
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
 \usepackage{xcolor}
 
 \usepackage{tikz}
