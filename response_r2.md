@@ -25,11 +25,11 @@ Reed A. Cartwright, on behalf of all authors
 
 1. Comment: *It is now very clear and easy to read manuscript and a important edition to the alignment literature since it does well relative to the objective it pursues.  It has moved away from statistical alignment formulation in the first submission toward doing well in agreeing with benchmark alignments.  Some discussion of this would be useful.*
 
-    TODO
+    Thank you for the positive words. We have added additional language to the manuscript about COATi's success with benchmark alignments.
 
 1. Comment: *And how will the authors turn this into a multiple alignment tool?*
 
-    COATi currently has an early-stage module for estimating pairwise alignments. However, it needs more work (and an additional round of funding) before it meets the high-quality standards exhibited by the pairwise aligner. We have included additional details about COATi MSA in the discussion.
+    COATi currently has an early-stage algorithm for estimating pairwise alignments. However, it needs more work (and an additional round of funding) before it meets the high-quality standards exhibited by the pairwise aligner. We have included additional details about COATi MSA in the discussion.
 
 ## Review 2 Comments
 
