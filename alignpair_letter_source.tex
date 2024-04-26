@@ -1,17 +1,30 @@
-% !TEX program=lualatex
+%!TEX program=pdflatex
 \documentclass[12pt,letterpaper]{article}
+\usepackage{ifluatex}
 
 \usepackage[letterpaper,margin=0.75in]{geometry}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
-\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
-\usepackage{fontspec}
-\usepackage{microtype}
+\ifluatex
+  \usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+  \usepackage{fontspec}
+  \setmainfont{TeX Gyre Pagella}
+  \setmathfont{Latin Modern Math}
+\else
+  \usepackage{etex}
+  \usepackage{fixltx2e}
+  \usepackage{morefloats}
+  \usepackage{tgpagella}
+  \usepackage{textgreek}
+  \usepackage[T1]{fontenc}
+\fi
 
-\setmainfont{TeX Gyre Pagella}
-\setmathfont{Latin Modern Math}
+%\usepackage[main=english,greek]{babel}
+
+
+\usepackage{microtype}
 
 \usepackage{url}
 \usepackage{graphicx}
@@ -56,7 +69,7 @@
 \newline
 % authors go here:
 \\
-Juan J. García Mesa\textsuperscript{1,2},
+Juan J. Garc\'{i}a Mesa\textsuperscript{1,2},
 Ziqi Zhu\textsuperscript{1,3},
 Reed A. Cartwright\textsuperscript{1,3,*}\\
 \bigskip
@@ -90,24 +103,6 @@ The alignment of protein-coding DNA sequences is one such challenge, and a commo
 Within protein-coding sequences, indels may occur between any pair of adjacent nucleotides, and therefore, gaps in alignments of natural sequences may occur both between and within codons (Fig.\ \ref{fig:aln}). In our nomenclature, gaps that start after the first, second, and third positions of a codon are known as phase-1, phase-2, and phase-3 gaps, respectively. Here, gaps that occur between codons are phase-3 gaps whereas they may be known as phase-0 gaps in earlier studies \cite[e.g.][]{taylor2004occurrence}. Indels that occur within codons can produce an amino-acid change in addition to adding or removing nucleotides (Fig.\ \ref{fig:aln}), and due to the structure of the genetic code, phase-1 gaps are less common than phase-2, which are less common than phase-3 \citep{taylor2004occurrence, zhu2022profiling}. While all three phases of gaps occur in natural sequences, alignments performed in amino-acid or codon space force all gaps to be phase-3 gaps. Because only about 42\% of indels are phase-3 \citep{taylor2004occurrence, zhu2022profiling}, this mismatch between aligner assumptions and biology can produce suboptimal alignments and inflated estimates of sequence divergence
 \citep[Fig.\ \ref{fig:aln};][]{redelings2007incorporating}.
 
-% Figures are 86 mm or 178 mm wide
-\begin{figure}[h!]
-    \centering%
-    \includegraphics[scale=1]{figures/fig-aln.pdf}
-    \par
-    \caption{
-        Standard algorithms produce suboptimal alignments.
-        (a) shows the true alignment of an ancestor sequence (A) and a descendant sequence (D).
-        (b--d) are the results of different aligners. Nucleotide mismatches are highlighted in red.---Notably, COATi is the only aligner able to retrieve the biological alignment in this example.---%
-        %
-        Indels in protein-coding sequences can be classified as having one of three different phases and being one of two different types.
-        Phases refer to the location of the gap with respect to the reading frame, while types refer to the consequence of the indel.
-        Phase-1, phase-2, and phase-3 indels are shown in blue, orange, and green respectively.
-        Additionally, the orange indel is type-II (an amino-acid indel plus an amino-acid change) while the blue indel is type-I (an amino-acid indel only). The difference between an in-frame and a frameshift indel is not displayed.
-        }
-    \label{fig:aln}
-\end{figure}
-
 Bioinformatic pipelines need to be robust to variation in quality across genomic datasets because uncorrected errors in the alignment stage can lead to erroneous results in comparative and functional genomic studies \citep{estimates_schneider_2009, effect_fletcher_2010, hubisz2011error}.
 While genomes for model organisms often get refined over many iterations and contain meticulously curated protein-coding sequences, 
 genomes for non-model organisms might only receive partial curation and typically have lower quality sequences and annotations.
@@ -129,22 +124,6 @@ While the use of pair-HMMs is ubiquitous in bioinformatics, they are limited to 
 
 There are well-established algorithms for combining FSTs in different ways allowing the design of complex models by combining simpler FSTs, including concatenation, composition, intersection, union, and reversal \citep{bradley2007transducers,silvestre2021machine}. Specifically, composition is an algorithm to combine two FSTs by sending the output of one FST into the input of another, creating a new, more complex transducer \citep{mohri2005weighted}. Figure~\ref{fig:base-calling} illustrates how FSTs modeling sequencing errors (Fig.~\ref{fig:base-calling}a) and ambiguity (Fig.~\ref{fig:base-calling}b) can be combined via composition to produce an FST that does both (Fig.~\ref{fig:base-calling}c). Conceptually, composition creates an FST that generates a descendant sequence from a known ancestor via an unknown intermediate, $J$, and can calculate the conditional probability $P(D|A) = \sum_{J} P(D|J)P(J|A)$. 
 
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=\textwidth]{figures/fig-fst-base-calling-new.pdf}
-    \caption[FSTs more the generation of sequences]{%
-    Finite state transducers (FSTs) model the generation of an output sequence based on an input sequence.
-    %
-    (a) A graph of a probabilistic FST \citep{cotterell-etal-2014-stochastic} for base-calling errors using a Mealy-machine architecture, where parameter $u$ is the error rate. This graph contains two states (S and M) connected by arcs, with labels ``input symbols~:~output symbols~/~weight''. Arcs consume symbols from the input sequence and emit symbols to the output sequence. Weights describe the probability that an arc is taken given the input symbols. Epsilon (ε) is a special symbol denoting that no symbols were either consumed or emitted.
-    %
-    (b) An FST for matching sequences against ambiguous nucleotides (N). 
-    (c) An FST that results from the composition ($∘$ operation) of the Error FST with the Ambiguity FST.
-    %
-    %Let $x$ be a symbol in the input of (a), $y$ be a symbol in the output of (b), and $z$ be a symbol in both the output of (a) and the input of (b). An arc in the composed FST (c) has an input symbol $x$, an output symbol $y$, and a weight that is the combination over $z$ of the aggregate weights of all $x$-$z$-$y$ arc pairs.
-    %
-    }\label{fig:base-calling}
-\end{figure}
-
 \subsection*{The COATi FST}
 
 COATi aligns pairs of sequences using a statistical alignment model, which is implemented as a finite-state transducer derived from the composition of multiple FSTs (Figs.~\ref{fig:base-calling} and \ref{fig:coati-fst}), each representing a specific biological or technical process: (1) the codon substitution FST, (2) the indel FST, (3) the error FST, and (4) the ambiguity FST. We call this transducer the COATi FST. Codon substitution models are uncommon in sequence aligners, despite their extensive use in phylogenetics. COATi implements both the \cite{muse_gaut_1994} codon model (codon-triplet-mg) and the Empirical Codon Model \citep[codon-triplet-ecm;][]{kosiol_ECM_2007}.
@@ -157,19 +136,6 @@ COATi FST is not a true probabilistic FST \citep{cotterell-etal-2014-stochastic}
 where $g$ is the gap opening parameter, $e$ is the gap-extension parameter, and $n$ is the length of the input sequence. The exponent has a $+1$ due to the presence of an ``immortal match'' immediately after the input sequence.
 
 Since codon substitution is the first process in COATi's model, the input sequence to the COATi FST must be compatible with a codon-substitution model and be a multiple of three nucleotides and not contain any ambiguous symbols or stop codons. The phases, reading frames, and amino-acid contexts of alignment columns is determined by the input sequence, and better alignments will be generated if the input is of high quality and free of artifacts. Depending on context, we may refer to the input sequence as the ``ancestral'' or ``reference'' sequence. In contrast, the output sequence must be compatible with the ambiguity FST, can be of any length, and can contain any nucleotides or ``N''. This allows COATi to align lower-quality sequences that may contain artifacts against a high-quality reference sequence. We may refer to the output sequence as the ``descendant'' or ``non-reference'' sequence. The choice of which sequence is the input sequence and which sequence is the output sequence is left up to the user.
-
-\begin{figure}[h!]
-\includegraphics[width=\textwidth]{figures/fig-fst-coati.pdf}
-\caption{The COATi FST is built from simpler FSTs via composition.
-(a) The substitution FST encodes a $61 \times 61 $ codon substitution model with 3721 arcs from S to M. These arcs consume three nucleotides from the input tape and emit three nucleotides to the output tape. The weight of each arc is a conditional probability derived from a codon substitution model. See Fig.~\ref{fig:base-calling} for more details about reading this graph.
-%
-(b) The indel FST allows for insertions (H to I) and deletions (C to D). Here $g$ is the gap-opening parameter and $e$ is the gap-extension parameter.
-Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. This FST is structured such that if insertions and deletions are contiguous, insertions will precede deletions \citep[Cf.][]{holmes2001evolutionary,demaio2021cumulative}.
-%
-(c) The COATi FST is derived via composition from the codon substitution, indel, error, and ambiguity FSTs.
-}
-\label{fig:coati-fst}
-\end{figure}
 
 In order to use the COATi FST to align an output sequence against an input sequence, we first convert each sequence into an acceptor, represented as a linear transducer where the input and output symbols of each transition are identical and each transition represents one nucleotide of a sequence \citep{allauzen2007openfst}. By composing the input and output acceptors with the COATi FST, we generate a transducer of all possible alignments of the two sequences. Any path through this FST represents a pairwise alignment, while the shortest path (by weight) corresponds to the best alignment. If more than one optimal alignment exists, ties are broken according to the implementation of the shortest-path algorithm. All FST operations in COATi, including model development, composition, search for the shortest path, and other optimization algorithms, are performed using the C++ openFST library \citep{allauzen2007openfst}. An example of an FST-based alignment can be found in Supplementary Materials, Figure S1.
 
@@ -204,7 +170,7 @@ We used ENSEMBL database v110 \citep{ensembl_hubbard_2002} to create an empirica
 
 \paragraph{Alignment Methods.}
 
-In order to compare COATi against other aligners, we evaluated five different alignment models: (1) COATi's FST model (i.e.\ codon-triplet-mg), (2) the amino-acid model of ClustalΩ \citep{clustal_omega_sievers_2011} via translation and reverse translation, (3) the amino-acid aware nucleotide model of MACSE \citep{ranwez_macse_2018}, (4) the DNA model of MAFFT \citep{katoh2013mafft}, and (5) the codon model of PRANK \citep{prank_loytynoja_2014}. 
+In order to compare COATi against other aligners, we evaluated five different alignment models: (1) COATi's FST model (i.e.\ codon-triplet-mg), (2) the amino-acid model of Clustal\textOmega{}{} \citep{clustal_omega_sievers_2011} via translation and reverse translation, (3) the amino-acid aware nucleotide model of MACSE \citep{ranwez_macse_2018}, (4) the DNA model of MAFFT \citep{katoh2013mafft}, and (5) the codon model of PRANK \citep{prank_loytynoja_2014}. 
 COATi is not a symmetric pairwise aligner, as reference sequences are more constrained than non-reference sequences. In order to evaluate the importance of the choice for reference sequence, we also aligned sequences pairs using (6) COATi with gorilla sequences as the reference (i.e.\ COATi-rev). Together, these six methods allow us to evaluate both different alignment strategies and different software implementations. See Supplemental Materials for additional details, including results for COATi's marginal and ECM models.
 
 We aligned our dataset of human-gorilla orthologs using all six alignment methods and calculated multiple biological and technical statistics on each alignment in order to compare how different alignment methods influence biological conclusions.
@@ -235,7 +201,7 @@ where TP is the number of alignments that correctly predicted positive (or negat
 \subsection*{Semi-Empirical Benchmark Alignments}
 
 In order to compare COATi against other aligners on realistic datasets with known alignments, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previously contain indels. We separated our 14,127 empirical sequence pairs into two sets: %
-(1) 8261 sequence pairs that did not contain any gaps when aligned by COATi FST, ClustalΩ, MACSE, MAFFT, and PRANK, and (2) 5821 sequence pairs for which at least one of these five aligners added gaps.
+(1) 8261 sequence pairs that did not contain any gaps when aligned by COATi FST, Clustal\textOmega{}, MACSE, MAFFT, and PRANK, and (2) 5821 sequence pairs for which at least one of these five aligners added gaps.
 (45 pairs that could not be aligned by at least one aligner were dropped.) We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark set of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 96 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if the gap pattern did not fit the ungapped sequence pair.)
 
 For example, consider the gapped alignment represented by the CIGAR string
@@ -275,49 +241,16 @@ Taken together, these three statistics not only allow a direct comparison of ali
 
 We generated 14,127 sequence pairs containing the coding sequences of a human gene and the orthologous gorilla gene. 22 human sequences contained early stop codons. These were not artifacts, but rather UGA codons which encoded for selenocysteine. 1 human sequence had a length that was not a multiple of 3, and no human sequences contained ambiguous nucleotides. Conversely, no gorilla sequences contained early stop codons (i.e.\ proteins containing selenocysteines were improperly annotated). 20 gorilla sequences had lengths that were not multiples of 3, and 173 sequences contained ambiguous nucleotides.
 
-As expected, COATi was not able to align 23 sequence pairs and COATi-rev was not able to align 193 sequence pairs. PRANK was not able to align 24 sequence pairs. MAFFT, MACSE, and ClustalΩ were able to align all sequence pairs, although the latter received some help from its wrapper script. Additionally, MAFFT produced alignments with columns that contained only gaps, which were removed by its wrapper script.
+As expected, COATi was not able to align 23 sequence pairs and COATi-rev was not able to align 193 sequence pairs. PRANK was not able to align 24 sequence pairs. MAFFT, MACSE, and Clustal\textOmega{} were able to align all sequence pairs, although the latter received some help from its wrapper script. Additionally, MAFFT produced alignments with columns that contained only gaps, which were removed by its wrapper script.
 A total of 10,296 sequence pairs were aligned equivalently by all five methods, including 8,261 sequence pairs that did not contain any gaps, 664 that had identical alignments, and another 1,371 that had identical scores.
 
-Compared to other aligners, COATi inferred more indels and aligned more nucleotides against a gap while producing fewer mismatches (Tab.~\ref{tab:gaps-empirical}). Additionally, COATi inferred that 60\% indels occurred in phase 1 or phase 2 in our coding sequences. MACSE's amino-acid aware nucleotide model inferred 7\%, while MAFFT's non-coding DNA model inferred 48\%. PRANK's codon and ClustalΩ's amino-acid models were constrained by their assumptions and inferred no phase 1 or phase 2 gaps. Note that ClustalΩ's gaps with phases of 1 and 2 were created by our wrapper script handling DNA sequences with lengths that are not multiples of 3.  
-
-\begin{table}[h]
-\caption{\label{tab:gaps-empirical}COATi produced more indels and fewer mismatches compared to other aligners.}
-\centering
-\begin{tabular}[t]{lrrrccc}
-\toprule
-\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Indel Phases\textsuperscript{1}} & \multicolumn{3}{c}{Homology Patterns\textsuperscript{2}}\\
-\cmidrule(l{3pt}r{3pt}){2-4}
-\cmidrule(l{3pt}r{3pt}){5-7}
-Method & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & Matches & Mismatches & Gaps\\
-\midrule
-COATi & 4493 & 3962 & 5822 & 95.93\% & 0.79\% & 3.28\%\\
-\addlinespace
-ClustalΩ & 8 & 6 & 10230 & 95.93\% & 1.54\% & 2.52\%\\
-\addlinespace
-MACSE & 455 & 497 & 13017 & 96.13\% & 1.33\% & 2.54\%\\
-\addlinespace
-MAFFT & 2317 & 2631 & 5458 & 96.12\% & 1.36\% & 2.52\%\\
-\addlinespace
-PRANK & 0 & 0 & 10862 & 95.64\% & 0.84\% & 3.52\%\\
-\addlinespace
-COATi-rev & 3992 & 3775 & 6176 & 95.95\% & 0.79\% & 3.25\%\\
-\bottomrule
-\addlinespace
-\multicolumn{7}{p{30em}}{\footnotesize\textsuperscript{1}Total number of indels inferred by each aligner separated by phase.}\\
-\multicolumn{7}{p{30em}}{\footnotesize\textsuperscript{2}The percent of nucleotides that were aligned against a match, mismatch, and gap respectively. This is different than the percent of columns that contain a match, mismatch, or gap because match and mismatch columns are counted twice.}
-
-\end{tabular}
-
-% The homology pattern columns contain the percent of nucleotides that were aligned
-% against a match, mismatch, and gap respectively. Note that this is different than the percent of columns that
-% contain a match, mismatch, or gap because match and mismatch columns are counted twice.
-\end{table}
+Compared to other aligners, COATi inferred more indels and aligned more nucleotides against a gap while producing fewer mismatches (Tab.~\ref{tab:gaps-empirical}). Additionally, COATi inferred that 60\% indels occurred in phase 1 or phase 2 in our coding sequences. MACSE's amino-acid aware nucleotide model inferred 7\%, while MAFFT's non-coding DNA model inferred 48\%. PRANK's codon and Clustal\textOmega{}'s amino-acid models were constrained by their assumptions and inferred no phase 1 or phase 2 gaps. Note that Clustal\textOmega{}'s gaps with phases of 1 and 2 were created by our wrapper script handling DNA sequences with lengths that are not multiples of 3.  
 
 \paragraph{Evolutionary Distances.}
 
-The distribution of evolutionary distances for COATi, COATi-rev, and PRANK were biologically reasonable for human-gorilla gene pairs, with means of 0.8\%--0.9\% (Fig.~\ref{fig:k2p-empirical}a). Conversely, the means for ClustalΩ, MACSE, and MAFFT were much higher, 1.5\%--1.8\%. These larger means are due to the fact that the right tails of the distributions for ClustalΩ, MACSE, and MAFFT were larger than the other methods. As expected, the alignment methods that ``overaligned'' sequences (produced more mismatches and fewer gaps) also produced higher evolutionary distances on average (Tab.~\ref{tab:gaps-empirical} and Fig.~\ref{fig:k2p-empirical}a). The differences between the distances inferred by COATi and other methods also shows ClustalΩ, MACSE, and MAFFT producing higher distance estimates for a subset of sequences (Fig.~\ref{fig:k2p-empirical}b).
+The distribution of evolutionary distances for COATi, COATi-rev, and PRANK were biologically reasonable for human-gorilla gene pairs, with means of 0.8\%--0.9\% (Fig.~\ref{fig:k2p-empirical}a). Conversely, the means for Clustal\textOmega{}, MACSE, and MAFFT were much higher, 1.5\%--1.8\%. These larger means are due to the fact that the right tails of the distributions for Clustal\textOmega{}, MACSE, and MAFFT were larger than the other methods. As expected, the alignment methods that ``overaligned'' sequences (produced more mismatches and fewer gaps) also produced higher evolutionary distances on average (Tab.~\ref{tab:gaps-empirical} and Fig.~\ref{fig:k2p-empirical}a). The differences between the distances inferred by COATi and other methods also shows Clustal\textOmega{}, MACSE, and MAFFT producing higher distance estimates for a subset of sequences (Fig.~\ref{fig:k2p-empirical}b).
 %
-COATi's alignments produced significantly lower K2P distances than ClustalΩ, MACSE, MAFFT, and PRANK. Single-tailed Wilcoxon signed-rank tests on matched data produced p-values $< 2.2\times10^{-16}$. Additionally, COATi's K2P distances did not depend on whether human or gorilla was used as the reference sequence (p-value of $0.4212$ for a two-sided test). Additional analyses of the empirical alignments can be found in Supplementary Methods, including results using p-distances, which did not differ from the results using K2P distances.
+COATi's alignments produced significantly lower K2P distances than Clustal\textOmega{}, MACSE, MAFFT, and PRANK. Single-tailed Wilcoxon signed-rank tests on matched data produced p-values $< 2.2\times10^{-16}$. Additionally, COATi's K2P distances did not depend on whether human or gorilla was used as the reference sequence (p-value of $0.4212$ for a two-sided test). Additional analyses of the empirical alignments can be found in Supplementary Methods, including results using p-distances, which did not differ from the results using K2P distances.
 
 % Wilcoxon signed rank test
 % coati vs rev-coati: p-value: 0.4212 (two.sided)
@@ -326,83 +259,25 @@ COATi's alignments produced significantly lower K2P distances than ClustalΩ, MA
 % coati vs mafft: p-value: < 2.2e-16 (less)
 % coati vs clustalo: p-value: < 2.2e-16 (less)
 
-\begin{figure}[h!]
-    \centering%
-    \includegraphics{figures/fig-k2p-empirical.pdf}
-    \par
-    \caption{COATi's alignments produce biologically reasonable evolutionary distances. (a) The distribution of K2P distances inferred from alignments generated by each method. The averages of each distribution are indicated by vertical lines. The averages are COATi = 0.0084, ClustalΩ = 0.0178, MACSE = 0.0149, MAFFT = 0.0154, PRANK = 0.0092, and COATi-rev = 0.0084. (b) The distribution of the differences between distances inferred by COATi and other methods. The X-axes of both plots have been pseudo-log transformed using the inverse hyperbolic sine.\label{fig:k2p-empirical}}
-\end{figure}
-
 \paragraph{Selection.}
 
-The vast majority of sequence pairs (12,344) were identified as showing evidence of negative selection when they were aligned using COATi, ClustalΩ, MACSE, MAFFT, PRANK, and COATi-rev (Fig.~\ref{fig:sel-empirical}). Another 1087 sequence pairs were identified as showing evidence of positive selection when they were aligned using all 6 strategies. The most common pattern that showed disagreement between aligners were 91 sequence pairs that were identified as positively selected by COATi, PRANK, and COATi-rev. The most common singleton pattern was 64 sequence pairs identified as positively selected only by MAFFT. Notably, 36 sequence pairs were identified as positively selected and 9 sequence pairs were identified as negatively selected by COATi and COATi-rev only.
+The vast majority of sequence pairs (12,344) were identified as showing evidence of negative selection when they were aligned using COATi, Clustal\textOmega{}, MACSE, MAFFT, PRANK, and COATi-rev (Fig.~\ref{fig:sel-empirical}). Another 1087 sequence pairs were identified as showing evidence of positive selection when they were aligned using all 6 strategies. The most common pattern that showed disagreement between aligners were 91 sequence pairs that were identified as positively selected by COATi, PRANK, and COATi-rev. The most common singleton pattern was 64 sequence pairs identified as positively selected only by MAFFT. Notably, 36 sequence pairs were identified as positively selected and 9 sequence pairs were identified as negatively selected by COATi and COATi-rev only.
 %
-In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence of positive selection. ClustalΩ identified 1,228. MACSE identified 1,183. MAFFT identified 1,340. And PRANK identified 1,349. Note that we did not explore whether any of these inferences were biologically or statistically significant.
-
-\begin{figure}[h!]
-    \centering%
-    \includegraphics{figures/fig-sel-empirical.pdf}
-    \par
-    \caption{Aligners varied in which sequence pairs they identified as undergoing positive selection.
-    In this UpSet plot, the bottom panel displays the 16 most frequent intersection patterns among aligners. A black circle represents positive selection. The most frequent pattern was that no aligner found positive selection while the second most frequent pattern was that all aligners found positive selection. Other patterns involved a disagreement between aligners about whether a sequence pair showed evidence of positive or negative selection. The top panel displays the number of sequence pairs in each grouping.
-%
-    \label{fig:sel-empirical}}
-\end{figure}
+In total, COATi identified 1,367 ($\sim$10\%) sequence pairs as showing evidence of positive selection. Clustal\textOmega{} identified 1,228. MACSE identified 1,183. MAFFT identified 1,340. And PRANK identified 1,349. Note that we did not explore whether any of these inferences were biologically or statistically significant.
 
 \subsection*{Semi-Empirical Benchmark}
 
-COATi produced better alignments than ClustalΩ, MACSE, MAFFT, and PRANK when evaluated by our benchmark data set. It produced more best alignments, more perfect alignments, and less imperfect alignments (Tab.~\ref{table:comp}).
+COATi produced better alignments than Clustal\textOmega{}, MACSE, MAFFT, and PRANK when evaluated by our benchmark data set. It produced more best alignments, more perfect alignments, and less imperfect alignments (Tab.~\ref{table:comp}).
 %
-COATi was significantly more accurate (lower $d_{seq}$) at inferring the benchmark alignments compared to the other methods (Tab.~\ref{table:comp}). All p-values were significant according to the one-tailed, paired Wilcoxon signed-rank tests. (P-value of COATi vs PRANK was $5.1 \times 10^{-8}$, and p-values of COATi vs the other aligners were $< 2.2 \times 10^{-16}$). Notably, the average alignment error of the second best protocol was four times larger than COATi's. We also calculated the average distance of alignments between aligners and used principal coordinate analysis (PCoA) to project the resulting distance matrix into two dimensions (Fig.~\ref{fig:dseq-benchmarks}). COATi was the closest aligner to the benchmark, and other aligners tended to diverge from the benchmark in different directions. Because benchmark alignments were derived from gap patterns estimated by different aligners, we also performed separate PCoA analyses for every source of gap patterns (Supplementary Materials, Fig.~S6). While all aligners, except ClustalΩ, do exceptionally well on their own patterns, COATi does exceptionally well on every set of patterns.
+COATi was significantly more accurate (lower $d_{seq}$) at inferring the benchmark alignments compared to the other methods (Tab.~\ref{table:comp}). All p-values were significant according to the one-tailed, paired Wilcoxon signed-rank tests. (P-value of COATi vs PRANK was $5.1 \times 10^{-8}$, and p-values of COATi vs the other aligners were $< 2.2 \times 10^{-16}$). Notably, the average alignment error of the second best protocol was four times larger than COATi's. We also calculated the average distance of alignments between aligners and used principal coordinate analysis (PCoA) to project the resulting distance matrix into two dimensions (Fig.~\ref{fig:dseq-benchmarks}). COATi was the closest aligner to the benchmark, and other aligners tended to diverge from the benchmark in different directions. Because benchmark alignments were derived from gap patterns estimated by different aligners, we also performed separate PCoA analyses for every source of gap patterns (Supplementary Materials, Fig.~S6). While all aligners, except Clustal\textOmega{}, do exceptionally well on their own patterns, COATi does exceptionally well on every set of patterns.
 
 For evolutionary distances, COATi had the lowest root-mean-square error (0.000694) relative to the benchmark alignments (Tab.~\ref{table:comp}). The second lowest aligner, PRANK, had a root-mean-square error that was over 400 times larger than COATi's. COATi only overestimated  10\% of its evolutionary distances, while other aligners overestimated 26\%--53\% of their evolutionary distances.
 %
 Additionally, COATi more accurately inferred events of positive and negative selection (Tab.~\ref{table:comp}).
 
-% Software comparison table
-\begin{table}[!ht]
-\definecolor{bestcolor}{RGB}{230,230,230}%
-\centering
-\caption{COATi generates better alignments than other alignment algorithms on semi-empirical benchmarks.\textsuperscript{1}\label{table:comp}}
-%
-% Copied from tables/benchmarks.tex
-% footnotes and \addlinespace are manually added
-\begin{tabular}{rccccc}
-  \toprule
- & COATi & ClustalΩ & MACSE & MAFFT & PRANK \\ 
-  \midrule
-Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.37\% & 1.67\% & 1.02\% \\
-\addlinespace 
-  Number of Best\textsuperscript{2} Alignments & \cellcolor{bestcolor}7050 & 3988 & 5226 & 5918 & 6128 \\ 
-  Number of Perfect\textsuperscript{2} Alignments & \cellcolor{bestcolor}6795 & 3954 & 5138 & 5840 & 5860 \\ 
-  Number of Imperfect\textsuperscript{2} Alignments & \cellcolor{bestcolor} 850 & 3691 & 2507 & 1805 & 1785 \\
-  \addlinespace 
-  RMSE for K2P Distances & \cellcolor{bestcolor}0.000694 & 0.0920 & 0.0528 & 0.0561 & 0.0305 \\ 
-  Overestimated K2P Distances & \cellcolor{bestcolor}10.3\% & 52.7\% & 38.0\% & 26.2\% & 25.6\% \\ 
-  \addlinespace
-  F\textsubscript{1} Score for Negative Selection & \cellcolor{bestcolor}99.8\% & 97.6\% & 98.4\% & 98.3\% & 99.1\% \\ 
-  F\textsubscript{1} Score for Positive Selection & \cellcolor{bestcolor}97.8\% & 77.2\% & 84.9\% & 85.5\% & 91.8\% \\ 
-   \bottomrule
-   \addlinespace
-\multicolumn{6}{p{40em}}{\textsuperscript{1}Total number of sequence pairs in the benchmark was 8,261.}\\
-\multicolumn{6}{p{40em}}{\textsuperscript{2}Best alignments have the lowest $d_{seq}$ (including equivalent alignments). Perfect alignments have $d_{seq} = 0$ (including equivalent alignments). Imperfect alignments are alignments that are not perfect when at least one method found a perfect alignment. }\\
-\end{tabular}
-\end{table}
-
-\begin{figure}[h!]
-    \centering%
-    \includegraphics{figures/fig-dseq-benchmarks.pdf}
-    \par
-    \caption{COATi's alignments were closer to the semi-empirical benchmark than other methods. A principal coordinates analysis (PCoA) of the average alignment distance ($d_{seq}$) between alignments generated by different methods.
-%
-    \label{fig:dseq-benchmarks}}
-\end{figure}
-
-\clearpage
-
 \section*{Discussion}
 
-We have developed a statistical alignment program using finite-state transducers called COATi. On empirical data, COATi produced alignments that provided reasonable biological inferences. On semi-empirical benchmarks, COATi was more accurate than the other aligners/alignment strategies that we tested: ClustalΩ's amino-acid model, MACSE's amino-acid aware nucleotide model, MAFFT's DNA model, and PRANK's codon model. Unlike standard codon or amino-acid alignment strategies, COATi supports aligning protein-coding sequences using all three phases of gaps. Consistent with \cite{taylor2004occurrence} and \cite{zhu2022profiling}, our COATi results indicate that only 41\% indels in protein-coding sequences are phase-3 indels between humans and gorillas. Therefore, alignment strategies that only support phase-3 gaps in protein-coding sequences are suboptimally aligning the 59\% of indels that are phase-1 and phase-2.
+We have developed a statistical alignment program using finite-state transducers called COATi. On empirical data, COATi produced alignments that provided reasonable biological inferences. On semi-empirical benchmarks, COATi was more accurate than the other aligners/alignment strategies that we tested: Clustal\textOmega{}'s amino-acid model, MACSE's amino-acid aware nucleotide model, MAFFT's DNA model, and PRANK's codon model. Unlike standard codon or amino-acid alignment strategies, COATi supports aligning protein-coding sequences using all three phases of gaps. Consistent with \cite{taylor2004occurrence} and \cite{zhu2022profiling}, our COATi results indicate that only 41\% indels in protein-coding sequences are phase-3 indels between humans and gorillas. Therefore, alignment strategies that only support phase-3 gaps in protein-coding sequences are suboptimally aligning the 59\% of indels that are phase-1 and phase-2.
 
 In addition to supporting all three phases of gaps, COATi's advantage over the other aligners was at least partially due to its default parameters fitting the human-gorilla coding sequences better than the other aligners' default settings. Different data sets may show different results. However, because COATi uses a statistical model with biologically meaningful parameters, users can easily optimize COATi by using parameters estimated by previous studies or estimating parameters themselves \citep[e.g.][]{zhu2022profiling}. This contrasts with other aligners that have limited ability to customize parameters and/or use parameters without biological interpretations.
 
@@ -412,11 +287,11 @@ COATi is not a symmetric pairwise aligner, as reference sequences are more const
 
 After COATi, PRANK's codon model was the second most accurate alignment method. Like COATi, PRANK also uses statistical models and supports aligning protein-coding sequences using codon models developed for phylogenetics. Both COATi and PRANK had reasonable distributions of evolutionary distances that lacked large right tails. This is likely because COATi and PRANK produced better alignments when tasked with aligning sequence pairs that contained non-orthologous exons. However, in contrast with COATi, PRANK's codon model only permits phase-3 gaps and is very sensitive to frameshift artifacts. In fact, PRANK refuses to align any sequence using a codon model if its length is not a multiple of three.
 
-ClustalΩ's amino-acid model also only permits phase-3 gaps and is very sensitive to frameshift artifacts. Because this approach depends on amino-acid translations, if a coding sequence contains an abiological frameshift, then translation will produce an abiological amino-acid sequence resulting in a poor alignment. ClustalΩ was the worst performing protocol that we tested. It had the highest average alignment error and also had difficulties correctly identifying positive selection and estimating evolutionary distances.  --- It even performed poorly on its own gap patterns. --- ClustalΩ's relatively poor performance likely derives from its default assumptions being a poor fit for our data set and also from the loss of information that occurred when we translated protein-coding DNA sequences into protein sequences.
+Clustal\textOmega{}'s amino-acid model also only permits phase-3 gaps and is very sensitive to frameshift artifacts. Because this approach depends on amino-acid translations, if a coding sequence contains an abiological frameshift, then translation will produce an abiological amino-acid sequence resulting in a poor alignment. Clustal\textOmega{} was the worst performing protocol that we tested. It had the highest average alignment error and also had difficulties correctly identifying positive selection and estimating evolutionary distances.  --- It even performed poorly on its own gap patterns. --- Clustal\textOmega{}'s relatively poor performance likely derives from its default assumptions being a poor fit for our data set and also from the loss of information that occurred when we translated protein-coding DNA sequences into protein sequences.
 
 We obtained better results when aligning in nucleotide space using both amino-acid aware MACSE and amino-acid agnostic MAFFT. These results indicate that aligning protein-coding sequences in nucleotide space works reasonably well if the sequences come from closely related species, such as humans and gorillas, as it supports all three gap phases and is robust to frameshift artifacts. If the sequences were further apart, we predict that amino-acid agnostic approaches would begin to produce unreasonable alignments. 
 
-We can look at distances between alignments generated by different aligners to understand the diversity of approaches used by our alignment protocols. Aside from the cluster of different COATi methods, we detected no other clusters in our analysis (Supplemental Materials Fig.~S7). Different aligners tended to spread out from one another and in different directions from the benchmark. This indicates that each protocol that we utilized approached alignment inference from a different section of ``aligner space''. While each aligner, except ClustalΩ, performed well on its own gap patterns, MACSE also did well on ClustalΩ and MAFFT gap patterns, and PRANK did well on ClustalΩ patterns. COATi did well on all patterns.
+We can look at distances between alignments generated by different aligners to understand the diversity of approaches used by our alignment protocols. Aside from the cluster of different COATi methods, we detected no other clusters in our analysis (Supplemental Materials Fig.~S7). Different aligners tended to spread out from one another and in different directions from the benchmark. This indicates that each protocol that we utilized approached alignment inference from a different section of ``aligner space''. While each aligner, except Clustal\textOmega{}, performed well on its own gap patterns, MACSE also did well on Clustal\textOmega{} and MAFFT gap patterns, and PRANK did well on Clustal\textOmega{} patterns. COATi did well on all patterns.
 
 This study has focused on COATi's module for estimating pairwise alignments; however, COATi has additional tools, including a module to sample pairwise alignments from alignment space and a module to generate multiple-sequence alignments. We have used the sampling module in a large study \citep{zhu2022profiling} and believe that it is ready to be used in further studies. On the other hand, COATi's multiple-sequence alignment algorithm is still in early development and needs additional work to ensure that it produces high quality alignments. Currently, COATi generates multiple sequence alignments by aligning non-reference sequences against a reference sequence and collapsing insertions following a user-provided guide tree.
 
@@ -438,10 +313,422 @@ The authors would like to thank Profs.\ Marco Mangone, Ted Pavlic, Banu Oskan, J
 
 \noindent \textit{Conflict of interest:} none declared.
 
-% \section{References}
+\newpage
+\section*{Figures}
+
+% Figures are 86 mm or 178 mm wide
+\begin{figure}[ht]
+    \centering%
+    %\includegraphics[scale=1]{figures/fig-aln.pdf}
+    \par
+    \caption{
+        Standard algorithms produce suboptimal alignments.
+        (a) shows the true alignment of an ancestor sequence (A) and a descendant sequence (D).
+        (b--d) are the results of different aligners. Nucleotide mismatches are highlighted in red.---Notably, COATi is the only aligner able to retrieve the biological alignment in this example.---%
+        %
+        Indels in protein-coding sequences can be classified as having one of three different phases and being one of two different types.
+        Phases refer to the location of the gap with respect to the reading frame, while types refer to the consequence of the indel.
+        Phase-1, phase-2, and phase-3 indels are shown in blue, orange, and green respectively.
+        Additionally, the orange indel is type-II (an amino-acid indel plus an amino-acid change) while the blue indel is type-I (an amino-acid indel only). The difference between an in-frame and a frameshift indel is not displayed.
+        \label{fig:aln}}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    %\includegraphics[width=\textwidth]{figures/fig-fst-base-calling-new.pdf}
+    \par
+    \caption{%
+    Finite state transducers (FSTs) model the generation of an output sequence based on an input sequence.
+    %
+    (a) A graph of a probabilistic FST \citep{cotterell-etal-2014-stochastic} for base-calling errors using a Mealy-machine architecture, where parameter $u$ is the error rate. This graph contains two states (S and M) connected by arcs, with labels ``input symbols~:~output symbols~/~weight''. Arcs consume symbols from the input sequence and emit symbols to the output sequence. Weights describe the probability that an arc is taken given the input symbols. Epsilon (\textepsilon) is a special symbol denoting that no symbols were either consumed or emitted.
+    %
+    (b) An FST for matching sequences against ambiguous nucleotides (N). 
+    (c) An FST that results from the composition ($\circ$ operation) of the Error FST with the Ambiguity FST.
+    %
+    %Let $x$ be a symbol in the input of (a), $y$ be a symbol in the output of (b), and $z$ be a symbol in both the output of (a) and the input of (b). An arc in the composed FST (c) has an input symbol $x$, an output symbol $y$, and a weight that is the combination over $z$ of the aggregate weights of all $x$-$z$-$y$ arc pairs.
+    %
+    \label{fig:base-calling}}
+\end{figure}
+
+\begin{figure}[ht]
+%\includegraphics[width=\textwidth]{figures/fig-fst-coati.pdf}
+\caption{The COATi FST is built from simpler FSTs via composition.
+(a) The substitution FST encodes a $61 \times 61 $ codon substitution model with 3721 arcs from S to M. These arcs consume three nucleotides from the input tape and emit three nucleotides to the output tape. The weight of each arc is a conditional probability derived from a codon substitution model. See Fig.~\ref{fig:base-calling} for more details about reading this graph.
+%
+(b) The indel FST allows for insertions (H to I) and deletions (C to D). Here $g$ is the gap-opening parameter and $e$ is the gap-extension parameter.
+Insertion arcs are weighted according to the codon model's stationary distribution of nucleotides, and deletion arcs have a weight of 1. This FST is structured such that if insertions and deletions are contiguous, insertions will precede deletions \citep[Cf.][]{holmes2001evolutionary,demaio2021cumulative}.
+%
+(c) The COATi FST is derived via composition from the codon substitution, indel, error, and ambiguity FSTs.
+\label{fig:coati-fst}}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering%
+    %\includegraphics{figures/fig-k2p-empirical.pdf}
+    \par
+    \caption{COATi's alignments produce biologically reasonable evolutionary distances. (a) The distribution of K2P distances inferred from alignments generated by each method. The averages of each distribution are indicated by vertical lines. The averages are COATi = 0.0084, Clustal\textOmega{} = 0.0178, MACSE = 0.0149, MAFFT = 0.0154, PRANK = 0.0092, and COATi-rev = 0.0084. (b) The distribution of the differences between distances inferred by COATi and other methods. The X-axes of both plots have been pseudo-log transformed using the inverse hyperbolic sine.\label{fig:k2p-empirical}}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering%
+    %\includegraphics{figures/fig-sel-empirical.pdf}
+    \par
+    \caption{Aligners varied in which sequence pairs they identified as undergoing positive selection.
+    In this UpSet plot, the bottom panel displays the 16 most frequent intersection patterns among aligners. A black circle represents positive selection. The most frequent pattern was that no aligner found positive selection while the second most frequent pattern was that all aligners found positive selection. Other patterns involved a disagreement between aligners about whether a sequence pair showed evidence of positive or negative selection. The top panel displays the number of sequence pairs in each grouping.\label{fig:sel-empirical}}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering%
+    %\includegraphics{figures/fig-dseq-benchmarks.pdf}
+    \par
+    \caption{COATi's alignments were closer to the semi-empirical benchmark than other methods. A principal coordinates analysis (PCoA) of the average alignment distance ($d_{seq}$) between alignments generated by different methods.\label{fig:dseq-benchmarks}}
+\end{figure}
+
+\clearpage
+\newpage
+\section*{Tables}
+
+\begin{table}[ht]
+\caption{\label{tab:gaps-empirical}COATi produced more indels and fewer mismatches compared to other aligners.}
+\centering
+\begin{tabular}[t]{lrrrccc}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Indel Phases\textsuperscript{1}} & \multicolumn{3}{c}{Homology Patterns\textsuperscript{2}}\\
+\cmidrule(l{3pt}r{3pt}){2-4}
+\cmidrule(l{3pt}r{3pt}){5-7}
+Method & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & Matches & Mismatches & Gaps\\
+\midrule
+COATi & 4493 & 3962 & 5822 & 95.93\% & 0.79\% & 3.28\%\\
+\addlinespace
+Clustal\textOmega{} & 8 & 6 & 10230 & 95.93\% & 1.54\% & 2.52\%\\
+\addlinespace
+MACSE & 455 & 497 & 13017 & 96.13\% & 1.33\% & 2.54\%\\
+\addlinespace
+MAFFT & 2317 & 2631 & 5458 & 96.12\% & 1.36\% & 2.52\%\\
+\addlinespace
+PRANK & 0 & 0 & 10862 & 95.64\% & 0.84\% & 3.52\%\\
+\addlinespace
+COATi-rev & 3992 & 3775 & 6176 & 95.95\% & 0.79\% & 3.25\%\\
+\bottomrule
+\addlinespace
+\multicolumn{7}{p{30em}}{\footnotesize\textsuperscript{1}Total number of indels inferred by each aligner separated by phase.}\\
+\multicolumn{7}{p{30em}}{\footnotesize\textsuperscript{2}The percent of nucleotides that were aligned against a match, mismatch, and gap respectively. This is different than the percent of columns that contain a match, mismatch, or gap because match and mismatch columns are counted twice.}
+
+\end{tabular}
+
+% The homology pattern columns contain the percent of nucleotides that were aligned
+% against a match, mismatch, and gap respectively. Note that this is different than the percent of columns that
+% contain a match, mismatch, or gap because match and mismatch columns are counted twice.
+\end{table}
+
+% Software comparison table
+\begin{table}[ht]
+\definecolor{bestcolor}{RGB}{230,230,230}%
+\centering
+\caption{COATi generates better alignments than other alignment algorithms on semi-empirical benchmarks.\textsuperscript{1}\label{table:comp}}
+%
+% Copied from tables/benchmarks.tex
+% footnotes and \addlinespace are manually added
+\begin{tabular}{rccccc}
+  \toprule
+ & COATi & Clustal\textOmega{} & MACSE & MAFFT & PRANK \\ 
+  \midrule
+Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.37\% & 1.67\% & 1.02\% \\
+\addlinespace 
+  Number of Best\textsuperscript{2} Alignments & \cellcolor{bestcolor}7050 & 3988 & 5226 & 5918 & 6128 \\ 
+  Number of Perfect\textsuperscript{2} Alignments & \cellcolor{bestcolor}6795 & 3954 & 5138 & 5840 & 5860 \\ 
+  Number of Imperfect\textsuperscript{2} Alignments & \cellcolor{bestcolor} 850 & 3691 & 2507 & 1805 & 1785 \\
+  \addlinespace 
+  RMSE for K2P Distances & \cellcolor{bestcolor}0.000694 & 0.0920 & 0.0528 & 0.0561 & 0.0305 \\ 
+  Overestimated K2P Distances & \cellcolor{bestcolor}10.3\% & 52.7\% & 38.0\% & 26.2\% & 25.6\% \\ 
+  \addlinespace
+  F\textsubscript{1} Score for Negative Selection & \cellcolor{bestcolor}99.8\% & 97.6\% & 98.4\% & 98.3\% & 99.1\% \\ 
+  F\textsubscript{1} Score for Positive Selection & \cellcolor{bestcolor}97.8\% & 77.2\% & 84.9\% & 85.5\% & 91.8\% \\ 
+   \bottomrule
+   \addlinespace
+\multicolumn{6}{p{40em}}{\textsuperscript{1}Total number of sequence pairs in the benchmark was 8,261.}\\
+\multicolumn{6}{p{40em}}{\textsuperscript{2}Best alignments have the lowest $d_{seq}$ (including equivalent alignments). Perfect alignments have $d_{seq} = 0$ (including equivalent alignments). Imperfect alignments are alignments that are not perfect when at least one method found a perfect alignment. }\\
+\end{tabular}
+\end{table}
+
+\clearpage
+\newpage
 \bibliographystyle{mbe}%
 \setlength{\bibhang}{0pt}
-\bibliography{alignpair_letter.bib}
+%\bibliography{alignpair_letter.bib}
+\begin{thebibliography}{43}
+\providecommand{\natexlab}[1]{#1}
+
+\bibitem[{Abascal et~al.(2010)Abascal, Zardoya, and
+  Telford}]{abascal2010translatorx}
+Abascal F, Zardoya R, and Telford MJ. 2010.
+\newblock {TranslatorX}: multiple alignment of nucleotide sequences guided by
+  amino acid translations.
+\newblock \emph{Nucleic Acids Research} 38:W7--W13.
+
+\bibitem[{Allauzen et~al.(2007)Allauzen, Riley, Schalkwyk, Skut, and
+  Mohri}]{allauzen2007openfst}
+Allauzen C, Riley M, Schalkwyk J, Skut W, and Mohri M. 2007.
+\newblock Openfst: A general and efficient weighted finite-state transducer
+  library.
+\newblock In \emph{International Conference on Implementation and Application
+  of Automata}, pages 11--23. Springer.
+
+\bibitem[{Arvestad(1997)}]{arvestad1997aligning}
+Arvestad L. 1997.
+\newblock Aligning coding dna in the presence of frame-shift errors.
+\newblock In A~Apostolico and J~Hein, editors, \emph{Combinatorial Pattern
+  Matching}, pages 180--190. Berlin, Heidelberg: Springer Berlin Heidelberg.
+
+\bibitem[{Bininda-Emonds(2005)}]{bininda2005transalign}
+Bininda-Emonds O. 2005.
+\newblock {transAlign}: using amino acids to facilitate the multiple alignment
+  of protein-coding {DNA} sequences.
+\newblock \emph{BMC Bioinformatics} 6:1--6.
+
+\bibitem[{Blackburne and Whelan(2011)}]{metrics_blackburne_whelan_2011}
+Blackburne BP and Whelan S. 2011.
+\newblock {Measuring the distance between multiple sequence alignments}.
+\newblock \emph{Bioinformatics} 28:495--502.
+
+\bibitem[{Bradley and Holmes(2007)}]{bradley2007transducers}
+Bradley RK and Holmes I. 2007.
+\newblock Transducers: an emerging probabilistic framework for modeling indels
+  on trees.
+\newblock \emph{Bioinformatics} 23.
+
+\bibitem[{Cartwright(2009)}]{problems_cartwright_2009}
+Cartwright RA. 2009.
+\newblock Problems and solutions for estimating indel rates and length
+  distributions.
+\newblock \emph{Molecular Biology and Evolution} 26:473--480.
+
+\bibitem[{Charif and Lobry(2007)}]{seqinr}
+Charif D and Lobry J. 2007.
+\newblock {SeqinR} 1.0-2: a contributed package to the {R} project for
+  statistical computing devoted to biological sequences retrieval and analysis.
+\newblock In U~Bastolla, M~Porto, H~Roman, and M~Vendruscolo, editors,
+  \emph{Structural approaches to sequence evolution: Molecules, networks,
+  populations}, Biological and Medical Physics, Biomedical Engineering, pages
+  207--232. New York: Springer Verlag.
+
+\bibitem[{Cotterell et~al.(2014)Cotterell, Peng, and
+  Eisner}]{cotterell-etal-2014-stochastic}
+Cotterell R, Peng N, and Eisner J. 2014.
+\newblock Stochastic contextual edit distance and probabilistic {FST}s.
+\newblock In K~Toutanova and H~Wu, editors, \emph{Proceedings of the 52nd
+  Annual Meeting of the Association for Computational Linguistics (Volume 2:
+  Short Papers)}, pages 625--630. Baltimore, Maryland: Association for
+  Computational Linguistics.
+
+\bibitem[{De~Maio(2021)}]{demaio2021cumulative}
+De~Maio N. 2021.
+\newblock The cumulative indel model: fast and accurate statistical
+  evolutionary alignment.
+\newblock \emph{Systematic Biology} 70:236--257.
+
+\bibitem[{Fletcher and Yang(2010)}]{effect_fletcher_2010}
+Fletcher W and Yang Z. 2010.
+\newblock The effect of insertions, deletions, and alignment errors on the
+  branch-site test of positive selection.
+\newblock \emph{Molecular Biology and Evolution} 27:2257--2267.
+
+\bibitem[{Garc\'{i}a~Mesa(2023)}]{garcia2023dissertation}
+Garc\'{i}a~Mesa JJ. 2023.
+\newblock Statistical sequence alignment of protein coding regions.
+\newblock Ph.D. thesis, Arizona State University.
+
+\bibitem[{Hein(1994)}]{hein1994algorithm}
+Hein J. 1994.
+\newblock An algorithm combining dna and protein alignment.
+\newblock \emph{Journal of Theoretical Biology} 167:169--174.
+
+\bibitem[{Hein(2001)}]{hein2001algorithm}
+Hein J. 2001.
+\newblock An algorithm for statistical alignment of sequences related by a
+  binary tree.
+\newblock \emph{Pacific Symposium on Biocomputing} 6:179--190.
+
+\bibitem[{Holmes and Bruno(2001)}]{holmes2001evolutionary}
+Holmes I and Bruno WJ. 2001.
+\newblock Evolutionary {HMMs}: a bayesian approach to multiple alignment.
+\newblock \emph{Bioinformatics} 17:803--820.
+
+\bibitem[{Hubbard et~al.(2002)Hubbard, Barker, Birney, Cameron, Chen, Clark,
+  Cox, Cuff, Curwen, Down et~al.}]{ensembl_hubbard_2002}
+Hubbard T, Barker D, Birney E, Cameron G, Chen Y, Clark L, Cox T, Cuff J,
+  Curwen V, Down T, et~al. 2002.
+\newblock The {Ensembl} genome database project.
+\newblock \emph{Nucleic Acids Research} 30:38--41.
+
+\bibitem[{Hubisz et~al.(2011)Hubisz, Lin, Kellis, and Siepel}]{hubisz2011error}
+Hubisz MJ, Lin MF, Kellis M, and Siepel A. 2011.
+\newblock Error and error mitigation in low-coverage genome assemblies.
+\newblock \emph{{PLoS} One} 6:e17,034.
+
+\bibitem[{Jackman et~al.(2018)Jackman, Coombe, Chu, Warren, Vandervalk, Yeo,
+  Xue, Mohamadi, Bohlmann, Jones et~al.}]{jackman2018tigmint}
+Jackman SD, Coombe L, Chu J, Warren RL, Vandervalk BP, Yeo S, Xue Z, Mohamadi
+  H, Bohlmann J, Jones SJ, et~al. 2018.
+\newblock Tigmint: correcting assembly errors using linked reads from large
+  molecules.
+\newblock \emph{BMC Bioinformatics} 19:1--10.
+
+\bibitem[{Katoh and Standley(2013)}]{katoh2013mafft}
+Katoh K and Standley DM. 2013.
+\newblock {MAFFT} multiple sequence alignment software version 7: improvements
+  in performance and usability.
+\newblock \emph{Molecular Biology and Evolution} 30:772--780.
+
+\bibitem[{Kimura(1980)}]{kimura1980simple}
+Kimura M. 1980.
+\newblock A simple method for estimating evolutionary rates of base
+  substitutions through comparative studies of nucleotide sequences.
+\newblock \emph{Journal of Molecular Evolution} 16:111--120.
+
+\bibitem[{Kosiol et~al.(2007)Kosiol, Holmes, and Goldman}]{kosiol_ECM_2007}
+Kosiol C, Holmes I, and Goldman N. 2007.
+\newblock An empirical codon model for protein sequence evolution.
+\newblock \emph{Molecular Biology and Evolution} 24:1464--1479.
+
+\bibitem[{Li(1993)}]{ka_ks_li_1993}
+Li WH. 1993.
+\newblock Unbiased estimation of the rates of synonymous and nonsynonymous
+  substitution.
+\newblock \emph{Journal of Molecular Evolution} 36:96--99.
+
+\bibitem[{Li et~al.(1985)Li, Wu, and Luo}]{Li1985}
+Li WH, Wu CI, and Luo CC. 1985.
+\newblock {A new method for estimating synonymous and nonsynonymous rates of
+  nucleotide substitution considering the relative likelihood of nucleotide and
+  codon changes.}
+\newblock \emph{Molecular Biology and Evolution} 2:150--174.
+
+\bibitem[{L{\"o}ytynoja(2014)}]{prank_loytynoja_2014}
+L{\"o}ytynoja A. 2014.
+\newblock Phylogeny-aware alignment with {PRANK}.
+\newblock In \emph{Multiple Sequence Alignment Methods}, pages 155--170.
+  Springer.
+
+\bibitem[{Lunter et~al.(2005)Lunter, Drummond, Mikl{\'o}s, and
+  Hein}]{Lunter2005-hk}
+Lunter G, Drummond AJ, Mikl{\'o}s I, and Hein J. 2005.
+\newblock Statistical alignment: Recent progress, new applications, and
+  challenges.
+\newblock In \emph{Statistical Methods in Molecular Evolution}, pages 375--405.
+  New York: Springer-Verlag.
+
+\bibitem[{Mohri et~al.(2005)Mohri, Pereira, and Riley}]{mohri2005weighted}
+Mohri M, Pereira F, and Riley M. 2005.
+\newblock Weighted automata in text and speech processing.
+
+\bibitem[{Morrison(2015)}]{art_morrison_2015}
+Morrison DA. 2015.
+\newblock Is sequence alignment an art or a science?
+\newblock \emph{Systematic Botany} 40:14--26.
+
+\bibitem[{Muse and Gaut(1994)}]{muse_gaut_1994}
+Muse SV and Gaut BS. 1994.
+\newblock A likelihood approach for comparing synonymous and nonsynonymous
+  nucleotide substitution rates, with application to the chloroplast genome.
+\newblock \emph{Molecular Biology and Evolution} 11:715--724.
+
+\bibitem[{Pamilo and Bianchi(1993)}]{Pamilo1993}
+Pamilo P and Bianchi NO. 1993.
+\newblock {Evolution of the Zfx and Zfy genes: rates and interdependence
+  between the genes.}
+\newblock \emph{Molecular Biology and Evolution} 10:271--281.
+
+\bibitem[{Paradis and Schliep(2019)}]{paradis2019ape}
+Paradis E and Schliep K. 2019.
+\newblock ape 5.0: an environment for modern phylogenetics and evolutionary
+  analyses in {R}.
+\newblock \emph{Bioinformatics} 35:526--528.
+
+\bibitem[{Pedersen et~al.(1998)Pedersen, Lyngs{\o}, and
+  Hein}]{pedersen1998comparison}
+Pedersen CNS, Lyngs{\o} R, and Hein J. 1998.
+\newblock Comparison of coding {DNA}.
+\newblock In M~Farach-Colton, editor, \emph{Combinatorial Pattern Matching},
+  pages 153--173. Berlin, Heidelberg: Springer Berlin Heidelberg.
+
+\bibitem[{{R Core Team}(2024)}]{r2024}
+{R Core Team}. 2024.
+\newblock \emph{R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+
+\bibitem[{Ranwez et~al.(2018)Ranwez, Douzery, Cambon, Chantret, and
+  Delsuc}]{ranwez_macse_2018}
+Ranwez V, Douzery EJP, Cambon C, Chantret N, and Delsuc F. 2018.
+\newblock {{MACSE} v2: toolkit for the alignment of coding sequences accounting
+  for frameshifts and stop codons}.
+\newblock \emph{Molecular Biology and Evolution} 35:2582--2584.
+
+\bibitem[{Ranwez et~al.(2011)Ranwez, Harispe, Delsuc, and
+  Douzery}]{ranwez_macse_2011}
+Ranwez V, Harispe S, Delsuc F, and Douzery EJ. 2011.
+\newblock {MACSE}: {M}ultiple {A}lignment of {C}oding {SE}quences accounting
+  for frameshifts and stop codons.
+\newblock \emph{{PLoS} One} 6:e22,594.
+
+\bibitem[{Redelings and Suchard(2007)}]{redelings2007incorporating}
+Redelings BD and Suchard MA. 2007.
+\newblock Incorporating indel information into phylogeny estimation for rapidly
+  emerging pathogens.
+\newblock \emph{BMC Evolutionary Biology} 7:1--19.
+
+\bibitem[{Rosenberg(2009)}]{sequence_alignment_rosenberg_2009}
+Rosenberg MS. 2009.
+\newblock \emph{Sequence Alignment: Methods, Models, Concepts, and Strategies}.
+\newblock Univ of California Press.
+
+\bibitem[{Saitou and Nei(1987)}]{saitou1987neighbor}
+Saitou N and Nei M. 1987.
+\newblock The neighbor-joining method: a new method for reconstructing
+  phylogenetic trees.
+\newblock \emph{Molecular Biology and Evolution} 4:406--425.
+
+\bibitem[{Schneider et~al.(2009)Schneider, Souvorov, Sabath, Landan, Gonnet,
+  and Graur}]{estimates_schneider_2009}
+Schneider A, Souvorov A, Sabath N, Landan G, Gonnet GH, and Graur D. 2009.
+\newblock Estimates of positive {Darwinian} selection are inflated by errors in
+  sequencing, annotation, and alignment.
+\newblock \emph{Genome Biology and Evolution} 1:114--118.
+
+\bibitem[{Sievers et~al.(2011)Sievers, Wilm, Dineen, Gibson, Karplus, Li,
+  Lopez, McWilliam, Remmert, S{\"o}ding et~al.}]{clustal_omega_sievers_2011}
+Sievers F, Wilm A, Dineen D, Gibson TJ, Karplus K, Li W, Lopez R, McWilliam H,
+  Remmert M, S{\"o}ding J, et~al. 2011.
+\newblock Fast, scalable generation of high-quality protein multiple sequence
+  alignments using {Clustal Omega}.
+\newblock \emph{Molecular Systems Biology} 7:539.
+
+\bibitem[{Silvestre-Ryan et~al.(2021)Silvestre-Ryan, Wang, Sharma, Lin, Shen,
+  Dider, and Holmes}]{silvestre2021machine}
+Silvestre-Ryan J, Wang Y, Sharma M, Lin S, Shen Y, Dider S, and Holmes I. 2021.
+\newblock {Machine Boss}: rapid prototyping of bioinformatic automata.
+\newblock \emph{Bioinformatics} 37:29--35.
+
+\bibitem[{Taylor et~al.(2004)Taylor, Ponting, and
+  Copley}]{taylor2004occurrence}
+Taylor MS, Ponting CP, and Copley RR. 2004.
+\newblock Occurrence and consequences of coding sequence insertions and
+  deletions in mammalian genomes.
+\newblock \emph{Genome Research} 14:555--566.
+
+\bibitem[{Yoon(2009)}]{yoon_2009_hmm}
+Yoon BJ. 2009.
+\newblock Hidden {Markov} models and their applications in biological sequence
+  analysis.
+\newblock \emph{Current Genomics} 10:402--415.
+
+\bibitem[{Zhu(2022)}]{zhu2022profiling}
+Zhu Z. 2022.
+\newblock Profiling of indel phases in coding regions.
+\newblock Ph.D. thesis, Arizona State University.
+
+\end{thebibliography}
+
 
 \nolinenumbers
 

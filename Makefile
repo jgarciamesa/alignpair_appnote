@@ -14,11 +14,36 @@ alignpair_letter.pdf: alignpair_letter.tex alignpair_letter.bib $(TABS) mbe.bst
 
 alignpair_letter.pdf: $(addprefix figures/, $(FIGS))
 
+# Used for checking grammar with google docs
+alignpair_letter.docx: alignpair_letter.tex
+	pandoc $< -o $@
+
 figures/fig-%.pdf: figures/fig-%.tex
 	latexmk -cd -lualatex $<
 
 figures/fig-%.pdf: figures/fig-%.R
 	Rscript --vanilla $<
+
+figures/figure-01.pdf: figures/fig-aln.pdf
+	cp $< $@
+
+figures/figure-02.pdf: figures/fig-fst-base-calling-new.pdf
+	cp $< $@
+
+figures/figure-03.pdf: figures/fig-fst-coati.pdf
+	cp $< $@
+
+figures/figure-04.pdf: figures/fig-k2p-empirical.pdf
+	cp $< $@
+
+figures/figure-05.pdf: figures/fig-sel-empirical.pdf
+	cp $< $@
+
+figures/figure-06.pdf: figures/fig-dseq-benchmarks.pdf
+	cp $< $@
+
+all: figures/figure-01.pdf figures/figure-02.pdf figures/figure-03.pdf
+all: figures/figure-04.pdf figures/figure-05.pdf figures/figure-06.pdf
 
 ALIGNERS = clustalo macse mafft prank
 
@@ -40,3 +65,6 @@ response_r2.pdf: response_r2.md
 clean:
 	@rm -f *.{aux,log,fdb_latexmk,fls,bbl,bcf,blg,run.xml,out}
 	@rm -f figures/*.{aux,log,fdb_latexmk,fls,bbl,bcf,blg,run.xml,out}
+
+
+# latexdiff-vc --flatten --git -r aa8402cd50d72 alignpair_letter.tex
