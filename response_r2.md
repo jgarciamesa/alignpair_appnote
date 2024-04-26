@@ -47,7 +47,7 @@ Reed A. Cartwright, on behalf of all authors
 
 3. Comment: *The authors should use “see” rather than c.f. on p. 5, line 82. The abbreviation should be cf., not c.f., and it should be used to mean “compare.” Given the Ranwez et al. references I don’t think the authors of this paper mean “compare.”*
 
-    We do mean "compare" here because COATi's innovation is in similar spirit to MACSE but fundamentally different.
+    We have reworked this section and included additional citations to prior work in this area.
 
 4. Comment: *I would consider adding the fact that their “…COATi results estimate that only 41% indels in protein-coding sequences between humans and gorillas are phase-3 indels” (on p. 15, line 370) to the abstract. This is a nice empirical demonstration that their methods is producing “biologically-reasonable” alignments.*
 

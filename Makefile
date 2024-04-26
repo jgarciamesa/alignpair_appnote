@@ -5,7 +5,7 @@ PLOT_DATA = tri-mg tri-ecm mar-mg mar-ecm
 
 default: all
 
-all: alignpair_letter.pdf response_r1.pdf supplementary_materials/supplementary_materials.pdf
+all: alignpair_letter.pdf response_r1.pdf response_r2.pdf supplementary_materials/supplementary_materials.pdf
 
 .PHONY: all default
 
