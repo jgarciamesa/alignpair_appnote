@@ -14,6 +14,7 @@
 \setmathfont{Latin Modern Math}
 
 \usepackage{url}
+\urlstyle{same}
 \usepackage{graphicx}
 
 \usepackage[compact,tiny]{titlesec}
@@ -80,7 +81,7 @@ To address these issues, we present COATi, a statistical, codon-aware pairwise a
 %While such errors are eventually fixed in the reference genomes of model organisms, many genomes used by researchers contain these artifacts, and researchers often discard large amounts of data in comparative genomic studies to prevent artifacts from impacting results. 
 
 % now start line numbers
-\linenumbers
+% \linenumbers
 
 \section*{Introduction}
 
@@ -109,21 +110,20 @@ Within protein-coding sequences, indels may occur between any pair of adjacent n
 \end{figure}
 
 Bioinformatic pipelines need to be robust to variation in quality across genomic datasets because uncorrected errors in the alignment stage can lead to erroneous results in comparative and functional genomic studies \citep{estimates_schneider_2009, effect_fletcher_2010, hubisz2011error}.
-While genomes for model organisms often get refined over many iterations and contain meticulously curated protein-coding sequences, 
+While genomes for model organisms are often refined over many iterations and contain meticulously curated protein-coding sequences, 
 genomes for non-model organisms might only receive partial curation and typically have lower quality sequences and annotations.
 These genomes often lack the amount of sequencing data needed to fix artifacts, including missing exons, erroneous mutations, and indels \citep{jackman2018tigmint}.
 %
 When comparative and functional genomics studies include data from non-model organisms, care must be taken to identify and manage such artifacts; however,
 current alignment methods are ill-equipped to handle common artifacts in genomic data, requiring costly curation practices that discard significant amounts of information.
 
-To address current limitations of alignment software to accurately align protein-coding sequences, we present COATi, short for COdon-aware Alignment Transducer, a pairwise statistical aligner that incorporates evolutionary models for protein-coding sequences and is robust to artifacts present in modern genomic data sets. We find that COATi generates biologically reasonable alignments and downstream inferences when applied to empirical data. We also find that COATi generates more accurate alignments when applied to semi-empirical benchmarks.
-
+To address current limitations of alignment software to accurately align protein-coding sequences, we present COATi, short for COdon-aware Alignment Transducer, a pairwise statistical aligner that incorporates evolutionary models for protein-coding sequences and is robust to artifacts present in modern genomic datasets. We find that COATi generates biologically reasonable alignments and downstream inferences when applied to empirical data. We also find that COATi generates more accurate alignments when applied to a semi-empirical benchmark dataset.
 
 \section*{Methods}
 
 \subsection*{Statistical Alignment via Finite State Tranducers}
 
-In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{hein2001algorithm,holmes2001evolutionary,Lunter2005-hk,demaio2021cumulative}. An advantage of statistical alignment is that its parameters are derived from biological processes, allowing them to be estimated directly from data or extracted from previous studies. While approaches vary, a statistical aligner for a pair of sequences, $X$ and $Y$, typically finds an alignment, $Aln$, that maximizes the joint probability $P(Aln, X, Y)$ or samples alignments from the posterior $P(Aln | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{holmes2001evolutionary,redelings2007incorporating,problems_cartwright_2009}. Pair-HMMs are computational machines with two output tapes. Each tape represents one sequence, and a path through the pair-HMM represents an alignment of the two sequences. Conceptually, pair-HMMs generate two sequences from an unknown ancestor and can calculate the joint probability $P(Aln, X, Y)$ \citep{yoon_2009_hmm}.
+In statistical alignment, sequence alignments are scored based on a stochastic model, typically derived from molecular evolutionary processes \citep{hein2001algorithm,holmes2001evolutionary,Lunter2005-hk,Holmes2020,demaio2021cumulative}. An advantage of statistical alignment is that its parameters are derived from biological processes, allowing them to be estimated directly from data or extracted from previous studies. While approaches vary, a statistical aligner for a pair of sequences, $X$ and $Y$, typically finds an alignment, $Aln$, that maximizes the joint probability $P(Aln, X, Y)$ or samples alignments from the posterior $P(Aln | X, Y)$. This is typically performed using pairwise hidden Markov models \citep[pair-HMMs;][]{holmes2001evolutionary,redelings2007incorporating,problems_cartwright_2009}. Pair-HMMs are computational machines with two output tapes. Each tape represents one sequence, and a path through the pair-HMM represents an alignment of the two sequences. Conceptually, pair-HMMs generate two sequences from an unknown ancestor and can calculate the joint probability $P(Aln, X, Y)$ \citep{yoon_2009_hmm}.
 
 While the use of pair-HMMs is ubiquitous in bioinformatics, they are limited to modeling the evolution of two related sequences from an unknown ancestor. As an alternative, finite-state transducers (FSTs, Fig.~\ref{fig:base-calling}) allow researchers to model the evolution of a descendant sequence from an ancestral sequence. FSTs are computational machines with one input tape and one output tape and provide similar benefits to pair-HMMs, while being more suitable for evolutionary models \citep{bradley2007transducers}. FSTs consume symbols from an input tape and emit symbols to an output tape based on the symbols consumed and the structure of the FST. Conceptually, FSTs generate a descendant sequence, $D$, from a known ancestor, $A$, and can calculate the conditional probability $P(Aln, D | A)$.
 
@@ -236,7 +236,7 @@ where TP is the number of alignments that correctly predicted positive (or negat
 
 In order to compare COATi against other aligners on realistic datasets with known alignments, we developed a procedure to introduce realistic gap patterns into human-gorilla orthologous gene pairs that did not previously contain indels. We separated our 14,127 empirical sequence pairs into two sets: %
 (1) 8261 sequence pairs that did not contain any gaps when aligned by COATi FST, ClustalΩ, MACSE, MAFFT, and PRANK, and (2) 5821 sequence pairs for which at least one of these five aligners added gaps.
-(45 pairs that could not be aligned by at least one aligner were dropped.) We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark set of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 96 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if the gap pattern did not fit the ungapped sequence pair.)
+(45 pairs that could not be aligned by at least one aligner were dropped.) We identified gap patterns from the sequence pairs that were aligned with gaps and randomly introduced them into the ungapped sequence pairs. We used an equal number of randomly sampled gap patterns from each aligner to produce a benchmark dataset of known alignments. The phases of gaps were preserved as were the spacings of any clusters of gaps. Segments of matches that were 96 nucleotides or longer were allowed to change length to accommodate the length of the ungapped sequence pair. (This criteria was recursively lowered if the gap pattern did not fit the ungapped sequence pair.)
 
 For example, consider the gapped alignment represented by the CIGAR string
 %
@@ -253,15 +253,15 @@ where * represents the locations that have flexible length. Considering only mat
 which was used to add gaps into the target, ungapped sequence pair.
 To apply deletions, we removed the corresponding nucleotides from the gorilla sequence, and to apply insertions, we added nucleotides to the gorilla sequence by sampling codons from their stationary frequency while respecting gap phases. The human sequence was left unchanged.
 %
-We generated a benchmark of 8261 sequence pairs with known alignments using this strategy.
+We generated a benchmark dataset of 8261 sequence pairs with known alignments using this strategy.
 
 \subsection*{Measuring Aligner Accuracy}
 
-We aligned our benchmark alignments using our suite of aligners and quantified the similarity of each alignment that was produced to its respective benchmark. As above, we measured Kimura's 2-parameter distance \citep{kimura1980simple} and $K_A/K_S$ \citep{ka_ks_li_1993} for the benchmark and estimated alignments. Additionally, we quantified the error of estimated alignments using the $d_{seq}$ metric \citep{metrics_blackburne_whelan_2011}.
+We aligned our benchmark alignments using our suite of aligners and quantified the similarity of each estimated alignment to its respective benchmark. As above, we measured Kimura's 2-parameter distance \citep{kimura1980simple} and $K_A/K_S$ \citep{ka_ks_li_1993} for the benchmark alignments and estimated alignments. Additionally, we quantified the error of estimated alignments using the $d_{seq}$ metric \citep{metrics_blackburne_whelan_2011}.
 
 Intuitively, $d_{seq}$ ranges between zero and one and can be interpreted as the fraction of nucleotides in the sequence pair that are aligned differently between estimated and benchmark alignments. This metric summarizes each alignment by building homology sets for each nucleotide in the sequence pair. Briefly, if an alignment column contains position $i$ from the first sequence and position $j$ from the second sequence, then $\{j\}$ is the homology set for position $i$ in the first sequence and $\{i\}$ is the homology set for position $j$ in the second sequence. If a position is aligned against a gap, then its homology set is simply $\{\text{gap}\}$. This treats all gaps equally as the location of the gap is not recorded. Finally, $d_{seq}$ is calculated  between an estimated and a benchmark alignment as the average, normalized Hamming distance between the homology sets for each nucleotide in the sequence pair \citep{metrics_blackburne_whelan_2011}.
 
-Using $d_{seq}$ we quantified the number of perfect, imperfect, and best alignments each aligner produced. We define perfect alignments as alignments with a distance of zero to the benchmark alignment ($d_{seq} = 0$) or any alignment that is evolutionary equivalent to an alignment with a distance of zero. We included equivalency in our definition of perfect alignments to prevent the manner by which aligners break ties from influencing our results. Evolutionary equivalence was determined by scoring alignments using COATi's marginal model. Any alignment that had a score which matched the score of its benchmark alignment was considered perfect even if its distance to the benchmark was greater than zero.
+Using $d_{seq}$ we quantified the number of perfect, imperfect, and best alignments each aligner produced. We define perfect alignments as alignments with a distance of zero to the benchmark alignment ($d_{seq} = 0$) or any alignment that is evolutionary equivalent to an alignment with a distance of zero. We included equivalency in our definition of perfect alignments to prevent the manner by which aligners break ties from influencing our results. Evolutionary equivalence was determined by scoring alignments using COATi's marginal model. Any alignment that had a score which matched the score of its benchmark alignment was considered perfect even if its distance to the benchmark alignment was greater than zero.
 %
 Imperfect alignments are defined as alignments that are not perfect when another method successfully produces a perfect alignment for the same pair of sequences.
 %
@@ -351,9 +351,9 @@ In total, COATi identified 1,367 (\sim{}10\%) sequence pairs as showing evidence
 
 \subsection*{Semi-Empirical Benchmark}
 
-COATi produced better alignments than ClustalΩ, MACSE, MAFFT, and PRANK when evaluated by our benchmark data set. It produced more best alignments, more perfect alignments, and less imperfect alignments (Tab.~\ref{table:comp}).
+COATi produced better alignments than ClustalΩ, MACSE, MAFFT, and PRANK when evaluated by our benchmark dataset. It produced more best alignments, more perfect alignments, and less imperfect alignments (Tab.~\ref{table:comp}).
 %
-COATi was significantly more accurate (lower $d_{seq}$) at inferring the benchmark alignments compared to the other methods (Tab.~\ref{table:comp}). All p-values were significant according to the one-tailed, paired Wilcoxon signed-rank tests. (P-value of COATi vs PRANK was $5.1 \times 10^{-8}$, and p-values of COATi vs the other aligners were $< 2.2 \times 10^{-16}$). Notably, the average alignment error of the second best protocol was four times larger than COATi's. We also calculated the average distance of alignments between aligners and used principal coordinate analysis (PCoA) to project the resulting distance matrix into two dimensions (Fig.~\ref{fig:dseq-benchmarks}). COATi was the closest aligner to the benchmark, and other aligners tended to diverge from the benchmark in different directions. Because benchmark alignments were derived from gap patterns estimated by different aligners, we also performed separate PCoA analyses for every source of gap patterns (Supplementary Materials, Fig.~S6). While all aligners, except ClustalΩ, do exceptionally well on their own patterns, COATi does exceptionally well on every set of patterns.
+COATi was significantly more accurate (lower $d_{seq}$) at inferring the benchmark alignments compared to the other methods (Tab.~\ref{table:comp}). All p-values were significant according to the one-tailed, paired Wilcoxon signed-rank tests. (P-value of COATi vs PRANK was $5.1 \times 10^{-8}$, and p-values of COATi vs the other aligners were $< 2.2 \times 10^{-16}$). Notably, the average alignment error of the second best protocol was four times larger than COATi's. We also calculated the average distance of alignments between aligners and used principal coordinate analysis (PCoA) to project the resulting distance matrix into two dimensions (Fig.~\ref{fig:dseq-benchmarks}). COATi was the closest aligner to the benchmark dataset, and other aligners tended to diverge from the benchmark dataset in different directions. Because benchmark alignments were derived from gap patterns estimated by different aligners, we also performed separate PCoA analyses for every source of gap patterns (Supplementary Materials, Fig.~S6). While all aligners, except ClustalΩ, do exceptionally well on their own patterns, COATi does exceptionally well on every set of patterns.
 
 For evolutionary distances, COATi had the lowest root-mean-square error (0.000694) relative to the benchmark alignments (Tab.~\ref{table:comp}). The second lowest aligner, PRANK, had a root-mean-square error that was over 400 times larger than COATi's. COATi only overestimated  10\% of its evolutionary distances, while other aligners overestimated 26\%--53\% of their evolutionary distances.
 %
@@ -363,7 +363,7 @@ Additionally, COATi more accurately inferred events of positive and negative sel
 \begin{table}[!ht]
 \definecolor{bestcolor}{RGB}{230,230,230}%
 \centering
-\caption{COATi generates better alignments than other alignment algorithms on semi-empirical benchmarks.\textsuperscript{1}\label{table:comp}}
+\caption{COATi generates better alignments than other alignment algorithms on a semi-empirical benchmark dataset.\textsuperscript{1}\label{table:comp}}
 %
 % Copied from tables/benchmarks.tex
 % footnotes and \addlinespace are manually added
@@ -384,7 +384,7 @@ Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.3
   F\textsubscript{1} Score for Positive Selection & \cellcolor{bestcolor}97.8\% & 77.2\% & 84.9\% & 85.5\% & 91.8\% \\ 
    \bottomrule
    \addlinespace
-\multicolumn{6}{p{40em}}{\textsuperscript{1}Total number of sequence pairs in the benchmark was 8,261.}\\
+\multicolumn{6}{p{40em}}{\textsuperscript{1}Total number of sequence pairs in the benchmark dataset was 8,261.}\\
 \multicolumn{6}{p{40em}}{\textsuperscript{2}Best alignments have the lowest $d_{seq}$ (including equivalent alignments). Perfect alignments have $d_{seq} = 0$ (including equivalent alignments). Imperfect alignments are alignments that are not perfect when at least one method found a perfect alignment. }\\
 \end{tabular}
 \end{table}
@@ -393,7 +393,7 @@ Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.3
     \centering%
     \includegraphics{figures/fig-dseq-benchmarks.pdf}
     \par
-    \caption{COATi's alignments were closer to the semi-empirical benchmark than other methods. A principal coordinates analysis (PCoA) of the average alignment distance ($d_{seq}$) between alignments generated by different methods.
+    \caption{COATi's alignments were closer to the semi-empirical benchmark dataset than other methods. A principal coordinates analysis (PCoA) of the average alignment distance ($d_{seq}$) between alignments generated by different methods.
 %
     \label{fig:dseq-benchmarks}}
 \end{figure}
@@ -402,7 +402,7 @@ Average Alignment Error ($d_{seq}$) & \cellcolor{bestcolor}0.23\% & 2.65\% & 1.3
 
 \section*{Discussion}
 
-We have developed a statistical alignment program using finite-state transducers called COATi. On empirical data, COATi produced alignments that provided reasonable biological inferences. On semi-empirical benchmarks, COATi was more accurate than the other aligners/alignment strategies that we tested: ClustalΩ's amino-acid model, MACSE's amino-acid aware nucleotide model, MAFFT's DNA model, and PRANK's codon model. Unlike standard codon or amino-acid alignment strategies, COATi supports aligning protein-coding sequences using all three phases of gaps. Consistent with \cite{taylor2004occurrence} and \cite{zhu2022profiling}, our COATi results indicate that only 41\% indels in protein-coding sequences are phase-3 indels between humans and gorillas. Therefore, alignment strategies that only support phase-3 gaps in protein-coding sequences are suboptimally aligning the 59\% of indels that are phase-1 and phase-2.
+We have developed a statistical alignment program using finite-state transducers called COATi. On empirical data, COATi produced alignments that provided reasonable biological inferences. On a semi-empirical benchmark dataset, COATi was more accurate than the other aligners/alignment strategies that we tested: ClustalΩ's amino-acid model, MACSE's amino-acid aware nucleotide model, MAFFT's DNA model, and PRANK's codon model. Unlike standard codon or amino-acid alignment strategies, COATi supports aligning protein-coding sequences using all three phases of gaps. Consistent with \cite{taylor2004occurrence} and \cite{zhu2022profiling}, our COATi results indicate that only 41\% indels in protein-coding sequences are phase-3 indels between humans and gorillas. Therefore, alignment strategies that only support phase-3 gaps in protein-coding sequences are suboptimally aligning the 59\% of indels that are phase-1 and phase-2.
 
 In addition to supporting all three phases of gaps, COATi's advantage over the other aligners was at least partially due to its default parameters fitting the human-gorilla coding sequences better than the other aligners' default settings. Different data sets may show different results. However, because COATi uses a statistical model with biologically meaningful parameters, users can easily optimize COATi by using parameters estimated by previous studies or estimating parameters themselves \citep[e.g.][]{zhu2022profiling}. This contrasts with other aligners that have limited ability to customize parameters and/or use parameters without biological interpretations.
 
@@ -416,17 +416,17 @@ ClustalΩ's amino-acid model also only permits phase-3 gaps and is very sensitiv
 
 We obtained better results when aligning in nucleotide space using both amino-acid aware MACSE and amino-acid agnostic MAFFT. These results indicate that aligning protein-coding sequences in nucleotide space works reasonably well if the sequences come from closely related species, such as humans and gorillas, as it supports all three gap phases and is robust to frameshift artifacts. If the sequences were further apart, we predict that amino-acid agnostic approaches would begin to produce unreasonable alignments. 
 
-We can look at distances between alignments generated by different aligners to understand the diversity of approaches used by our alignment protocols. Aside from the cluster of different COATi methods, we detected no other clusters in our analysis (Supplemental Materials Fig.~S7). Different aligners tended to spread out from one another and in different directions from the benchmark. This indicates that each protocol that we utilized approached alignment inference from a different section of ``aligner space''. While each aligner, except ClustalΩ, performed well on its own gap patterns, MACSE also did well on ClustalΩ and MAFFT gap patterns, and PRANK did well on ClustalΩ patterns. COATi did well on all patterns.
+We can look at distances between alignments generated by different aligners to understand the diversity of approaches used by our alignment protocols. Aside from the cluster of different COATi methods, we detected no other clusters in our analysis (Supplemental Materials Fig.~S7). Different aligners tended to spread out from one another and in different directions from the benchmark dataset. This indicates that each protocol that we utilized approached alignment inference from a different section of ``aligner space''. While each aligner, except ClustalΩ, performed well on its own gap patterns, MACSE also did well on ClustalΩ and MAFFT gap patterns, and PRANK did well on ClustalΩ patterns. COATi did well on all patterns.
 
 This study has focused on COATi's module for estimating pairwise alignments; however, COATi has additional tools, including a module to sample pairwise alignments from alignment space and a module to generate multiple-sequence alignments. We have used the sampling module in a large study \citep{zhu2022profiling} and believe that it is ready to be used in further studies. On the other hand, COATi's multiple-sequence alignment algorithm is still in early development and needs additional work to ensure that it produces high quality alignments. Currently, COATi generates multiple sequence alignments by aligning non-reference sequences against a reference sequence and collapsing insertions following a user-provided guide tree.
 
 The present study has shown that COATi offers a biologically significant improvement over other methods. COATi produces more accurate alignments of protein-coding sequences and better downstream inferences of sequence divergence, selection, and indel processes. While here we have focused on the challenge of aligning pairs of sequences from sister species that may contain genomic artifacts, in other work, we have begun to explore application of COATi to more divergent sequences and evaluate in detail the accuracy of the marginal approximation of the COATi FST \citep{garcia2023dissertation}.
 
-COATi is under active development, and future work will enhance the multiple-sequence aligner to refine the initial alignment according to a scoring function consistent with COATi's FST model. We also plan on extending COATi to support more complex gap models, e.g.\ mixtures of single-nucleotide and triple-nucleotide indel models and weighting gap openings to reflect known selection on indel phases \citep{zhu2022profiling}. We also plan on improving its alignment sampling capabilities, as well as implement new models for aligning long-read sequences of genes against reference genomes. Our goal is to develop COATi into a user-friendly suite of tools that will allow researchers to analyze more data with higher accuracy and facilitate the study of important biological processes that shape genomic data.
+COATi is under active development, and future work will enhance the multiple-sequence aligner to refine the initial alignment according to a scoring function consistent with COATi's FST model. We also plan on extending COATi to support more complex gap models, e.g.\ mixtures of single-nucleotide and triple-nucleotide indel models and weighting gap openings to reflect known selection on indel phases \citep{zhu2022profiling}. We also plan on improving its alignment sampling capabilities, as well as implementing new models for aligning long-read sequences of genes against reference genomes. Our goal is to develop COATi into a user-friendly suite of tools that will allow researchers to analyze more data with higher accuracy and facilitate the study of important biological processes that shape genomic data.
 
 \section*{Availability}
 
-The source code for COATi, along with documentation, is freely available on GitHub: \url{https://github.com/CartwrightLab/coati} and is implemented in C++. COATi is released under an MIT license. Additional information, code, and workflows to replicate the analysis can be found on GitHub: \url{https://github.com/jgarciamesa/coati-testing} and \url{https://github.com/jgarciamesa/alignpair_letter}.
+The source code for COATi, along with documentation, is freely available on GitHub: \nolinkurl{https://github.com/CartwrightLab/coati} (DOI: \nolinkurl{10.5281/zenodo.11499800}) and is implemented in C++. COATi is released under an MIT license. Additional information, code, and workflows to replicate the analysis can be found on GitHub: \nolinkurl{https://github.com/jgarciamesa/coati-testing} (DOI: \nolinkurl{10.5281/zenodo.11515933}) and \nolinkurl{https://github.com/jgarciamesa/alignpair_letter} (DOI: \nolinkurl{10.5281/zenodo.11512411}).
 
 % \section*{Supplementary information}
 
@@ -434,7 +434,7 @@ The source code for COATi, along with documentation, is freely available on GitH
 
 This research was funded by NSF award DBI-1929850.
 %
-The authors would like to thank Profs.\ Marco Mangone, Ted Pavlic, Banu Oskan, Jay Taylor, and Jeremy Wideman for their helpful support on two separate PhD dissertation projects. The authors would also like to thank the associate editor and two reviewers for their helpful comments on earlier versions of this manuscript.
+The authors would like to thank Profs.\ Marco Mangone, Ted Pavlic, Banu Ozkan, Jay Taylor, and Jeremy Wideman for their helpful support on two separate PhD dissertation projects. The authors would also like to thank the associate editor and two reviewers for their helpful comments on earlier versions of this manuscript.
 
 \noindent \textit{Conflict of interest:} none declared.
 
